@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.user">
+
+	<select id="selectTotCntUser" parameterType="dataMap" resultType="int">
+	/* admin.user.selectTotCntUser */
+	<![CDATA[
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_USER A
+	WHERE 1 = 1
+	]]>
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'user_id'">
+		AND A.USER_ID LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'user_nm'">
+		AND A.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+	AND A.USER_STTUS_CODE =#{sch_user_sttus_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_user_se_code != null and sch_user_se_code != ''">
+	AND A.USER_SE_CODE = #{sch_user_se_code, jdbcType=VARCHAR}
+	</if>
+
+	</select>
+
+	<select id="selectPageListUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectPageListUser */
+	SELECT A.USER_NO
+			 , A.USER_NM
+			 , A.USER_ID
+			 , B.USER_NM AS REGISTER_NM
+			 , DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+			 , A.USER_STTUS_CODE
+			 , C.CODE_NM AS USER_STTUS_NM
+		FROM TB_USER A
+		LEFT OUTER JOIN TB_USER B ON A.REGISTER_NO = B.USER_NO
+		LEFT OUTER JOIN TB_CODE C ON A.USER_STTUS_CODE = C.CODE AND C.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+		WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'user_id'">
+		AND A.USER_ID LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'user_nm'">
+		AND A.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+	AND A.USER_STTUS_CODE = #{sch_user_sttus_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_user_se_code != null and sch_user_se_code != ''">
+		AND A.USER_SE_CODE = #{sch_user_se_code, jdbcType=VARCHAR}
+	</if>
+	ORDER BY A.USER_NM ASC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<insert id="insertUser" parameterType="dataMap">
+	/* admin.user.insertUser */
+	INSERT INTO TB_USER (
+		USER_NO
+		, USER_SE_CODE
+		, USER_ID
+		, PASSWORD
+		, USER_NM
+		, USER_STTUS_CODE
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{user_no, jdbcType=INTEGER}
+		, #{user_se_code, jdbcType=VARCHAR}
+		, #{user_id, jdbcType=VARCHAR}
+		, #{password, jdbcType=VARCHAR}
+		, #{user_nm, jdbcType=VARCHAR}
+		, #{user_sttus_code, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=VARCHAR}
+		, NOW()
+	)
+	</insert>
+
+	<select id="selectUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectUser */
+	SELECT A.USER_NO
+			, A.USER_ID
+			, A.USER_NM
+			, A.REGISTER_NO
+			, A.PASSWORD
+			, DATE_FORMAT(A.REGIST_DT, '%Y%m%d') AS REGIST_YMD
+			, A.USER_STTUS_CODE
+			, B.CODE_NM AS USER_STTUS_NM
+			, A.PASSWORD_INITL_YN
+			, H.CODE_NM AS USER_SE_NM
+			, A.USER_SE_CODE
+			, Z.CTTPC_SE_CODE
+			, Y.CODE_NM AS CTTPC_SE_NM
+			, Z.CTTPC
+			, Z.EMAIL
+  	FROM TB_USER A
+	  	LEFT OUTER JOIN TB_CODE B ON A.USER_STTUS_CODE = B.CODE AND B.GROUP_ID = #{user_sttus_group_id, jdbcType=VARCHAR}
+			LEFT OUTER JOIN TB_CODE H ON A.USER_SE_CODE = H.CODE AND H.GROUP_ID = #{user_se_group_id, jdbcType=VARCHAR}
+			LEFT OUTER JOIN TB_USER_ADI Z ON A.USER_NO = Z.USER_NO
+			LEFT OUTER JOIN TB_CODE Y ON Z.CTTPC_SE_CODE = Y.CODE AND Y.GROUP_ID = #{cttpc_se_group_id, jdbcType=VARCHAR}
+	WHERE A.USER_NO = #{user_no, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateUser" parameterType="dataMap">
+	/* admin.user.updateUser */
+	UPDATE TB_USER
+		SET USER_NM = #{user_nm, jdbcType=VARCHAR}
+			, UPDUSR_NO = #{ss_user_no, jdbcType=INTEGER}
+			, USER_STTUS_CODE = #{user_sttus_code, jdbcType=VARCHAR}
+			, USER_SE_CODE = #{user_se_code, jdbcType=VARCHAR}
+		<if test="password != null and password != ''">
+			, PASSWORD = #{password, jdbcType=VARCHAR}
+		</if>
+			, LOGIN_FAILR_CNT = 0
+			, UPDT_DT = NOW()
+		WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateUserInfo" parameterType="dataMap">
+	/* admin.user.updateUserInfo */
+	UPDATE TB_USER_ADI
+	SET
+		USER_NO = USER_NO
+		, CTTPC_SE_CODE = #{cttpc_se_code, jdbcType=VARCHAR}
+		, CTTPC = #{cttpc, jdbcType=VARCHAR}
+		, EMAIL = #{email, jdbcType=VARCHAR}
+	WHERE USER_NO = #{user_no, jdbcType=INTEGER}
+	</update>
+
+	<delete id="deleteUser" parameterType="dataMap">
+	/* admin.user.deleteUser */
+	UPDATE TB_USER
+	SET
+		USER_STTUS_CODE = #{user_sttus_code_stop, jdbcType=VARCHAR}
+		,UPDT_DT = NOW()
+	WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteAuthUser" parameterType="dataMap">
+	/* admin.user.deleteAuthUser */
+	DELETE
+	FROM TB_USER_AUTHOR
+	WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</delete>
+
+	<select id="selectNumberUser" resultType="int">
+	/* admin.user.selectNumberUser */
+	SELECT FN_NEXTVAL('SQ_USER_NO')
+	</select>
+
+	<select id="selectIdExistYn" parameterType="dataMap" resultType="string">
+	/* admin.user.selectIdExistYn */
+	SELECT
+		CASE WHEN COUNT(*) <![CDATA[ > ]]> 0
+			THEN 'Y'
+			ELSE 'N'
+		END EXIST_YN
+	FROM TB_USER A
+	WHERE A.USER_ID = #{user_id, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectListAuthor" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectListAuthor */
+	SELECT A.AUTHOR_ID
+		, A.AUTHOR_NM
+	FROM TB_AUTHOR A
+	ORDER BY AUTHOR_ID
+	</select>
+
+	<insert id="insertAuthUser" parameterType="dataMap">
+	/* admin.user.insertAuthUser */
+	INSERT INTO TB_USER_AUTHOR (
+		  USER_NO
+		, AUTHOR_ID
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		  #{user_no, jdbcType=VARCHAR}
+		, #{author_id, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=INTEGER}
+		, NOW()
+	)
+	</insert>
+
+	<select id="selectListAuthorUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectListAuthorUser */
+	 SELECT A.AUTHOR_ID
+        , A.USER_AUTHOR_SEQ
+        , A.USER_NO
+        , B.AUTHOR_NM
+	FROM TB_USER_AUTHOR A
+	LEFT OUTER JOIN TB_AUTHOR B
+    	ON A.AUTHOR_ID = B.AUTHOR_ID
+    WHERE A.USER_NO = #{user_no, jdbcType=VARCHAR}
+	</select>
+
+
+
+
+	<insert id="insertUserInfo" parameterType="dataMap">
+	/* admin.user.insertUserInfo */
+	INSERT INTO TB_USER_ADI (
+		  USER_NO
+		, CTTPC_SE_CODE
+		, CTTPC
+		, EMAIL
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		  #{user_no, jdbcType=INTEGER}
+		, #{cttpc_se_code, jdbcType=VARCHAR}
+		, #{cttpc, jdbcType=VARCHAR}
+		, #{email, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=INTEGER}
+		, NOW()
+	)
+	</insert>
+
+	<select id="selectUserInfoExistYn" parameterType="dataMap" resultType="string">
+	/* admin.user.selectUserInfoExistYn */
+	SELECT
+		CASE WHEN COUNT(*) <![CDATA[ > ]]> 0
+			THEN 'Y'
+			ELSE 'N'
+		END EXIST_YN
+	FROM TB_USER_ADI A
+	WHERE A.USER_NO = #{user_no, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updatePwd" parameterType="dataMap">
+	/* admin.user.updatePwd */
+	UPDATE TB_USER
+	SET UPDUSR_NO = #{user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+		, PASSWORD = #{modal_password, jdbcType=VARCHAR}
+		<if test="modal_password_initl_yn != null and modal_password_initl_yn != ''">
+			, PASSWORD_INITL_YN = #{modal_password_initl_yn, jdbcType=VARCHAR}
+			</if>
+	WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</update>
+
+<update id="initlUserPassword" parameterType="dataMap" >
+	/* admin.user.initlUserPassword */
+	UPDATE	TB_USER
+	SET 	PASSWORD_INITL_YN = 'Y'
+		,	LOGIN_FAILR_CNT = 0
+	WHERE	USER_NO = #{user_no, jdbcType=VARCHAR}
+	</update>
+</mapper>

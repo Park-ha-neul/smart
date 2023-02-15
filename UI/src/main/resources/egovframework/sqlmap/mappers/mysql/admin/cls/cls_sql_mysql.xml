@@ -1,0 +1,795 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.cls">
+
+	<select id="selectTotCntCls" parameterType="dataMap" resultType="int">
+	/* admin.cls.selectTotCntCls */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_CLASS_BASS_INFO A1
+	WHERE 1 = 1
+	<if test="sch_year != null and sch_year != ''">
+		AND A1.YY = #{sch_year, jdbcType=INTEGER}
+	</if>
+	<!-- 추첨가능한 강좌 조회 -->
+	<if test='type == "A"'>
+		AND A1.DRWT_DT <![CDATA[ < ]]> NOW()
+	</if>
+	</select>
+
+	<select id="selectPageListCls" parameterType="dataMap" resultType="dataMap">
+	/* admin.cls.selectPageListCls */
+	SELECT A1.YY
+		, A1.CLASS_PD_CODE
+		, A3.CODE_NM AS CLASS_PD_NM
+		, DATE_FORMAT(A1.DISP_BEGIN_DT, '%Y.%m.%d %H:%i') AS DISP_BEGIN_DT
+		, DATE_FORMAT(A1.DISP_END_DT, '%Y.%m.%d %H:%i') AS DISP_END_DT
+		, DATE_FORMAT(A1.RCRIT_BEGIN_DT, '%Y.%m.%d %H:%i') AS RCRIT_BEGIN_DT
+		, DATE_FORMAT(A1.RCRIT_END_DT, '%Y.%m.%d %H:%i') AS RCRIT_END_DT
+		, A1.USE_YN
+		, DATE_FORMAT(A1.DRWT_DT, '%Y.%m.%d %H:%i') AS DRWT_DT
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, A1.REGISTER_NO
+		, A2.USER_NM AS REGISTER_NM
+	FROM TB_CLASS_BASS_INFO A1
+	LEFT OUTER JOIN TB_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	LEFT OUTER JOIN TB_CODE A3
+	ON A1.CLASS_PD_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R010330'
+	WHERE 1 = 1
+	<if test="sch_year != null and sch_year != ''">
+		AND A1.YY = #{sch_year, jdbcType=INTEGER}
+	</if>
+	<!-- 추첨가능한 강좌 조회 -->
+	<if test='type == "A"'>
+		AND A1.DRWT_DT <![CDATA[ < ]]> NOW()
+	</if>
+	ORDER BY A1.YY DESC, A1.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+	
+	<update id="updateClsBaseUseN" parameterType="dataMap">
+	/* admin.cls.updateClsBaseUseN */
+	UPDATE TB_CLASS_BASS_INFO
+	SET USE_YN = 'N'
+	</update>
+	
+	<insert id="insertClsInfo" parameterType="dataMap">
+	/* admin.cls.insertClsInfo */
+	INSERT INTO TB_CLASS_BASS_INFO (
+		YY
+		, CLASS_PD_CODE
+		, DISP_BEGIN_DT
+		, DISP_END_DT
+		, RCRIT_BEGIN_DT
+		, RCRIT_END_DT
+		, USE_YN
+		, DRWT_DT
+		, REGIST_DT
+		, REGISTER_NO
+	) VALUES (
+		#{yy, jdbcType=INTEGER}
+		, #{class_pd_code, jdbcType=VARCHAR}
+		, STR_TO_DATE(#{disp_begin_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, STR_TO_DATE(#{disp_end_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, STR_TO_DATE(#{rcrit_begin_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, STR_TO_DATE(#{rcrit_end_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, #{use_yn, jdbcType=VARCHAR}
+		, STR_TO_DATE(#{drwt_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, NOW()
+		, #{ss_user_no, jdbcType=VARCHAR}
+	)
+	</insert>
+	
+	<insert id="insertCls" parameterType="dataMap">
+	<selectKey keyProperty="class_seq" order="BEFORE" resultType="int">
+		SELECT FN_NEXTVAL('SQ_CLASS_SEQ') AS class_seq
+	</selectKey>
+	/* admin.cls.insertCls */
+	INSERT INTO TB_CLASS (
+		CLASS_SEQ
+		 , YY
+		 , CLASS_PD_CODE
+		 , CLASS_TY_CODE
+		 , SJ
+		 , CN
+		 , REFER
+		 , RCRIT_SE_CODE
+		 , RCRIT_NMPR
+		 , WAIT_NMPR
+		 , CLASS_STTUS_CODE
+		 , DRWT_YN
+		 , REGIST_DT
+		 , REGISTER_NO
+	) VALUES (
+		#{class_seq, jdbcType=INTEGER}
+		, #{yy, jdbcType=INTEGER}
+		, #{class_pd_code, jdbcType=VARCHAR}
+		, #{class_ty_code, jdbcType=VARCHAR}
+		, #{sj, jdbcType=VARCHAR}
+		, #{cn, jdbcType=VARCHAR}
+		, #{refer, jdbcType=VARCHAR}
+		, #{rcrit_se_code, jdbcType=VARCHAR}
+		, #{rcrit_nmpr, jdbcType=INTEGER}
+		, #{wait_nmpr, jdbcType=INTEGER}
+		, #{class_sttus_code, jdbcType=VARCHAR}
+		, 'N'
+		, NOW()
+		, #{ss_user_no, jdbcType=VARCHAR}
+	)
+	</insert>
+	
+	<insert id="insertClsDetail" parameterType="dataMap">
+	/* admin.cls.insertClsDetail */
+	INSERT INTO TB_CLASS_DETAIL (
+		CLASS_SEQ
+		, CLASS_WIK_CODE
+		, CLASS_TIME_CODE
+		, CLASS_PLACE_CODE
+		, REGIST_DT
+		, REGISTER_NO
+	) VALUES (
+		#{class_seq, jdbcType=INTEGER}
+		, #{class_wik_code, jdbcType=VARCHAR}
+		, #{class_time_code, jdbcType=VARCHAR}
+		, #{class_place_code, jdbcType=VARCHAR}
+		, NOW()
+		, #{ss_user_no, jdbcType=VARCHAR}
+	)
+	</insert>
+	
+	<resultMap id="resultMap_classInfo" type="dataMap">
+		<result property="YY"										column="YY" />
+		<result property="CLASS_PD_CODE"				column="CLASS_PD_CODE" />
+		<result property="CLASS_PD_NM"					column="CLASS_PD_NM" />
+		<result property="DISP_BEGIN_DT"				column="DISP_BEGIN_DT" />
+		<result property="DISP_END_DT"					column="DISP_END_DT" />
+		<result property="RCRIT_BEGIN_DT"				column="RCRIT_BEGIN_DT" />
+		<result property="RCRIT_END_DT"					column="RCRIT_END_DT" />
+		<result property="USE_YN"								column="USE_YN" />
+		<result property="USE_YN_NM"						column="USE_YN_NM" />
+		<result property="DRWT_DT"							column="DRWT_DT" />
+		<result property="REGIST_DT"						column="REGIST_DT" />
+		<result property="REGIST_YMD"						column="REGIST_YMD" />
+		<result property="REGISTER_NO"					column="REGISTER_NO" />
+		<result property="REGISTER_NM"					column="REGISTER_NM" />
+		<result property="UPDATE_YN"						column="UPDATE_YN" />
+		
+		<collection property="CLASS_LIST" javaType="java.util.ArrayList" column="{yy = YY, class_pd_code = CLASS_PD_CODE}" ofType="dataMap" select="selectListCls" />
+	</resultMap>
+	
+	<select id="selectClsInfo" parameterType="dataMap" resultMap="resultMap_classInfo">
+	/* admin.cls.selectClsInfo */
+	SELECT A1.YY
+		, A1.CLASS_PD_CODE
+		, A3.CODE_NM AS CLASS_PD_NM
+		, DATE_FORMAT(A1.DISP_BEGIN_DT, '%Y.%m.%d %H:%i') AS DISP_BEGIN_DT
+		, DATE_FORMAT(A1.DISP_END_DT, '%Y.%m.%d %H:%i') AS DISP_END_DT
+		, DATE_FORMAT(A1.RCRIT_BEGIN_DT, '%Y.%m.%d %H:%i') AS RCRIT_BEGIN_DT
+		, DATE_FORMAT(A1.RCRIT_END_DT, '%Y.%m.%d %H:%i') AS RCRIT_END_DT
+		, A1.USE_YN
+		, A4.CODE_NM AS USE_YN_NM
+		, DATE_FORMAT(A1.DRWT_DT, '%Y.%m.%d %H:%i') AS DRWT_DT
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, A1.REGISTER_NO
+		, A2.USER_NM AS REGISTER_NM
+		, CASE WHEN NOW() <![CDATA[ < ]]> A1.RCRIT_BEGIN_DT OR (A1.USE_YN = 'N' AND A5.CNT = 0)
+				THEN 'Y'
+				ELSE 'N'
+			END UPDATE_YN
+	FROM TB_CLASS_BASS_INFO A1
+	LEFT OUTER JOIN TB_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	LEFT OUTER JOIN TB_CODE A3
+	ON A1.CLASS_PD_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R010330'
+	LEFT OUTER JOIN TB_CODE A4
+	ON A1.USE_YN = A4.CODE
+		AND A4.GROUP_ID = 'R010020'
+	LEFT OUTER JOIN (
+		SELECT B1.YY
+			, B1.CLASS_PD_CODE
+			, SUM(IF(B3.CLASS_SEQ IS NULL, 0, 1)) AS CNT
+		FROM TB_CLASS_BASS_INFO B1
+		LEFT OUTER JOIN TB_CLASS B2
+		ON B1.YY = B2.YY
+			AND B1.CLASS_PD_CODE = B2.CLASS_PD_CODE
+		LEFT OUTER JOIN TB_ATNLCREQST_HIST B3
+		ON B2.CLASS_SEQ = B3.CLASS_SEQ
+		WHERE B1.YY = #{yy, jdbcType=INTEGER}
+			AND B1.CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+	) A5
+	ON A1.YY = A5.YY
+		AND A1.CLASS_PD_CODE = A5.CLASS_PD_CODE
+	WHERE A1.YY = #{yy, jdbcType=INTEGER}
+		AND A1.CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+	<!-- 추첨가능한 강좌 조회 -->
+	<if test='type == "A"'>
+		AND A1.DRWT_DT <![CDATA[ < ]]> NOW()
+	</if>
+	</select>
+	
+	<resultMap id="resultMap_class" type="dataMap">
+		<result property="CLASS_SEQ"						column="CLASS_SEQ" />
+		<result property="YY"										column="YY" />
+		<result property="CLASS_PD_CODE"				column="CLASS_PD_CODE" />
+		<result property="CLASS_PD_NM"					column="CLASS_PD_NM" />
+		<result property="CLASS_TY_CODE"				column="CLASS_TY_CODE" />
+		<result property="CLASS_TY_NM"					column="CLASS_TY_NM" />
+		<result property="SJ"										column="SJ" />
+		<result property="CN"										column="CN" />
+		<result property="REFER"								column="REFER" />
+		<result property="RCRIT_SE_CODE"				column="RCRIT_SE_CODE" />
+		<result property="RCRIT_SE_NM"					column="RCRIT_SE_NM" />
+		<result property="RCRIT_NMPR"						column="RCRIT_NMPR" />
+		<result property="WAIT_NMPR"						column="WAIT_NMPR" />
+		<result property="CLASS_STTUS_CODE"			column="CLASS_STTUS_CODE" />
+		<result property="CLASS_STTUS_NM"				column="CLASS_STTUS_NM" />
+		<result property="DRWT_YN"							column="DRWT_YN" />
+		<result property="REGIST_DT"						column="REGIST_DT" />
+		<result property="REGIST_YMD"						column="REGIST_YMD" />
+		<result property="REGISTER_NO"					column="REGISTER_NO" />
+		<result property="REGISTER_NM"					column="REGISTER_NM" />
+		<result property="APPLY_CNT"						column="APPLY_CNT" />
+		
+		<collection property="CLASS_DETAIL_LIST" javaType="java.util.ArrayList" column="{class_seq = CLASS_SEQ}" ofType="dataMap" select="selectListClsDetail" />
+	</resultMap>
+	
+	<select id="selectListCls" parameterType="dataMap" resultMap="resultMap_class">
+	/* admin.cls.selectListCls */
+	SELECT A1.CLASS_SEQ
+		 , A1.YY
+		 , A1.CLASS_PD_CODE
+		 , A3.CODE_NM AS CLASS_PD_NM
+		 , A1.CLASS_TY_CODE
+		 , A4.CODE_NM AS CLASS_TY_NM
+		 , A1.SJ
+		 , A1.CN
+		 , A1.REFER
+		 , A1.RCRIT_SE_CODE
+		 , A5.CODE_NM AS RCRIT_SE_NM
+		 , A1.RCRIT_NMPR
+		 , A1.WAIT_NMPR
+		 , A1.CLASS_STTUS_CODE
+		 , A6.CODE_NM AS CLASS_STTUS_NM
+		 , A1.REGIST_DT
+		 , DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		 , A1.REGISTER_NO
+		 , A2.USER_NM AS REGISTER_NM
+		 , A1.DRWT_YN
+		 , IFNULL(A7.APPLY_CNT, 0) AS APPLY_CNT
+	FROM TB_CLASS A1
+	LEFT OUTER JOIN TB_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	LEFT OUTER JOIN TB_CODE A3
+	ON A1.CLASS_PD_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R010330'
+	LEFT OUTER JOIN TB_CODE A4
+	ON A1.CLASS_TY_CODE = A4.CODE
+		AND A4.GROUP_ID = 'R010340'
+	LEFT OUTER JOIN TB_CODE A5
+	ON A1.RCRIT_SE_CODE = A5.CODE
+		AND A5.GROUP_ID = 'R010350'
+	LEFT OUTER JOIN TB_CODE A6
+	ON A1.CLASS_STTUS_CODE = A6.CODE
+		AND A6.GROUP_ID = 'R010390'
+	LEFT OUTER JOIN (
+		SELECT CLASS_SEQ
+			, COUNT(1) AS APPLY_CNT
+		FROM TB_ATNLCREQST_HIST B1
+		INNER JOIN TB_MBER B2
+		ON B1.USER_NO = B2.USER_NO
+		GROUP BY CLASS_SEQ
+	) A7
+	ON A1.CLASS_SEQ = A7.CLASS_SEQ
+	WHERE A1.YY = #{yy, jdbcType=INTEGER}
+		AND A1.CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+	ORDER BY A1.CLASS_SEQ
+	</select>
+	
+	<select id="selectCls" parameterType="dataMap" resultMap="resultMap_class">
+	/* admin.cls.selectCls */
+	SELECT A1.CLASS_SEQ
+		 , A1.YY
+		 , A1.CLASS_PD_CODE
+		 , A3.CODE_NM AS CLASS_PD_NM
+		 , A1.CLASS_TY_CODE
+		 , A4.CODE_NM AS CLASS_TY_NM
+		 , A1.SJ
+		 , A1.CN
+		 , A1.REFER
+		 , A1.RCRIT_SE_CODE
+		 , A5.CODE_NM AS RCRIT_SE_NM
+		 , A1.RCRIT_NMPR
+		 , A1.WAIT_NMPR
+		 , A1.CLASS_STTUS_CODE
+		 , A6.CODE_NM AS CLASS_STTUS_NM
+		 , A1.REGIST_DT
+		 , DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		 , A1.REGISTER_NO
+		 , A2.USER_NM AS REGISTER_NM
+		 , A1.DRWT_YN
+		 , IFNULL(A7.APPLY_CNT, 0) AS APPLY_CNT
+	FROM TB_CLASS A1
+	LEFT OUTER JOIN TB_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	LEFT OUTER JOIN TB_CODE A3
+	ON A1.CLASS_PD_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R010330'
+	LEFT OUTER JOIN TB_CODE A4
+	ON A1.CLASS_TY_CODE = A4.CODE
+		AND A4.GROUP_ID = 'R010340'
+	LEFT OUTER JOIN TB_CODE A5
+	ON A1.RCRIT_SE_CODE = A5.CODE
+		AND A5.GROUP_ID = 'R010350'
+	LEFT OUTER JOIN TB_CODE A6
+	ON A1.CLASS_STTUS_CODE = A6.CODE
+		AND A6.GROUP_ID = 'R010390'
+	LEFT OUTER JOIN (
+		SELECT CLASS_SEQ
+			, COUNT(1) AS APPLY_CNT
+		FROM TB_ATNLCREQST_HIST 
+		GROUP BY CLASS_SEQ
+	) A7
+	ON A1.CLASS_SEQ = A7.CLASS_SEQ
+	WHERE A1.CLASS_SEQ = #{class_seq, jdbcType=INTEGER}
+	</select>
+	
+	<resultMap id="resultMap_classDetail" type="dataMap">
+		<result property="CLASS_SEQ"							column="CLASS_SEQ" />
+		<result property="CLASS_WIK_CODE"					column="CLASS_WIK_CODE" />
+		<result property="CLASS_WIK_NM"						column="CLASS_WIK_NM" />
+		<result property="CLASS_TIME_CODE"				column="CLASS_TIME_CODE" />
+		<result property="CLASS_TIME_NM"					column="CLASS_TIME_NM" />
+		<result property="CLASS_PLACE_CODE"				column="CLASS_PLACE_CODE" />
+		<result property="CLASS_PLACE_NM"					column="CLASS_PLACE_NM" />
+		<result property="REGIST_DT"							column="REGIST_DT" />
+		<result property="REGIST_YMD"							column="REGIST_YMD" />
+		<result property="REGISTER_NO"						column="REGISTER_NO" />
+		<result property="REGISTER_NM"						column="REGISTER_NM" />
+	</resultMap>
+	
+	<select id="selectListClsDetail" parameterType="dataMap" resultMap="resultMap_classDetail">
+	/* admin.cls.selectListClsDetail */
+	SELECT A1.CLASS_SEQ
+		, A1.CLASS_WIK_CODE
+		, A3.CODE_NM AS CLASS_WIK_NM
+		, A1.CLASS_TIME_CODE
+		, A4.CODE_NM AS CLASS_TIME_NM
+		, A1.CLASS_PLACE_CODE
+		, A5.CODE_NM AS CLASS_PLACE_NM
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, A1.REGISTER_NO
+		, A2.USER_NM AS REGISTER_NM
+	FROM TB_CLASS_DETAIL A1
+	LEFT OUTER JOIN TB_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	LEFT OUTER JOIN TB_CODE A3
+	ON A1.CLASS_WIK_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R010360'
+	LEFT OUTER JOIN TB_CODE A4
+	ON A1.CLASS_TIME_CODE = A4.CODE
+		AND A4.GROUP_ID = 'R010370'
+	LEFT OUTER JOIN TB_CODE A5
+	ON A1.CLASS_PLACE_CODE = A5.CODE
+		AND A5.GROUP_ID = 'R010380'
+	WHERE A1.CLASS_SEQ = #{class_seq, jdbcType=INTEGER}
+	</select>
+	
+	<update id="updateClsInfo" parameterType="dataMap">
+	/* admin.cls.updateClsInfo */
+	UPDATE TB_CLASS_BASS_INFO
+	SET DISP_BEGIN_DT = STR_TO_DATE(#{disp_begin_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, DISP_END_DT = STR_TO_DATE(#{disp_end_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, RCRIT_BEGIN_DT = STR_TO_DATE(#{rcrit_begin_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, RCRIT_END_DT = STR_TO_DATE(#{rcrit_end_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, DRWT_DT = STR_TO_DATE(#{drwt_dt, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, USE_YN = #{use_yn, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT =NOW()
+	WHERE YY = #{yy, jdbcType=INTEGER}
+		AND CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="deleteClsInfo" parameterType="dataMap">
+	/* admin.cls.deleteClsInfo */
+		DELETE FROM TB_CLASS_BASS_INFO
+		WHERE YY = #{yy, jdbcType=INTEGER}
+		AND CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+	</delete>
+	
+	<delete id="deleteCls" parameterType="dataMap">
+	/* admin.cls.deleteClsInfo */
+		DELETE FROM TB_CLASS
+		WHERE YY = #{yy, jdbcType=INTEGER}
+		AND CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+	</delete>
+	
+	<delete id="deleteClsDetail" parameterType="dataMap">
+	/* admin.cls.deleteClsDetail */
+		DELETE FROM TB_CLASS_DETAIL
+		WHERE CLASS_SEQ IN (
+			SELECT CLASS_SEQ 
+			FROM TB_CLASS
+			WHERE YY = #{yy, jdbcType=INTEGER}
+				AND CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+		)
+	</delete>
+	
+	<select id="selectListInsertY" parameterType="dataMap" resultType="dataMap">
+	/* admin.cls.selectListInsertY */
+	SELECT B1.YY
+		, B1.CODE AS CLASS_PD_CODE
+		, B1.CODE_NM AS CLASS_PD_NM
+	FROM (
+		SELECT A1.YY
+			, A2.CODE
+			, A2.CODE_NM
+		FROM (
+			SELECT DATE_FORMAT(NOW(), '%Y') AS YY
+			UNION ALL
+			SELECT DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 YEAR), '%Y')
+			UNION ALL
+			SELECT DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 2 YEAR), '%Y')
+		) A1
+		INNER JOIN TB_CODE A2
+		ON A2.GROUP_ID = 'R010330'
+			AND A2.USE_YN = 'Y'
+	) B1
+	LEFT OUTER JOIN TB_CLASS_BASS_INFO B2
+	ON B1.YY = B2.YY
+		AND B1.CODE = B2.CLASS_PD_CODE
+	WHERE B2.CLASS_PD_CODE IS NULL
+	ORDER BY B1.YY, B1.CODE
+	</select>
+	
+	<insert id="insertCopyClsInfo" parameterType="dataMap">
+	/* admin.cls.insertCopyClsInfo */
+	INSERT INTO TB_CLASS_BASS_INFO (
+		YY
+		, CLASS_PD_CODE
+		, DISP_BEGIN_DT
+		, DISP_END_DT
+		, RCRIT_BEGIN_DT
+		, RCRIT_END_DT
+		, USE_YN
+		, DRWT_DT
+		, REGIST_DT
+		, REGISTER_NO
+	)
+	SELECT #{copy_yy, jdbcType=VARCHAR}
+		, #{copy_class_pd_code, jdbcType=VARCHAR}
+		, DISP_BEGIN_DT
+		, DISP_END_DT
+		, RCRIT_BEGIN_DT
+		, RCRIT_END_DT
+		, 'N'
+		, DRWT_DT
+		, NOW()
+		, #{ss_user_no, jdbcType=VARCHAR}
+	FROM TB_CLASS_BASS_INFO
+	WHERE YY = #{yy, jdbcType=VARCHAR}
+		AND CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+	</insert>
+	
+	<insert id="insertCopyCls" parameterType="dataMap">
+	<selectKey keyProperty="new_class_seq" order="BEFORE" resultType="int">
+		SELECT FN_NEXTVAL('SQ_CLASS_SEQ') AS new_class_seq
+	</selectKey>
+	/* admin.cls.insertCopyCls */
+	INSERT INTO TB_CLASS (
+		CLASS_SEQ
+		, YY
+		, CLASS_PD_CODE
+		, CLASS_TY_CODE
+		, SJ
+		, CN
+		, REFER
+		, RCRIT_SE_CODE
+		, RCRIT_NMPR
+		, WAIT_NMPR
+		, CLASS_STTUS_CODE
+		, DRWT_YN
+		, REGIST_DT
+		, REGISTER_NO
+	)
+	SELECT #{new_class_seq, jdbcType=INTEGER}
+		, #{copy_yy, jdbcType=VARCHAR}
+		, #{copy_class_pd_code, jdbcType=VARCHAR}
+		, CLASS_TY_CODE
+		, SJ
+		, CN
+		, REFER
+		, RCRIT_SE_CODE
+		, RCRIT_NMPR
+		, WAIT_NMPR
+		, CLASS_STTUS_CODE
+		, 'N'
+		, NOW()
+		, #{ss_user_no, jdbcType=VARCHAR}
+	FROM TB_CLASS
+	WHERE CLASS_SEQ = #{class_seq, jdbcType=VARCHAR}
+	</insert>
+	
+	<insert id="insertCopyClsDetail" parameterType="dataMap">
+	/* admin.cls.insertCopyClsDetail */
+	INSERT INTO TB_CLASS_DETAIL (
+		CLASS_SEQ
+		, CLASS_WIK_CODE
+		, CLASS_TIME_CODE
+		, CLASS_PLACE_CODE
+		, REGIST_DT
+		, REGISTER_NO
+	)
+	SELECT #{new_class_seq, jdbcType=INTEGER}
+		, CLASS_WIK_CODE
+		, CLASS_TIME_CODE
+		, CLASS_PLACE_CODE
+		, NOW()
+		, #{ss_user_no, jdbcType=VARCHAR}
+	FROM TB_CLASS_DETAIL
+	WHERE CLASS_SEQ = #{class_seq, jdbcType=VARCHAR}
+	</insert>
+	
+	<select id="selectListChartCls" parameterType="dataMap" resultType="dataMap">
+	/* admin.cls.selectListChartCls */
+	SELECT A1.YY
+		, A1.CLASS_PD_CODE
+		, A4.CODE_NM AS CLASS_PD_NM
+		, A2.SJ
+		, A2.CLASS_TY_CODE
+		, A2.CLASS_STTUS_CODE
+		, A2.RCRIT_SE_CODE
+		, A2.RCRIT_NMPR
+		, A2.WAIT_NMPR
+		, A2.CLASS_SEQ
+		, A2.DRWT_YN
+		, IFNULL(A3.CNT, 0) AS CNT
+	FROM TB_CLASS_BASS_INFO A1
+	INNER JOIN TB_CLASS A2
+	ON A1.YY = A2.YY
+		AND A1.CLASS_PD_CODE = A2.CLASS_PD_CODE
+	LEFT OUTER JOIN (
+		SELECT CLASS_SEQ
+			, COUNT(1) AS CNT
+		FROM TB_ATNLCREQST_HIST B1
+		INNER JOIN TB_MBER B2
+		ON B1.USER_NO = B2.USER_NO
+		GROUP BY CLASS_SEQ
+	) A3
+	ON A2.CLASS_SEQ = A3.CLASS_SEQ
+	LEFT OUTER JOIN TB_CODE A4
+	ON A1.CLASS_PD_CODE = A4.CODE
+		AND A4.GROUP_ID = 'R010330'
+	WHERE A1.YY = #{yy, jdbcType=INTEGER}
+		AND A1.CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+		AND A2.RCRIT_SE_CODE = '10'
+	ORDER BY A2.CLASS_TY_CODE
+	</select>
+	
+	<select id="selectListTyCls" parameterType="dataMap" resultType="dataMap">
+	/* admin.cls.selectListTyCls */
+	SELECT A1.YY
+		 , A1.CLASS_PD_CODE
+		 , A1.CLASS_TY_CODE
+		 , A4.CODE_NM AS CLASS_TY_NM
+	FROM TB_CLASS A1
+	LEFT OUTER JOIN TB_CODE A4
+	ON A1.CLASS_TY_CODE = A4.CODE
+		AND A4.GROUP_ID = 'R010340'
+	WHERE A1.YY = #{yy, jdbcType=INTEGER}
+		AND A1.CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+	GROUP BY A1.YY, A1.CLASS_PD_CODE, A1.CLASS_TY_CODE
+	</select>
+	
+	<update id="updateRaffleCls" parameterType="dataMap">
+	<!-- 
+		1. 수강신청이력에서 랜덤으로 순서 정한후 그 순서에 따라 당첨, 대기, 낙첨 상태값으로 변경시킨다.
+		2. 해당 강좌의 동시간대에 이미 당첨,대기로 뽑힌경우는 그사람은 제외시킨다.
+	 -->
+	/* admin.cls.updateRaffleCls */
+	UPDATE TB_ATNLCREQST_HIST T1, (
+		SELECT D1.CLASS_SEQ
+			, D1.REGISTER_NO
+			, IF(D1.RANK <![CDATA[ <= ]]> D1.RCRIT_NMPR, 'Y', 'N') AS RCRIT_YN 
+			, IF(D1.RANK <![CDATA[ > ]]> D1.RCRIT_NMPR AND D1.RANK <![CDATA[ <= ]]> D1.RCRIT_NMPR + D1.WAIT_NMPR, 'Y', 'N') AS WAIT_YN
+		FROM (
+			SELECT C1.*
+				, FLOOR(@ROWNUM:=@ROWNUM+1) AS RANK
+			FROM (
+				SELECT B1.*
+				FROM (
+					SELECT A1.CLASS_SEQ
+						, A1.RCRIT_NMPR
+						, A1.WAIT_NMPR
+						, A2.REGISTER_NO
+						, FLOOR(RAND() * 10000) AS SCORE
+					FROM TB_CLASS A1
+					INNER JOIN TB_ATNLCREQST_HIST A2
+					ON A1.CLASS_SEQ = A2.CLASS_SEQ
+					INNER JOIN TB_MBER A3
+					ON A2.USER_NO = A3.USER_NO
+					WHERE A1.CLASS_SEQ = #{class_seq, jdbcType=INTEGER}
+						AND A2.USER_NO NOT IN (
+							SELECT USER_NO
+							FROM TB_ATNLCREQST_HIST
+							WHERE CLASS_SEQ IN (
+								SELECT P1.CLASS_SEQ
+								FROM (
+									SELECT S1.CLASS_SEQ
+										, S1.YY
+										, S1.SJ
+										, S1.CLASS_PD_CODE
+										, S2.CLASS_TIME_CODE
+										, S2.CLASS_WIK_CODE
+									FROM TB_CLASS S1
+									INNER JOIN TB_CLASS_DETAIL S2
+									ON S1.CLASS_SEQ = S2.CLASS_SEQ
+									WHERE S1.RCRIT_SE_CODE != '20'
+								)P1
+								LEFT OUTER JOIN (
+									SELECT S1.CLASS_SEQ
+										, S1.YY
+										, S1.CLASS_PD_CODE
+										, S2.CLASS_TIME_CODE
+										, S2.CLASS_WIK_CODE
+									FROM TB_CLASS S1
+									INNER JOIN TB_CLASS_DETAIL S2
+									ON S1.CLASS_SEQ = S2.CLASS_SEQ
+									WHERE S1.CLASS_SEQ = #{class_seq, jdbcType=INTEGER}
+								) P2
+								ON P1.YY = P2.YY
+									AND P1.CLASS_PD_CODE = P2.CLASS_PD_CODE
+									AND P1.CLASS_WIK_CODE = P2.CLASS_WIK_CODE
+									AND P1.CLASS_TIME_CODE = P2.CLASS_TIME_CODE
+								WHERE P2.CLASS_SEQ IS NOT NULL
+									AND P1.CLASS_SEQ != #{class_seq, jdbcType=INTEGER}
+								GROUP BY P1.CLASS_SEQ
+							)
+								AND RESULT_CODE IN ('10', '20')
+						)
+				) B1
+				ORDER BY B1.SCORE
+			) C1
+			WHERE (@ROWNUM:=0)=0
+		) D1
+	) T2
+	SET T1.RESULT_CODE = IF(T2.RCRIT_YN = 'Y', '10', IF(T2.WAIT_YN = 'Y', '20', '30'))
+		, T1.UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, T1.UPDT_DT = NOW()
+	WHERE T1.CLASS_SEQ = T2.CLASS_SEQ
+		AND T1.REGISTER_NO = T2.REGISTER_NO
+	</update>
+	
+	<update id="updateAtnlcreqstHist" parameterType="dataMap">
+	/* admin.cls.updateAtnlcreqstHist */
+	UPDATE TB_ATNLCREQST_HIST
+	SET RESULT_CODE = #{result_code, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE CLASS_SEQ = #{class_seq, jdbcType=INTEGER}
+		AND RESULT_CODE IS NULL
+	</update>
+	
+	<update id="updateDrwtYCls" parameterType="dataMap">
+	/* admin.cls.updateDrwtYCls */
+	UPDATE TB_CLASS
+	SET DRWT_YN = 'Y'
+	WHERE CLASS_SEQ = #{class_seq, jdbcType=INTEGER}
+	</update>
+	
+	<select id="selectListRaffleResultCls" parameterType="dataMap" resultType="dataMap">
+	/* admin.cls.selectListRaffleResultCls */
+	SELECT A1.CLASS_SEQ
+		, A3.SJ
+		, A1.RESULT_CODE
+		, A4.CODE_NM AS RESULT_NM
+		, A2.NM
+		, A2.MOBLPHON_NO
+		, A2.IHIDNUM
+	FROM TB_ATNLCREQST_HIST A1
+	INNER JOIN TB_MBER A2
+	ON A1.USER_NO = A2.USER_NO
+	LEFT OUTER JOIN TB_CLASS A3
+	ON A1.CLASS_SEQ = A3.CLASS_SEQ
+	LEFT OUTER JOIN TB_CODE A4
+	ON A1.RESULT_CODE = A4.CODE
+		AND A4.GROUP_ID = 'R010410'
+	WHERE A1.CLASS_SEQ = #{class_seq, jdbcType=INTEGER}
+	<if test='search_type == null or search_type == ""'>
+		AND A1.RESULT_CODE IN ('10', '20')
+	ORDER BY A1.RESULT_CODE, A2.USER_NO
+	</if>
+	<if test='search_type != null and search_type != ""'>
+		<choose>
+			<when test='search_type == "ALL"'>
+	ORDER BY A1.REGIST_DT DESC
+			</when>
+		</choose>
+	</if>
+	
+	</select>
+	
+	<resultMap id="resultMap_raffleClass" type="dataMap">
+		<result property="CLASS_SEQ"						column="CLASS_SEQ" />
+		<result property="YY"										column="YY" />
+		<result property="CLASS_PD_CODE"				column="CLASS_PD_CODE" />
+		<result property="CLASS_PD_NM"					column="CLASS_PD_NM" />
+		<result property="SJ"										column="SJ" />
+		<result property="APPLY_CNT"						column="APPLY_CNT" />
+		
+		<collection property="CLASS_HISTORY_LIST" javaType="java.util.ArrayList" column="{class_seq = CLASS_SEQ}" ofType="dataMap" select="selectListRaffleResultCls" />
+	</resultMap>
+	
+	<select id="selectListResultRaffleCls" parameterType="dataMap" resultMap="resultMap_raffleClass">
+	/* admin.cls.selectListResultRaffleCls */
+	SELECT A1.CLASS_SEQ
+		 , A1.YY
+		 , A1.CLASS_PD_CODE
+		 , A3.CODE_NM AS CLASS_PD_NM
+		 , A1.SJ
+		 , IFNULL(A7.APPLY_CNT, 0) AS APPLY_CNT
+	FROM TB_CLASS A1
+	LEFT OUTER JOIN TB_CODE A3
+	ON A1.CLASS_PD_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R010330'
+	LEFT OUTER JOIN (
+		SELECT CLASS_SEQ
+			, COUNT(1) AS APPLY_CNT
+		FROM TB_ATNLCREQST_HIST B1
+		INNER JOIN TB_MBER B2
+		ON B1.USER_NO = B2.USER_NO
+		GROUP BY CLASS_SEQ
+	) A7
+	ON A1.CLASS_SEQ = A7.CLASS_SEQ
+	WHERE A1.YY = #{yy, jdbcType=INTEGER}
+		AND A1.CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+		AND A1.RCRIT_SE_CODE != '20'
+	ORDER BY A1.CLASS_SEQ
+	</select>
+	
+	<resultMap id="resultMap_raffleClass2" type="dataMap">
+		<result property="CLASS_SEQ"						column="CLASS_SEQ" />
+		<result property="YY"										column="YY" />
+		<result property="CLASS_PD_CODE"				column="CLASS_PD_CODE" />
+		<result property="CLASS_PD_NM"					column="CLASS_PD_NM" />
+		<result property="SJ"										column="SJ" />
+		<result property="APPLY_CNT"						column="APPLY_CNT" />
+		<result property="SEARCH_TYPE"					column="SEARCH_TYPE" />
+		
+		<collection property="CLASS_HISTORY_LIST" javaType="java.util.ArrayList" column="{class_seq = CLASS_SEQ, search_type = SEARCH_TYPE}" ofType="dataMap" select="selectListRaffleResultCls" />
+	</resultMap>
+	
+	<select id="selectListRaffleCls" parameterType="dataMap" resultMap="resultMap_raffleClass2">
+	/* admin.cls.selectListRaffleCls */
+	SELECT A1.CLASS_SEQ
+		 , A1.YY
+		 , A1.CLASS_PD_CODE
+		 , A3.CODE_NM AS CLASS_PD_NM
+		 , A1.SJ
+		 , IFNULL(A7.APPLY_CNT, 0) AS APPLY_CNT
+		 , 'ALL' AS SEARCH_TYPE
+	FROM TB_CLASS A1
+	LEFT OUTER JOIN TB_CODE A3
+	ON A1.CLASS_PD_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R010330'
+	LEFT OUTER JOIN (
+		SELECT CLASS_SEQ
+			, COUNT(1) AS APPLY_CNT
+		FROM TB_ATNLCREQST_HIST B1
+		INNER JOIN TB_MBER B2
+		ON B1.USER_NO = B2.USER_NO
+		GROUP BY CLASS_SEQ
+	) A7
+	ON A1.CLASS_SEQ = A7.CLASS_SEQ
+	WHERE A1.YY = #{yy, jdbcType=INTEGER}
+		AND A1.CLASS_PD_CODE = #{class_pd_code, jdbcType=VARCHAR}
+		AND A1.RCRIT_SE_CODE != '20'
+	ORDER BY A1.CLASS_SEQ
+	</select>
+	
+</mapper>

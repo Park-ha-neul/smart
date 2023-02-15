@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="admin.banners">
+
+	<select id="selectTotCntBanners" parameterType="dataMap" resultType="int">
+	/* admin.banners.selectTotCntBanners */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_BANNER A
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'banner_nm'">
+		AND A.BANNER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'attrb_1'">
+		AND A.ATTRB_1 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'attrb_2'">
+		AND A.ATTRB_2 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'attrb_3'">
+		AND A.ATTRB_3 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'attrb_123'">
+		AND ((A.ATTRB_1 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')) OR (A.ATTRB_2 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%'))
+			OR (A.ATTRB_3 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')))
+			</when>
+		</choose>
+	</if>
+	<if test="sch_sys_code != null and sch_sys_code != ''">
+		AND A.SYS_CODE =#{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_zone_code != null and sch_zone_code != ''">
+		AND A.ZONE_CODE = #{sch_zone_code, jdbcType=VARCHAR}
+	</if>
+	</select>
+
+	<select id="selectPageListBanners" parameterType="dataMap" resultType="dataMap">
+	/* admin.banners.selectPageListBanners */
+	SELECT
+		A.BANNER_SEQ
+		, B.CODE_NM AS SYS_NM
+		, A.ZONE_CODE
+		, C.CODE_NM AS ZONE_NM
+		, A.BANNER_NM
+		, CASE A.DISP_YN WHEN 'Y' THEN '예' ELSE '아니오' END DISP_YN_NM
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	FROM TB_BANNER A
+	LEFT OUTER JOIN TB_CODE B ON A.SYS_CODE = B.CODE AND B.GROUP_ID = #{sys_group_id, jdbcType=VARCHAR}
+	LEFT OUTER JOIN TB_CODE C ON A.ZONE_CODE = C.CODE AND C.GROUP_ID = #{zone_group_id, jdbcType=VARCHAR}
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'banner_nm'">
+		AND A.BANNER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'attrb_1'">
+		AND A.ATTRB_1 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'attrb_2'">
+		AND A.ATTRB_2 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'attrb_3'">
+		AND A.ATTRB_3 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'attrb_123'">
+		AND ((A.ATTRB_1 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')) OR (A.ATTRB_2 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%'))
+			OR (A.ATTRB_3 LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')))
+			</when>
+		</choose>
+	</if>
+	<if test="sch_sys_code != null and sch_sys_code != ''">
+		AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_zone_code != null and sch_zone_code != ''">
+		AND A.ZONE_CODE = #{sch_zone_code, jdbcType=VARCHAR}
+	</if>
+	ORDER BY A.BANNER_SEQ DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<insert id="insertBanners" parameterType="dataMap">
+	/* admin.banners.insertBanners */
+	INSERT INTO TB_BANNER(
+		SYS_CODE
+		, ZONE_CODE
+		, BANNER_NM
+		, WEB_IMAGE_DOC_ID
+		, MOBILE_IMAGE_DOC_ID
+		, DISP_YN
+		, ATTRB_1
+		, ATTRB_2
+		, ATTRB_3
+		, REGISTER_NO
+		, REGIST_DT
+	)VALUES(
+		#{sys_code, jdbcType=VARCHAR}
+		, #{zone_code, jdbcType=VARCHAR}
+		, #{banner_nm, jdbcType=VARCHAR}
+		, #{web_image_doc_id, jdbcType=VARCHAR}
+		, #{mobile_image_doc_id, jdbcType=VARCHAR}
+		, #{disp_yn, jdbcType=VARCHAR}
+		, #{attrb_1, jdbcType=VARCHAR}
+		, #{attrb_2, jdbcType=VARCHAR}
+		, #{attrb_3, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=VARCHAR}
+		, NOW()
+	)
+	</insert>
+
+	<select id="selectBanners" parameterType="dataMap" resultType="dataMap">
+	/* admin.banners.selectBanners */
+	SELECT
+		A.BANNER_SEQ
+		, A.SYS_CODE
+		, A.ZONE_CODE
+		, B.CODE_NM AS SYS_NM
+		, C.CODE_NM AS ZONE_NM
+		, A.BANNER_NM
+		, A.WEB_IMAGE_DOC_ID
+		, A.MOBILE_IMAGE_DOC_ID
+		, A.DISP_YN
+		, CASE A.DISP_YN WHEN 'Y' THEN '예' ELSE '아니오' END DISP_YN_NM
+		, A.ATTRB_1
+		, A.ATTRB_2
+		, A.ATTRB_3
+		, X.USER_NM AS REGISTER_NM
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d %H:%i:%s') AS REGIST_YMD
+		, Y.USER_NM AS UPDUSR_NM
+		, DATE_FORMAT(A.UPDT_DT, '%Y.%m.%d %H:%i:%s') AS UPDT_YMD
+	FROM TB_BANNER A
+		LEFT OUTER JOIN TB_CODE B ON A.SYS_CODE = B.CODE AND B.GROUP_ID = #{sys_group_id, jdbcType=VARCHAR}
+		LEFT OUTER JOIN TB_CODE C ON A.ZONE_CODE = C.CODE AND C.GROUP_ID = #{zone_group_id, jdbcType=VARCHAR}
+		LEFT OUTER JOIN TB_USER X ON A.REGISTER_NO = X.USER_NO
+		LEFT OUTER JOIN TB_USER Y ON A.UPDUSR_NO = Y.USER_NO
+	WHERE
+		A.BANNER_SEQ = #{banner_seq, jdbcType=INTEGER}
+	</select>
+
+	<update id="updateBanners" parameterType="dataMap">
+	/* admin.banners.updateBanners */
+	UPDATE TB_BANNER
+	SET	SYS_CODE = #{sys_code, jdbcType=VARCHAR}
+		, ZONE_CODE = #{zone_code, jdbcType=VARCHAR}
+		, BANNER_NM = #{banner_nm, jdbcType=VARCHAR}
+		, WEB_IMAGE_DOC_ID = #{web_image_doc_id, jdbcType=VARCHAR}
+		, MOBILE_IMAGE_DOC_ID = #{mobile_image_doc_id, jdbcType=VARCHAR}
+		, DISP_YN = #{disp_yn, jdbcType=VARCHAR}
+		, ATTRB_1 = #{attrb_1, jdbcType=VARCHAR}
+		, ATTRB_2 = #{attrb_2, jdbcType=VARCHAR}
+		, ATTRB_3 = #{attrb_3, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE
+		BANNER_SEQ = #{banner_seq, jdbcType=INTEGER}
+	</update>
+
+	<delete id="deleteBanners" parameterType="dataMap">
+	/* admin.banners.deleteBanners */
+	DELETE FROM TB_BANNER
+	WHERE BANNER_SEQ = #{banner_seq, jdbcType=INTEGER}
+	</delete>
+
+	<select id="selectBannersImgs" parameterType="bannersImgFileVo" resultType="bannersImgFileVo">
+	/* admin.banners.selectBannersImgs */
+	SELECT LINK_URL
+		, ATTRB_1
+		, ATTRB_2
+		, ATTRB_3
+		, FILE_ID
+		, DOC_ID
+		, FILE_NM
+		, FILE_SIZE
+		, FILE_EXTSN_NM AS FILE_EXT_NM
+		, FILE_PARTN_COURS AS FILE_RLTV_PATH
+		, FILE_ABSLT_COURS AS FILE_ASLT_PATH
+		, CNTNTS_TY AS CONTENT_TYPE
+		, SORT_ORDR AS SRT_ORD
+		, REGISTER_NO AS RGSTP_ID
+		, REGIST_DT AS RGST_DTTM
+	FROM TB_BANNER_IMAGE
+	WHERE DOC_ID = #{docId, jdbcType=VARCHAR}
+	ORDER BY SORT_ORDR
+	</select>
+
+	<select id="selectBannersImg" parameterType="ntsysFileVO" resultType="ntsysFileVO">
+	/* admin.banners.selectBannersImg */
+	SELECT
+		FILE_ID
+		, DOC_ID
+		, FILE_NM
+		, FILE_SIZE
+		, FILE_EXTSN_NM AS FILE_EXT_NM
+		, FILE_PARTN_COURS AS FILE_RLTV_PATH
+		, FILE_ABSLT_COURS AS FILE_ASLT_PATH
+		, CNTNTS_TY AS CONTENT_TYPE
+		, SORT_ORDR AS SRT_ORD
+		, REGISTER_NO AS RGSTP_ID
+		, REGIST_DT AS RGST_DTTM
+	FROM TB_BANNER_IMAGE
+	WHERE FILE_ID = #{fileId, jdbcType=VARCHAR}
+	ORDER BY SORT_ORDR
+	</select>
+
+	<insert id="insertBannersImg" parameterType="ntsysFileVO">
+	/* admin.banners.insertBannersImg */
+	INSERT INTO TB_BANNER_IMAGE(
+		DOC_ID
+		, FILE_ID
+		, FILE_NM
+		, FILE_EXTSN_NM
+		, FILE_SIZE
+		, FILE_PARTN_COURS
+		, FILE_ABSLT_COURS
+		, CNTNTS_TY
+		, SORT_ORDR
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{docId, jdbcType=VARCHAR}
+		, #{fileId, jdbcType=VARCHAR}
+		, #{fileNm, jdbcType=VARCHAR}
+		, #{fileExtNm, jdbcType=VARCHAR}
+		, #{fileSize, jdbcType=VARCHAR}
+		, #{fileRltvPath, jdbcType=VARCHAR}
+		, #{fileAsltPath, jdbcType=VARCHAR}
+		, #{contentType, jdbcType=VARCHAR}
+		, (SELECT IFNULL(MAX(A1.SORT_ORDR),0)+1 FROM TB_BANNER_IMAGE A1 WHERE A1.DOC_ID = #{docId, jdbcType=VARCHAR})
+		, #{ssUserId, jdbcType=VARCHAR}
+		, NOW()
+	)
+	</insert>
+
+	<update id="updateBannersImg" parameterType="dataMap" >
+	/* admin.banners.updateBannersImg */
+	UPDATE TB_BANNER_IMAGE
+	SET SORT_ORDR = #{sort_ordr, jdbcType=VARCHAR}
+		, LINK_URL = #{link_url, jdbcType=VARCHAR}
+		, ATTRB_1 = #{attrb_1, jdbcType=VARCHAR}
+		, ATTRB_2 = #{attrb_2, jdbcType=VARCHAR}
+		, ATTRB_3 = #{attrb_3, jdbcType=VARCHAR}
+	WHERE FILE_ID = #{file_id, jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteBannersImg" parameterType="dataMap" >
+	/* admin.banners.deleteBannersImg */
+	DELETE FROM TB_BANNER_IMAGE
+	WHERE FILE_ID = #{file_id, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteBannersImgs" parameterType="dataMap" >
+	/* admin.banners.deleteBannersImgs */
+	DELETE FROM TB_BANNER_IMAGE
+	WHERE DOC_ID = #{doc_id, jdbcType=VARCHAR}
+	</delete>
+</mapper>

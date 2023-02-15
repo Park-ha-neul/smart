@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.recsroom">
+
+	<select id="selectRecsroomSeq" resultType="string">
+	/* admin.recsroom.selectRecsroomSeq */
+	SELECT IFNULL(MAX(RECSROOM_SEQ), 0)+1
+	FROM TB_RECSROOM
+	</select>
+
+	<insert id="insertRecsroomMgt" parameterType="dataMap">
+	/* admin.recsroom.insertRecsroomMgt*/
+	INSERT INTO TB_RECSROOM
+	(RECSROOM_SEQ
+	,SJ
+	,CN
+	,DOC_ID
+	,IMAGE_DOC_ID
+	,HIT_CNT
+	,DISP_YN
+	,DELETE_YN
+	,REGISTER_NO
+	,REGIST_DT)
+	VALUES
+	(#{recsroom_seq, jdbcType=VARCHAR}
+	,#{sj, jdbcType=VARCHAR}
+	,#{cn, jdbcType=VARCHAR}
+	,#{doc_id, jdbcType=VARCHAR}
+	,#{image_doc_id, jdbcType=VARCHAR}
+	,0
+	,#{disp_yn, jdbcType=VARCHAR}
+	,'N'
+	,#{ss_user_no}
+	,NOW())
+	</insert>
+
+	<select id="selectPageListRecsroomMgt" parameterType="dataMap" resultType="dataMap">
+	/* admin.recsroom.selectPageListRecsroomMgt */
+	SELECT A.RECSROOM_SEQ
+		,A.SJ
+		,DATE_FORMAT (A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT
+		,B.USER_NM AS REGISTER_NM
+	FROM TB_RECSROOM A
+	LEFT OUTER JOIN TB_USER B ON A.REGISTER_NO = B.USER_NO
+	WHERE 1=1
+		<if test="sch_text != null and sch_text != ''">
+ 			AND A.SJ LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+ 		</if>
+ 	ORDER BY A.RECSROOM_SEQ DESC;
+	</select>
+
+	<select id="selectTotRecsroomMgt" parameterType="dataMap" resultType="int">
+	/* admin.recsroom.selectTotRecsroomMgt */
+	<![CDATA[
+	SELECT COUNT(*) AS TOT_RECSROOM
+ 	FROM TB_RECSROOM A
+ 	WHERE 1=1
+ 	]]>
+ 	<if test="sch_text != null and sch_type != ''" >
+		AND A.SJ LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+	</if>
+	</select>
+
+	<select id="selectRecsroomMgt" parameterType="dataMap" resultType="dataMap">
+	/* admin.recsroom.selectRecsroomMgt */
+	SELECT A.RECSROOM_SEQ
+	,A.SJ
+	,A.CN
+	,A.IMAGE_DOC_ID
+	,A.DOC_ID
+	,A.HIT_CNT
+	,A.DISP_YN
+	,CASE A.DISP_YN WHEN 'Y' THEN '예' ELSE '아니오' END DISP_YN_NM
+	,A.DELETE_YN
+	,CASE A.DELETE_YN WHEN 'Y' THEN '예' ELSE '아니오' END DELETE_YN_NM
+	,A.REGISTER_NO
+	,C.USER_NM AS REGISTER_NM
+	,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d %H:%i:%s') AS REGIST_DT
+	,A.UPDUSR_NO
+	,DATE_FORMAT(A.UPDT_DT, '%Y.%m.%d %H:%i:%s') AS UPDT_DT
+	FROM TB_RECSROOM A
+		LEFT OUTER JOIN TB_USER C ON A.REGISTER_NO = C.USER_NO
+	WHERE
+		A.RECSROOM_SEQ = #{recsroom_seq, jdbcType=INTEGER}
+	</select>
+
+	<delete id="deleteRecsroomMgt" parameterType="dataMap">
+	/* admin.recsroom.deleteRecsroomMgt */
+	DELETE FROM TB_RECSROOM WHERE RECSROOM_SEQ = #{recsroom_seq}
+	</delete>
+
+	<update id="updateRecsroomMgt" parameterType="DataMap">
+	UPDATE TB_RECSROOM
+	SET	SJ = #{sj, jdbcType=VARCHAR}
+		,CN = #{cn, jdbcType=VARCHAR}
+		,DOC_ID = #{doc_id, jdbcType=VARCHAR}
+		,IMAGE_DOC_ID = #{image_doc_id, jdbcType=VARCHAR}
+		,DISP_YN = #{disp_yn, jdbcType=VARCHAR}
+		,DELETE_YN = #{delete_yn, jdbcType=VARCHAR}
+		,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		,UPDT_DT = NOW()
+		WHERE RECSROOM_SEQ = #{recsroom_seq, jdbcType=VARCHAR}
+	</update>
+
+</mapper>

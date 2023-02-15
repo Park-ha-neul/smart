@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.popup">
+
+	<select id="selectTotCntPopupMgt" parameterType="dataMap" resultType="int">
+	/* admin.popup.selectTotCntPopupMgt */
+	SELECT COUNT(1) AS TOT_CNT
+	FROM TB_POPUP A
+	WHERE 1=1
+			<if test="sch_sys_code != null and sch_sys_code != ''">
+		AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+			</if>
+			<if test="sch_popup_se_code != null and sch_popup_se_code != ''">
+		AND A.POPUP_SE_CODE = #{sch_popup_se_code, jdbcType=VARCHAR}
+			</if>
+			<if test="sch_disp_begin_de_tmp != null and sch_disp_begin_de_tmp != ''">
+			<![CDATA[
+		AND SUBSTR(A.DISP_BEGIN_DE, 1, 8) >= #{sch_disp_begin_de_tmp, jdbcType=VARCHAR}
+			]]>
+			</if>
+			<if test="sch_disp_end_de_tmp != null and sch_disp_end_de_tmp != ''">
+			<![CDATA[
+		AND SUBSTR(A.DISP_END_DE, 1, 8) <= #{sch_disp_end_de_tmp, jdbcType=VARCHAR}
+			]]>
+			</if>
+			<if test="sch_text != null and sch_text != ''">
+		AND A.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</if>
+	</select>
+
+	<select id="selectPageListPopupMgt" parameterType="dataMap" resultType="dataMap">
+	/* admin.popup.selectPageListPopupMgt */
+	SELECT A.POPUP_SE_CODE
+		,A.SYS_CODE
+		,(SELECT CODE_NM FROM TB_CODE WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR} AND CODE = A.SYS_CODE) SYS_CODE_NM
+		,A.SJ
+		,A.CN
+		,A.LINK_URL
+		,A.WIDTH_SIZE
+		,A.VRTICL_SIZE
+		,A.CRDNT_X
+		,A.CRDNT_Y
+		,A.IMAGE_DOC_ID
+		,CASE A.USE_YN WHEN 'Y' THEN '예' ELSE '아니오' END USE_YN_NM
+		,CASE A.MOBILE_USE_YN WHEN 'Y' THEN '예' ELSE '아니오' END MOBILE_USE_YN_NM
+		,DATE_FORMAT(STR_TO_DATE(A.DISP_BEGIN_DE, '%Y%m%d%H%i'), '%Y.%m.%d %T') AS DISP_BEGIN_DE
+		,DATE_FORMAT(STR_TO_DATE(A.DISP_END_DE, '%Y%m%d%H%i'), '%Y.%m.%d %T') AS DISP_END_DE
+		,A.POPUP_SEQ
+		,(SELECT CODE_NM FROM TB_CODE WHERE GROUP_ID = #{group_id_popup_se, jdbcType=VARCHAR} AND CODE = A.POPUP_SE_CODE) POPUP_SE_NM
+		,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT
+	FROM TB_POPUP A
+	WHERE 1=1
+		<if test="sch_sys_code != null and sch_sys_code != ''">
+	AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+		</if>
+		<if test="sch_popup_se_code != null and sch_popup_se_code != ''">
+	AND A.POPUP_SE_CODE = #{sch_popup_se_code, jdbcType=VARCHAR}
+		</if>
+		<if test="sch_disp_begin_de_tmp != null and sch_disp_begin_de_tmp != ''">
+		<![CDATA[
+	AND SUBSTR(A.DISP_BEGIN_DE, 1, 8) >= #{sch_disp_begin_de_tmp, jdbcType=VARCHAR}
+		]]>
+		</if>
+		<if test="sch_disp_end_de_tmp != null and sch_disp_end_de_tmp != ''">
+		<![CDATA[
+	AND SUBSTR(A.DISP_END_DE, 1, 8) <= #{sch_disp_end_de_tmp, jdbcType=VARCHAR}
+		]]>
+		</if>
+		<if test="sch_text != null and sch_text != ''">
+	AND A.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+		</if>
+	ORDER BY A.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<resultMap id="popupDetailMap" type="dataMap">
+		<result property="SYS_CODE"			column="SYS_CODE" />
+		<result property="SYS_CODE_NM"		column="SYS_CODE_NM" />
+		<result property="POPUP_SE_CODE"	column="POPUP_SE_CODE" />
+		<result property="SJ"				column="SJ" />
+		<result property="CN"				column="CN" />
+		<result property="LINK_URL"			column="LINK_URL" />
+		<result property="WIDTH_SIZE"		column="WIDTH_SIZE" />
+		<result property="VRTICL_SIZE"		column="VRTICL_SIZE" />
+		<result property="IMAGE_DOC_ID"		column="IMAGE_DOC_ID" />
+		<result property="CRDNT_X"			column="CRDNT_X" />
+		<result property="CRDNT_Y"			column="CRDNT_Y" />
+		<result property="USE_YN"			column="USE_YN" />
+		<result property="USE_YN_NM"		column="USE_YN_NM" />
+		<result property="MOBILE_USE_YN"	column="MOBILE_USE_YN" />
+		<result property="MOBILE_USE_YN_NM"	column="MOBILE_USE_YN_NM" />
+		<result property="DISP_BEGIN_DE"	column="DISP_BEGIN_DE" />
+		<result property="DISP_END_DE"		column="DISP_END_DE" />
+		<result property="POPUP_SE_NM"		column="POPUP_SE_NM" />
+		<result property="REGIST_DT"		column="REGIST_DT" />
+	</resultMap>
+
+	<select id="selectPopupMgt" parameterType="dataMap" resultMap="popupDetailMap">
+	/* admin.popup.selectPopupMgt */
+	SELECT A.POPUP_SE_CODE
+		,A.SYS_CODE
+		,(SELECT CODE_NM FROM TB_CODE WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR} AND CODE = A.SYS_CODE) SYS_CODE_NM
+		,A.SJ
+		,A.CN
+		,A.LINK_URL
+		,A.WIDTH_SIZE
+		,A.VRTICL_SIZE
+		,A.IMAGE_DOC_ID
+		,A.CRDNT_X
+		,A.CRDNT_Y
+		,A.USE_YN
+		,CASE A.USE_YN WHEN 'Y' THEN '예' ELSE '아니오' END USE_YN_NM
+		,A.MOBILE_USE_YN
+		,CASE A.MOBILE_USE_YN WHEN 'Y' THEN '예' ELSE '아니오' END MOBILE_USE_YN_NM
+		,DATE_FORMAT(STR_TO_DATE(A.DISP_BEGIN_DE, '%Y%m%d%H%i'), '%Y.%m.%d %T') AS DISP_BEGIN_DE
+		,DATE_FORMAT(STR_TO_DATE(A.DISP_END_DE, '%Y%m%d%H%i'), '%Y.%m.%d %T') AS DISP_END_DE
+		,(SELECT CODE_NM FROM TB_CODE WHERE GROUP_ID = #{group_id_popup_se, jdbcType=VARCHAR} AND CODE = A.POPUP_SE_CODE) POPUP_SE_NM
+		,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT
+	FROM TB_POPUP A
+	WHERE A.POPUP_SEQ = #{popup_seq, jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deletePopupMgt" parameterType="dataMap">
+	/* admin.popup.deletePopupMgt */
+	<![CDATA[
+	DELETE FROM TB_POPUP WHERE POPUP_SEQ = #{popup_seq, jdbcType=VARCHAR}
+	]]>
+	</delete>
+
+	<insert id="insertPopupMgt" parameterType="dataMap">
+	/* admin.popup.insertPopupMgt */
+	INSERT INTO TB_POPUP (
+		POPUP_SEQ
+		,SYS_CODE
+		,POPUP_SE_CODE
+		,SJ
+		,CN
+		,LINK_URL
+		,WIDTH_SIZE
+		,VRTICL_SIZE
+		,IMAGE_DOC_ID
+		,CRDNT_X
+		,CRDNT_Y
+		,USE_YN
+		,MOBILE_USE_YN
+		,DISP_BEGIN_DE
+		,DISP_END_DE
+		,REGISTER_NO
+		,REGIST_DT
+	) VALUES (
+		(SELECT FN_NEXTVAL('SQ_POPUP_SEQ'))
+		,#{sys_code, jdbcType=VARCHAR}
+		,#{popup_se_code, jdbcType=VARCHAR}
+		,#{sj, jdbcType=VARCHAR}
+		,#{cn, jdbcType=VARCHAR}
+		,#{link_url, jdbcType=VARCHAR}
+		,IF(#{width_size, jdbcType=INTEGER} = '', NULL, #{width_size, jdbcType=INTEGER})
+		,IF(#{vrticl_size, jdbcType=INTEGER} = '', NULL, #{vrticl_size, jdbcType=INTEGER})
+		,#{image_doc_id, jdbcType=VARCHAR}
+		,IF(#{crdnt_x, jdbcType=INTEGER} = '', NULL, #{crdnt_x, jdbcType=INTEGER})
+		,IF(#{crdnt_y, jdbcType=INTEGER} = '', NULL, #{crdnt_y, jdbcType=INTEGER})
+		,#{use_yn, jdbcType=VARCHAR}
+		,#{mobile_use_yn, jdbcType=VARCHAR}
+		,#{disp_begin_de, jdbcType=VARCHAR}
+		,#{disp_end_de, jdbcType=VARCHAR}
+		,#{ss_user_no, jdbcType=VARCHAR}
+		,NOW()
+	)
+	</insert>
+
+	<update id="updatePopupMgt" parameterType="dataMap">
+	/* admin.popup.updatePopupMgt */
+	UPDATE TB_POPUP
+	SET POPUP_SE_CODE = #{popup_se_code, jdbcType=VARCHAR}
+			,SJ = #{sj, jdbcType=VARCHAR}
+			,CN = #{cn, jdbcType=VARCHAR}
+			,LINK_URL = #{link_url, jdbcType=VARCHAR}
+			,WIDTH_SIZE = IF(#{width_size, jdbcType=INTEGER} = '', NULL, #{width_size, jdbcType=INTEGER})
+			,VRTICL_SIZE = IF(#{vrticl_size, jdbcType=INTEGER} = '', NULL, #{vrticl_size, jdbcType=INTEGER})
+			,IMAGE_DOC_ID = #{image_doc_id, jdbcType=VARCHAR}
+			,CRDNT_X = IF(#{crdnt_x, jdbcType=INTEGER} = '', NULL, #{crdnt_x, jdbcType=INTEGER})
+			,CRDNT_Y = IF(#{crdnt_y, jdbcType=INTEGER} = '', NULL, #{crdnt_y, jdbcType=INTEGER})
+			,USE_YN = #{use_yn, jdbcType=VARCHAR}
+			,MOBILE_USE_YN = #{mobile_use_yn, jdbcType=VARCHAR}
+			,DISP_BEGIN_DE = #{disp_begin_de, jdbcType=VARCHAR}
+			,DISP_END_DE = #{disp_end_de, jdbcType=VARCHAR}
+			,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+			,UPDT_DT = NOW()
+	WHERE POPUP_SEQ = #{popup_seq, jdbcType=VARCHAR}
+	</update>
+
+</mapper>

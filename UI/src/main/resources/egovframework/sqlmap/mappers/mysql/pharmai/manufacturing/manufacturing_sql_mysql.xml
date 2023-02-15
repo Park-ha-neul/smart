@@ -1,0 +1,2107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pharm.manufacturing">
+
+	<select id="selectTotCntUser" parameterType="dataMap" resultType="int">
+	/* admin.user.selectTotCntUser */
+	<![CDATA[
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_USER A
+	WHERE 1 = 1
+	]]>
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'user_id'">
+		AND A.USER_ID LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'user_nm'">
+		AND A.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+	AND A.USER_STTUS_CODE =#{sch_user_sttus_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_user_se_code != null and sch_user_se_code != ''">
+	AND A.USER_SE_CODE = #{sch_user_se_code, jdbcType=VARCHAR}
+	</if>
+
+	</select>
+
+	<select id="selectPageListUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectPageListUser */
+	SELECT A.USER_NO
+			 , A.USER_NM
+			 , A.USER_ID
+			 , B.USER_NM AS REGISTER_NM
+			 , DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+			 , A.USER_STTUS_CODE
+			 , C.CODE_NM AS USER_STTUS_NM
+		FROM TB_USER A
+		LEFT OUTER JOIN TB_USER B ON A.REGISTER_NO = B.USER_NO
+		LEFT OUTER JOIN TB_CODE C ON A.USER_STTUS_CODE = C.CODE AND C.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+		WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'user_id'">
+		AND A.USER_ID LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'user_nm'">
+		AND A.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+	AND A.USER_STTUS_CODE = #{sch_user_sttus_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_user_se_code != null and sch_user_se_code != ''">
+		AND A.USER_SE_CODE = #{sch_user_se_code, jdbcType=VARCHAR}
+	</if>
+	ORDER BY A.USER_NM ASC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<insert id="insertUser" parameterType="dataMap">
+	/* admin.user.insertUser */
+	INSERT INTO TB_USER (
+		USER_NO
+		, USER_SE_CODE
+		, USER_ID
+		, PASSWORD
+		, USER_NM
+		, USER_STTUS_CODE
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{user_no, jdbcType=INTEGER}
+		, #{user_se_code, jdbcType=VARCHAR}
+		, #{user_id, jdbcType=VARCHAR}
+		, #{password, jdbcType=VARCHAR}
+		, #{user_nm, jdbcType=VARCHAR}
+		, #{user_sttus_code, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=VARCHAR}
+		, NOW()
+	)
+	</insert>
+
+	<select id="selectUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectUser */
+	SELECT A.USER_NO
+			, A.USER_ID
+			, A.USER_NM
+			, A.REGISTER_NO
+			, A.PASSWORD
+			, DATE_FORMAT(A.REGIST_DT, '%Y%m%d') AS REGIST_YMD
+			, A.USER_STTUS_CODE
+			, B.CODE_NM AS USER_STTUS_NM
+			, A.PASSWORD_INITL_YN
+			, H.CODE_NM AS USER_SE_NM
+			, A.USER_SE_CODE
+			, Z.CTTPC_SE_CODE
+			, Y.CODE_NM AS CTTPC_SE_NM
+			, Z.CTTPC
+			, Z.EMAIL
+  	FROM TB_USER A
+	  	LEFT OUTER JOIN TB_CODE B ON A.USER_STTUS_CODE = B.CODE AND B.GROUP_ID = #{user_sttus_group_id, jdbcType=VARCHAR}
+			LEFT OUTER JOIN TB_CODE H ON A.USER_SE_CODE = H.CODE AND H.GROUP_ID = #{user_se_group_id, jdbcType=VARCHAR}
+			LEFT OUTER JOIN TB_USER_ADI Z ON A.USER_NO = Z.USER_NO
+			LEFT OUTER JOIN TB_CODE Y ON Z.CTTPC_SE_CODE = Y.CODE AND Y.GROUP_ID = #{cttpc_se_group_id, jdbcType=VARCHAR}
+	WHERE A.USER_NO = #{user_no, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateUser" parameterType="dataMap">
+	/* admin.user.updateUser */
+	UPDATE TB_USER
+		SET USER_NM = #{user_nm, jdbcType=VARCHAR}
+			, UPDUSR_NO = #{ss_user_no, jdbcType=INTEGER}
+			, USER_STTUS_CODE = #{user_sttus_code, jdbcType=VARCHAR}
+			, USER_SE_CODE = #{user_se_code, jdbcType=VARCHAR}
+		<if test="password != null and password != ''">
+			, PASSWORD = #{password, jdbcType=VARCHAR}
+		</if>
+			, LOGIN_FAILR_CNT = 0
+			, UPDT_DT = NOW()
+		WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateUserInfo" parameterType="dataMap">
+	/* admin.user.updateUserInfo */
+	UPDATE TB_USER_ADI
+	SET
+		USER_NO = USER_NO
+		, CTTPC_SE_CODE = #{cttpc_se_code, jdbcType=VARCHAR}
+		, CTTPC = #{cttpc, jdbcType=VARCHAR}
+		, EMAIL = #{email, jdbcType=VARCHAR}
+	WHERE USER_NO = #{user_no, jdbcType=INTEGER}
+	</update>
+
+	<delete id="deleteUser" parameterType="dataMap">
+	/* admin.user.deleteUser */
+	UPDATE TB_USER
+	SET
+		USER_STTUS_CODE = #{user_sttus_code_stop, jdbcType=VARCHAR}
+		,UPDT_DT = NOW()
+	WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteAuthUser" parameterType="dataMap">
+	/* admin.user.deleteAuthUser */
+	DELETE
+	FROM TB_USER_AUTHOR
+	WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</delete>
+
+	<select id="selectNumberUser" resultType="int">
+	/* admin.user.selectNumberUser */
+	SELECT FN_NEXTVAL('SQ_USER_NO')
+	</select>
+
+	<select id="selectIdExistYn" parameterType="dataMap" resultType="string">
+	/* admin.user.selectIdExistYn */
+	SELECT
+		CASE WHEN COUNT(*) <![CDATA[ > ]]> 0
+			THEN 'Y'
+			ELSE 'N'
+		END EXIST_YN
+	FROM TB_USER A
+	WHERE A.USER_ID = #{user_id, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectListAuthor" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectListAuthor */
+	SELECT A.AUTHOR_ID
+		, A.AUTHOR_NM
+	FROM TB_AUTHOR A
+	ORDER BY AUTHOR_ID
+	</select>
+
+	<insert id="insertAuthUser" parameterType="dataMap">
+	/* admin.user.insertAuthUser */
+	INSERT INTO TB_USER_AUTHOR (
+		  USER_NO
+		, AUTHOR_ID
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		  #{user_no, jdbcType=VARCHAR}
+		, #{author_id, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=INTEGER}
+		, NOW()
+	)
+	</insert>
+
+	<select id="selectListAuthorUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.user.selectListAuthorUser */
+	 SELECT A.AUTHOR_ID
+        , A.USER_AUTHOR_SEQ
+        , A.USER_NO
+        , B.AUTHOR_NM
+	FROM TB_USER_AUTHOR A
+	LEFT OUTER JOIN TB_AUTHOR B
+    	ON A.AUTHOR_ID = B.AUTHOR_ID
+    WHERE A.USER_NO = #{user_no, jdbcType=VARCHAR}
+	</select>
+
+
+
+
+	<insert id="insertUserInfo" parameterType="dataMap">
+	/* admin.user.insertUserInfo */
+	INSERT INTO TB_USER_ADI (
+		  USER_NO
+		, CTTPC_SE_CODE
+		, CTTPC
+		, EMAIL
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		  #{user_no, jdbcType=INTEGER}
+		, #{cttpc_se_code, jdbcType=VARCHAR}
+		, #{cttpc, jdbcType=VARCHAR}
+		, #{email, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=INTEGER}
+		, NOW()
+	)
+	</insert>
+
+	<select id="selectUserInfoExistYn" parameterType="dataMap" resultType="string">
+	/* admin.user.selectUserInfoExistYn */
+	SELECT
+		CASE WHEN COUNT(*) <![CDATA[ > ]]> 0
+			THEN 'Y'
+			ELSE 'N'
+		END EXIST_YN
+	FROM TB_USER_ADI A
+	WHERE A.USER_NO = #{user_no, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updatePwd" parameterType="dataMap">
+	/* admin.user.updatePwd */
+	UPDATE TB_USER
+	SET UPDUSR_NO = #{user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+		, PASSWORD = #{modal_password, jdbcType=VARCHAR}
+		<if test="modal_password_initl_yn != null and modal_password_initl_yn != ''">
+			, PASSWORD_INITL_YN = #{modal_password_initl_yn, jdbcType=VARCHAR}
+			</if>
+	WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</update>
+
+<update id="initlUserPassword" parameterType="dataMap" >
+	/* admin.user.initlUserPassword */
+	UPDATE	TB_USER
+	SET 	PASSWORD_INITL_YN = 'Y'
+		,	LOGIN_FAILR_CNT = 0
+	WHERE	USER_NO = #{user_no, jdbcType=VARCHAR}
+	</update>
+
+
+
+	<select id="selectNextDataExt" parameterType="dataMap" resultType="String">
+	/* pharm.manufacturing.selectNextDataExt */
+	SELECT
+	<![CDATA[
+		CASE WHEN STEP_CD > LPAD(#{status, jdbcType=VARCHAR}, 2, '0') THEN 'Y'
+		ELSE 'N' END AS NEXT_DATA
+	]]>
+	FROM TB_PRJ_MST
+	WHERE 1=1
+	AND PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	</select>
+
+
+	<!--  dsafsd;flds;fl;sfklsf;safas -->
+	<insert id="insertMenufacStep03" parameterType="dataMap">
+	/* pharm.manufacturing.insertMenufacStep03 */
+	INSERT INTO TB_MANUFACT_STP_03
+	(
+		PRJCT_ID,
+		TYPE,
+		FP_CQAS_STATUS,
+		PHA_COL_1,
+		PHA_COL_2,
+		PHA_COL_3,
+		PHA_COL_4,
+		PHA_COL_5,
+		PHA_COL_6,
+		PHA_COL_7,
+		PHA_COL_8,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	)
+	VALUES (
+		#{prjct_id},
+		#{type},
+		#{fp_cqas_status},
+		#{pha_col_1},
+		#{pha_col_2},
+		#{pha_col_3},
+		#{pha_col_4},
+		#{pha_col_5},
+		#{pha_col_6},
+		#{pha_col_7},
+		#{pha_col_8},
+		'Y',
+		#{ss_user_no},
+		NOW()
+	)
+
+	</insert>
+
+
+	<select id="selectMenufacStep03" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectMenufacStep03 */
+	SELECT
+		STP_03_SEQ,
+		PRJCT_ID,
+		TYPE,
+		FP_CQAS_STATUS,
+		PHA_COL_1,
+		PHA_COL_2,
+		PHA_COL_3,
+		PHA_COL_4,
+		PHA_COL_5,
+		PHA_COL_6,
+		PHA_COL_7,
+		PHA_COL_8
+	FROM TB_MANUFACT_STP_03
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+
+	</select>
+
+	<select id="selectTotCntStep_06" parameterType="dataMap" resultType="int">
+	/* pharm.manufacturing.selectTotCntStep_06 */
+	SELECT
+		COUNT(1) AS TOT_CNT
+	FROM TB_PRJ_MST A LEFT JOIN TB_FORMULA_STP_02 B
+	ON A.PRJCT_ID = B.PRJCT_ID
+	WHERE 1=1
+	AND A.STEP_CD = '06'
+	AND B.USE_YN = 'Y'
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+		    <when test="sch_type == 'sj'">
+	 		AND A.PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type1'">
+	 		AND B.ROUTES_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type2'">
+	 		AND B.DOSAGE_FORM_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	</select>
+	
+<!-- 	바이오의약품 제조 불러오기 -->
+	<select id="bioSelectTotCntStep_06" parameterType="dataMap" resultType="int">
+	/* pharm.manufacturing.bioSelectTotCntStep_06 */
+	SELECT
+		COUNT(1) AS TOT_CNT
+	FROM TB_PRJ_MST A LEFT JOIN TB_FORMULA_STP_02 B
+	ON A.PRJCT_ID = B.PRJCT_ID
+	WHERE 1=1
+	AND A.STEP_CD = '06'
+	AND A.PRJCT_TYPE = 'BF'
+	AND B.USE_YN = 'Y'
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+		    <when test="sch_type == 'sj'">
+	 		AND A.PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type1'">
+	 		AND B.ROUTES_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type2'">
+	 		AND B.DOSAGE_FORM_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	</select>
+
+	<select id="selectPageListChoiceFormulation" parameterType="dataMap" resultType="dataMap">
+<!-- 	합성의약품 제형에서 만든 부분만 불러오기 (합성의약품 제조 시작하기에서) -->
+	/* pharm.manufacturing.selectPageListChoiceFormulation */
+	SELECT
+		A.PRJCT_ID,
+		A.PRJCT_NM,
+		A.UPDT_DT,
+		C.ROUTES_TYPE,
+		C.DOSAGE_FORM_TYPE
+	FROM TB_PRJ_MST A
+		INNER JOIN (
+   			SELECT DISTINCT A_A.PRJCT_ID
+   		FROM TB_FORMULA_STP_07_RESULT A_A
+   		INNER JOIN TB_FORMULA_STP_07_RESULT_IMG A_B ON A_A.PRJCT_ID = A_B.PRJCT_ID
+   		WHERE A_A.USE_YN = 'Y' AND A_B.USE_YN = 'Y'
+		) B
+		INNER JOIN TB_FORMULA_STP_02 C ON A.PRJCT_ID = C.PRJCT_ID
+	WHERE A.PRJCT_ID = B.PRJCT_ID
+	AND A.USE_YN = 'Y'
+	AND C.USE_YN = 'Y'
+	AND A.PRJCT_TYPE = 'F'
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+		    <when test="sch_type == 'sj'">
+	 		AND A.PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type1'">
+	 		AND B.ROUTES_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type2'">
+	 		AND B.DOSAGE_FORM_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<![CDATA[
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	]]>
+	</select>
+	
+	<select id="selectCountChoiceFormulation" parameterType="dataMap" resultType="int">
+<!-- 	합성의약품 제형에서 만든 부분만 불러오기 (합성의약품 제조 시작하기에서) -->
+	/* pharm.manufacturing.selectCountChoiceFormulation */
+	
+	select count(*)
+	from (
+	SELECT
+		A.PRJCT_ID,
+		A.PRJCT_NM,
+		A.UPDT_DT,
+		C.ROUTES_TYPE,
+		C.DOSAGE_FORM_TYPE
+	FROM TB_PRJ_MST A
+		INNER JOIN (
+   			SELECT DISTINCT A_A.PRJCT_ID
+   		FROM TB_FORMULA_STP_07_RESULT A_A
+   		INNER JOIN TB_FORMULA_STP_07_RESULT_IMG A_B ON A_A.PRJCT_ID = A_B.PRJCT_ID
+   		WHERE A_A.USE_YN = 'Y' AND A_B.USE_YN = 'Y'
+		) B
+		INNER JOIN TB_FORMULA_STP_02 C ON A.PRJCT_ID = C.PRJCT_ID
+	WHERE A.PRJCT_ID = B.PRJCT_ID
+	AND A.USE_YN = 'Y'
+	AND C.USE_YN = 'Y'
+	AND A.PRJCT_TYPE = 'F'
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+		    <when test="sch_type == 'sj'">
+	 		AND A.PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type1'">
+	 		AND B.ROUTES_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type2'">
+	 		AND B.DOSAGE_FORM_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	) D
+	</select>
+	
+	<select id="bioSelectPageListChoiceFormulation" parameterType="dataMap" resultType="dataMap">
+<!-- 	합성의약품 제형에서 만든 부분만 불러오기 (합성의약품 제조 시작하기에서) -->
+	/* pharm.manufacturing.bioSelectPageListChoiceFormulation */
+	SELECT
+		A.PRJCT_ID,
+		A.PRJCT_NM,
+		A.UPDT_DT,
+		C.ROUTES_TYPE,
+		C.DOSAGE_FORM_TYPE
+	FROM TB_PRJ_MST A
+		INNER JOIN (
+   			SELECT DISTINCT A_A.PRJCT_ID
+   		FROM TB_FORMULA_STP_07_RESULT A_A
+   		INNER JOIN TB_FORMULA_STP_07_RESULT_IMG A_B ON A_A.PRJCT_ID = A_B.PRJCT_ID
+   		WHERE A_A.USE_YN = 'Y' AND A_B.USE_YN = 'Y'
+		) B
+		INNER JOIN TB_FORMULA_STP_02 C ON A.PRJCT_ID = C.PRJCT_ID
+	WHERE A.PRJCT_ID = B.PRJCT_ID
+	AND A.USE_YN = 'Y'
+	AND C.USE_YN = 'Y'
+	AND A.PRJCT_TYPE = 'BF'
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+		    <when test="sch_type == 'sj'">
+	 		AND A.PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type1'">
+	 		AND B.ROUTES_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type2'">
+	 		AND B.DOSAGE_FORM_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<![CDATA[
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	]]>
+	</select>
+	
+	<select id="bioSelectCountListChoiceFormulation" parameterType="dataMap" resultType="int">
+<!-- 	합성의약품 제형에서 만든 부분만 불러오기 (합성의약품 제조 시작하기에서) -->
+	/* pharm.manufacturing.bioSelectCountListChoiceFormulation */
+	select count(*)
+	from(
+	SELECT
+		A.PRJCT_ID,
+		A.PRJCT_NM,
+		A.UPDT_DT,
+		C.ROUTES_TYPE,
+		C.DOSAGE_FORM_TYPE
+	FROM TB_PRJ_MST A
+		INNER JOIN (
+   			SELECT DISTINCT A_A.PRJCT_ID
+   		FROM TB_FORMULA_STP_07_RESULT A_A
+   		INNER JOIN TB_FORMULA_STP_07_RESULT_IMG A_B ON A_A.PRJCT_ID = A_B.PRJCT_ID
+   		WHERE A_A.USE_YN = 'Y' AND A_B.USE_YN = 'Y'
+		) B
+		INNER JOIN TB_FORMULA_STP_02 C ON A.PRJCT_ID = C.PRJCT_ID
+	WHERE A.PRJCT_ID = B.PRJCT_ID
+	AND A.USE_YN = 'Y'
+	AND C.USE_YN = 'Y'
+	AND A.PRJCT_TYPE = 'BF'
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+		    <when test="sch_type == 'sj'">
+	 		AND A.PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type1'">
+	 		AND B.ROUTES_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'type2'">
+	 		AND B.DOSAGE_FORM_TYPE LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	) D
+	</select>
+
+	<select id="projectCreate" resultType="String">
+	/* pharm.manufacturing.projectCreate  */
+		SELECT FN_CREAT_PJT_ID()
+	</select>
+
+	<insert id="insertPrjMst" parameterType="dataMap">
+	/* pharmai.manufacturing.insertPrjMst  */
+		INSERT INTO TB_PRJ_MST (PRJCT_ID, PRJCT_NM, PRJCT_TYPE, STEP_CD, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{projectName}, 'M', '01', 'Y', #{ss_user_no}, NOW())
+	</insert>
+	
+<!-- 	바이오의약품 제조 프로젝트 생성 시 insert문 -->
+	<insert id="bioInsertPrjMst" parameterType="dataMap">
+	/* pharmai.manufacturing.bioInsertPrjMst  */
+		INSERT INTO TB_PRJ_MST (PRJCT_ID, PRJCT_NM, PRJCT_TYPE, STEP_CD, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{projectName}, 'BM', '01', 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertManufacturStp_01" parameterType="dataMap">
+	/* pharm.manufacturing.insertManufacturStp_01  */
+		INSERT INTO TB_MANUFACT_STP_01 (STP_01_SEQ, PRJCT_ID, ROUTES_TYPE, DOSAGE_FORM_TYPE, MANUFACTURING_METHOD, CHECK_YN, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{stpSeq}, #{prjct_id}, #{routes_type}, #{dosage_form_type}, #{manufacturing_method}, #{check_yn}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertMenufactStep06" parameterType="dataMap">
+	/* pharm.manufacturing.insertMenufactStep06  */
+		INSERT INTO tb_manufact_stp_06 (PRJCT_ID, CHECK_YN, PROCESS, CPP_FACTOR, USE_RANGE_S, USE_RANGE_E, IPT_USE_RANGE_S, IPT_USE_RANGE_E, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{check_yn}, #{process},#{cpp_factor}, #{use_range_s}, #{use_range_e}, #{startRange}, #{endRange}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<select id="selectMenufactStep06" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectMenufactStep06  */
+	SELECT
+		STP_06_SEQ,
+		PRJCT_ID,
+		CHECK_YN,
+		PROCESS,
+		CPP_FACTOR,
+		USE_RANGE_S,
+		USE_RANGE_E,
+		IPT_USE_RANGE_S,
+		IPT_USE_RANGE_E,
+		USE_YN
+	FROM TB_MANUFACT_STP_06
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<update id="projectNmUpdate" parameterType="dataMap">
+	/* pharmai.manufacturing.projectNmUpdate */
+		UPDATE TB_PRJ_MST
+	 	SET PRJCT_NM = #{projectName, jdbcType=VARCHAR},
+	 	UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR},
+	 	UPDT_DT = NOW()
+	 	WHERE PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	</update>
+
+	<select id="selectManufacturingStep1" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.manufacturing.selectManufacturingStep1 */
+	SELECT 	STP_01_SEQ,
+		PRJCT_ID,
+		ROUTES_TYPE,
+		DOSAGE_FORM_TYPE,
+		CHECK_YN,
+		MANUFACTURING_METHOD,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	FROM TB_MANUFACT_STP_01
+	WHERE USE_YN = 'Y'
+	AND PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectTotCntManufacturing" parameterType="dataMap" resultType="int">
+	/* pharm.manufacturing.selectTotCntManufacturing */
+	SELECT
+		COUNT(1) AS TOT_CNT
+	FROM TB_PRJ_MST
+	WHERE 1=1
+	AND PRJCT_TYPE = 'M'
+	AND USE_YN = 'Y'
+	<if test="sch_text != null and sch_text != ''">
+		AND PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_disp_begin_de != null and sch_disp_begin_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') >= #{sch_disp_begin_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_disp_end_de != null and sch_disp_end_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') <= #{sch_disp_end_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	</select>
+
+	<select id="selectPageListManufacturing" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectPageListManufacturing */
+	SELECT
+		PRJCT_ID,
+		PRJCT_NM,
+		PRJCT_TYPE,
+		STEP_CD,
+		UPDT_DT
+		FROM TB_PRJ_MST
+	WHERE PRJCT_TYPE= 'M'
+	AND USE_YN = 'Y'
+	<if test="sch_text != null and sch_text != ''">
+		AND PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_disp_begin_de != null and sch_disp_begin_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') >= #{sch_disp_begin_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_disp_end_de != null and sch_disp_end_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') <= #{sch_disp_end_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	ORDER BY REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="bioSelectPageListManufacturing" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.bioSelectPageListManufacturing */
+	SELECT
+		PRJCT_ID,
+		PRJCT_NM,
+		PRJCT_TYPE,
+		STEP_CD,
+		UPDT_DT
+		FROM TB_PRJ_MST
+	WHERE PRJCT_TYPE= 'BM'
+	AND USE_YN = 'Y'
+	<if test="sch_text != null and sch_text != ''">
+		AND PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_disp_begin_de != null and sch_disp_begin_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') >= #{sch_disp_begin_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_disp_end_de != null and sch_disp_end_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') <= #{sch_disp_end_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	ORDER BY REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateChoicePrjctSeq" parameterType="dataMap">
+	/* pharm.manufacturing.updateChoicePrjctSeq */
+	UPDATE TB_USER
+	SET
+	CUR_PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	WHERE USER_NO = #{userNo, jdbcType=VARCHAR}
+	</update>
+
+	<insert id="insertMenufacStep04" parameterType="dataMap">
+	/* pharm.manufacturing.insertMenufacStep04  */
+		INSERT INTO TB_MANUFACT_STP_04 (STP_04_SEQ, PRJCT_ID, FMEA_UNIT, RISK_STATUS, FMEA_CPPS, FMEA_FAILURE_MODE, FMEA_CQAS_QTTP, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{stpSeq}, #{prjct_id}, #{FMEA_UNIT}, #{risk_status}, #{FMEA_CPPS}, #{FMEA_FAILURE_MODE}, #{FMEA_CQAS_QTTP}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertMenufacStep07" parameterType="dataMap">
+	/* pharm.manufacturing.insertMenufacStep07  */
+		INSERT INTO TB_MANUFACT_STP_07 (PRJCT_ID, CHECK_YN, CQA_NM, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{check_yn}, #{cqa_nm}, 'Y', #{ss_user_no}, NOW())
+
+	</insert>
+
+	<select id="selectMenufacStep07" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectMenufacStep07  */
+		SELECT
+			CQA_SEQ,
+			PRJCT_ID,
+			CHECK_YN,
+			CQA_NM,
+			USE_YN,
+			REGIST_NO,
+			REGIST_DT
+		 FROM TB_MANUFACT_STP_07
+		 WHERE PRJCT_ID = #{prjct_id}
+		 	AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectformulaStep4" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectformulaStep4  */
+		SELECT STP_04_SEQ
+			, PRJCT_ID
+			, FMEA_UNIT
+			, RISK_STATUS
+			, FMEA_CPPS
+			, FMEA_FAILURE_MODE
+			, FMEA_CQAS_QTTP
+			, USE_YN
+		FROM tb_manufact_stp_04
+		WHERE PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+		AND USE_YN = 'Y';
+	</select>
+
+	<select id="selectUnit_Rowspan" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectUnit_Rowspan  */
+		SELECT FMEA_UNIT
+		, COUNT(FMEA_UNIT) AS UNIT_rowspan
+		FROM TB_MANUFACT_STP_04
+		WHERE PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+		 	AND USE_YN = 'Y'
+		GROUP BY FMEA_UNIT
+		ORDER BY STP_04_SEQ
+	</select>
+
+	<update id="updateMstStep" parameterType="dataMap">
+	/* pharm.manufacturing.updateMstStep */
+	UPDATE TB_PRJ_MST SET
+		STEP_CD = #{step_cd}
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<select id="selectPjtMst" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectPjtMst */
+		SELECT
+			PRJCT_ID,
+			PRJCT_NM,
+			PRJCT_TYPE,
+			STEP_CD,
+			USE_YN
+		FROM TB_PRJ_MST
+		WHERE PRJCT_ID = #{prjct_id}
+			AND USE_YN = 'Y'
+	</select>
+
+	<select id="stepChangeFuncManu" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.stepChangeFuncManu */
+		SELECT FN_RESET_MANU_STEP(#{prjct_id}, #{status}, #{ss_user_no}) AS RSLT
+	</select>
+
+	<insert id="insertMenufacStep08" parameterType="dataMap">
+	/* pharm.manufacturing.insertMenufacStep08 */
+	INSERT INTO TB_MANUFACT_STP_08 (PRJCT_ID, TYPE, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, USE_YN, REGIST_NO, REGIST_DT)
+	VALUES (#{prjct_id}, #{type}, #{c1}, #{c2}, #{c3}, #{c4}, #{c5}, #{c6}, #{c7}, #{c8}, #{c9}, #{c10}, #{c11}, #{c12}, #{c13}, 'Y', #{ss_user_no}, NOW() )
+	</insert>
+
+	<select id="selectMenufacStep08" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectMenufacStep08 */
+	SELECT
+		STP_08_SEQ,
+		PRJCT_ID,
+		TYPE,
+		IFNULL(C1, 'NULL') AS C1,
+		IFNULL(C2, 'NULL') AS C2,
+		IFNULL(C3, 'NULL') AS C3,
+		IFNULL(C4, 'NULL') AS C4,
+		IFNULL(C5, 'NULL') AS C5,
+		IFNULL(C6, 'NULL') AS C6,
+		IFNULL(C7, 'NULL') AS C7,
+		IFNULL(C8, 'NULL') AS C8,
+		IFNULL(C9, 'NULL') AS C9 ,
+		IFNULL(C10, 'NULL') AS C10,
+		IFNULL(C11, 'NULL') AS C11,
+		IFNULL(C12, 'NULL') AS C12,
+		IFNULL(C13, 'NULL') AS C13,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	FROM TB_MANUFACT_STP_08
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<insert id="insertMenufacStep02" parameterType="dataMap">
+	/* pharm.manufacturing.insertMenufacStep02 */
+
+	INSERT INTO TB_MANUFACT_STP_02 (PRJCT_ID, CHECK_YN, PROCESS_NAME, INPUT_MATERIAL, PROCESS_PARAM, OUTPUT_MATERIAL, USE_YN, REGIST_NO, REGIST_DT)
+	VALUES (#{prjct_id}, #{check_Yn}, #{process_name}, #{input_material}, #{process_param}, #{output_material}, 'Y', #{ss_user_no}, NOW())
+
+	</insert>
+
+	<select id="selectMenufacStep02" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectMenufacStep02 */
+	SELECT
+		STP_02_SEQ,
+		PRJCT_ID,
+		CHECK_YN,
+		PROCESS_NAME,
+		INPUT_MATERIAL,
+		PROCESS_PARAM,
+		OUTPUT_MATERIAL,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT,
+		UPDUSR_NO,
+		UPDT_DT
+	FROM TB_MANUFACT_STP_02
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectFormulationProp_dtl" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectFormulationProp_dtl */
+	SELECT  B.PKA
+		, B.PKB
+		, B.CA_PERM
+		, B.BOL_POINT
+		, B.LOGP
+		, B.BIO
+		, B.DOSAGE_FORM
+		, B.MOL_WEI
+		, B.LIP_RULE
+	FROM TB_PRJ_MST A
+	LEFT JOIN tb_formula_prop_dtl B ON A.PRJCT_ID = B.PRJCT_ID
+	WHERE B.USE_YN = 'Y'
+	AND B.PRJCT_ID = #{formulation_pjt_id}
+
+	</select>
+
+	<select id="selectFormulationProp" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectFormulationProp */
+	SELECT B.PROP_TYPE
+		, B.PH1
+		, B.PH2
+		, B.PH3
+		, B.PH4
+		, B.PH5
+		, B.PH6
+		, B.PH7
+		, B.PH8
+		, B.PH9
+		, B.PH10
+		, B.USE_YN
+	FROM TB_PRJ_MST A
+	LEFT JOIN TB_FORMULA_PROP B ON A.PRJCT_ID = B.PRJCT_ID
+	WHERE B.USE_YN = 'Y'
+	AND B.PRJCT_ID = #{formulation_pjt_id}
+
+	</select>
+
+	<select id="selectFormulationStp2_dtl" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectFormulationStp2_dtl */
+	SELECT  B.ROUTES_TYPE
+		, B.DOSAGE_FORM_TYPE
+		, B.VOLUME
+	FROM TB_PRJ_MST A
+	LEFT JOIN TB_FORMULA_STP_02 B ON A.PRJCT_ID = B.PRJCT_ID
+	WHERE B.USE_YN = 'Y'
+	AND B.PRJCT_ID = #{formulation_pjt_id}
+
+	</select>
+
+	<select id="selectFormulationStp4_dtl" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectFormulationStp4_dtl */
+	SELECT B.CHECK_YN
+		, B.CQA_NM
+	FROM TB_PRJ_MST A
+	LEFT JOIN TB_FORMULA_STP_04 B ON A.PRJCT_ID = B.PRJCT_ID
+	WHERE B.USE_YN = 'Y'
+	AND B.CHECK_YN = 'Y'
+	AND B.PRJCT_ID = #{formulation_pjt_id}
+
+	</select>
+
+	<insert id="insertCopyFormulationProp" parameterType="dataMap">
+ 	/* pharmai.formulation.insertCopyFormulationProp  */
+		INSERT INTO TB_COPY_FORMULA_PROP (PRJCT_ID, FORMULATION_PJT_ID, PROP_TYPE, PH1, PH2, PH3, PH4, PH5, PH6, PH7, PH8, PH9, PH10, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{formulation_pjt_id}, #{prop_type}, #{ph1}, #{ph2}, #{ph3}, #{ph4}, #{ph5}, #{ph6}, #{ph7}, #{ph8}, #{ph9}, #{ph10}, #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertCopyFormulationProp_dtl" parameterType="dataMap">
+ 	/* pharmai.formulation.insertCopyFormulationProp_dtl  */
+		INSERT INTO TB_COPY_FORMULA_PROP_DTL (PRJCT_ID, FORMULATION_PJT_ID, PKA, PKB, CA_PERM, BOL_POINT, LOGP, BIO, DOSAGE_FORM, MOL_WEI, LIP_RULE, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{formulation_pjt_id}, #{pka}, #{pkb}, #{ca_perm}, #{bol_point}, #{logp}, #{bio}, #{dosage_form}, #{mol_wei}, #{lip_rule}, #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertCopyFormulationStp2_dtl" parameterType="dataMap">
+ 	/* pharmai.formulation.insertCopyFormulationStp2_dtl  */
+		INSERT INTO TB_COPY_FORMULA_STP_02 (PRJCT_ID, FORMULATION_PJT_ID, ROUTES_TYPE, DOSAGE_FORM_TYPE, VOLUME, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{formulation_pjt_id}, #{routes_type}, #{dosage_form_type}, #{volume}, #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertCopyFormulationStp4_dtl" parameterType="dataMap">
+ 	/* pharmai.formulation.insertCopyFormulationStp4_dtl  */
+		INSERT INTO TB_COPY_FORMULA_STP_04 (PRJCT_ID, FORMULATION_PJT_ID, CHECK_YN, CQA_NM, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{formulation_pjt_id}, #{check_yn}, #{cqa_nm}, #{ss_user_no}, NOW())
+	</insert>
+
+	<select id="selectCopy_Prop" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectCopy_Prop */
+	SELECT PRJCT_ID
+		, PROP_TYPE
+		, PH1
+		, PH2
+		, PH3
+		, PH4
+		, PH5
+		, PH6
+		, PH7
+		, PH8
+		, PH9
+		, PH10
+	FROM TB_COPY_FORMULA_PROP
+	WHERE PRJCT_ID = #{prjct_id}
+	</select>
+
+	<select id="selectCopy_Prop_dtl" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectCopy_Prop_dtl */
+	SELECT PRJCT_ID
+		, PKA
+		, PKB
+		, CA_PERM
+		, BOL_POINT
+		, LOGP
+		, BIO
+		, DOSAGE_FORM
+		, MOL_WEI
+		, LIP_RULE
+	FROM TB_COPY_FORMULA_PROP_DTL
+	WHERE PRJCT_ID = #{prjct_id}
+	</select>
+
+	<select id="selectCopy_Stp2_dtl" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectCopy_Stp2_dtl */
+	SELECT PRJCT_ID
+		, ROUTES_TYPE
+		, DOSAGE_FORM_TYPE
+	FROM TB_COPY_FORMULA_STP_02
+	WHERE PRJCT_ID = #{prjct_id}
+	</select>
+
+	<select id="selectCopy_Stp4_cqa" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectCopy_Stp4_cqa */
+	SELECT
+		CQA_NM
+	FROM TB_COPY_FORMULA_STP_04
+	WHERE PRJCT_ID = #{prjct_id}
+	</select>
+
+	<select id="selectStp_01_data" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectStp_01_data */
+	SELECT ROUTES_TYPE
+		,DOSAGE_FORM_TYPE
+		,MANUFACTURING_METHOD
+		,CHECK_YN
+	FROM TB_MANUFACT_STP_01
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+		AND CHECK_YN = 'Y'
+	</select>
+
+	<select id="selectStp_06_data" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectStp_06_data */
+	SELECT CHECK_YN
+		,CPP_FACTOR
+		,IPT_USE_RANGE_S
+		,IPT_USE_RANGE_E
+	FROM TB_MANUFACT_STP_06
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<update id="updatePjt_mst" parameterType="dataMap">
+	/* pharm.manufacturing.updatePjt_mst */
+	UPDATE TB_PRJ_MST
+	SET	UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+
+	<select id="selectFormulProp" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectFormulProp */
+	SELECT
+		PROP_SEQ,
+		PRJCT_ID,
+		FORMULATION_PJT_ID,
+		PROP_TYPE,
+		PH1,
+		PH2,
+		PH3,
+		PH4,
+		PH5,
+		PH6,
+		PH7,
+		PH8,
+		PH9,
+		PH10
+	FROM TB_COPY_FORMULA_PROP
+	WHERE PRJCT_ID = #{prjct_id}
+	</select>
+
+	<select id="selectFormulPropDtl" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectFormulPropDtl */
+	SELECT
+		PROP_DTL_SEQ,
+		PRJCT_ID,
+		FORMULATION_PJT_ID,
+		PKA,
+		PKB,
+		CA_PERM,
+		BOL_POINT,
+		LOGP,
+		BIO,
+		DOSAGE_FORM,
+		MOL_WEI,
+		LIP_RULE
+	FROM TB_COPY_FORMULA_PROP_DTL
+	WHERE PRJCT_ID = #{prjct_id}
+	</select>
+
+	<select id="selectFormulStp02" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectFormulStp02 */
+	SELECT
+		STP_02_SEQ,
+		PRJCT_ID,
+		FORMULATION_PJT_ID,
+		ROUTES_TYPE,
+		DOSAGE_FORM_TYPE,
+		VOLUME
+	FROM tb_copy_formula_stp_02
+	WHERE PRJCT_ID = #{prjct_id}
+	</select>
+
+	<select id="selectFormulStp04" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectFormulStp04 */
+	SELECT
+		CQA_SEQ,
+		PRJCT_ID,
+		FORMULATION_PJT_ID,
+		CHECK_YN,
+		CQA_NM
+	 FROM tb_copy_formula_stp_04
+	WHERE PRJCT_ID = #{prjct_id}
+	AND CHECK_YN = 'Y'
+	</select>
+
+	<select id="selectMenufactStp08Count" resultType="int">
+	/* pharm.manufacturing.selectMenufactStp08Count */
+	SELECT COUNT(*)
+	FROM information_schema.columns
+	WHERE table_name='TB_MANUFACT_STP_08';
+	</select>
+
+
+	<select id="selectManufactStp06List" parameterType="dataMap" resultType="int">
+	/* pharm.manufacturing.selectManufactStp06List */
+		SELECT
+			COUNT(*)
+		FROM TB_MANUFACT_STP_06
+		WHERE PRJCT_ID = #{prjct_id}
+			AND USE_YN = 'Y'
+			AND CHECK_YN = 'Y'
+
+	</select>
+
+	<select id="selectMenufacStep09_pareto" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectMenufacStep09_pareto */
+	SELECT
+		PARETO_PATH_1,
+		PARETO_PATH_2,
+		PARETO_PATH_3,
+		PARETO_PATH_4,
+		PARETO_PATH_5,
+		PARETO_PATH_6,
+		PARETO_PATH_7,
+		PARETO_PATH_8,
+		PARETO_PATH_9,
+		PARETO_PATH_10
+	FROM tb_manufact_stp_09_graph
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectMenufacStep09_contour" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectMenufacStep09_contour */
+	SELECT
+		CONTOUR_PATH_1,
+		CONTOUR_PATH_2,
+		CONTOUR_PATH_3,
+		CONTOUR_PATH_4,
+		CONTOUR_PATH_5,
+		CONTOUR_PATH_6,
+		CONTOUR_PATH_7,
+		CONTOUR_PATH_8,
+		CONTOUR_PATH_9,
+		CONTOUR_PATH_10,
+		CONTOUR_PATH_11,
+		CONTOUR_PATH_12,
+		CONTOUR_PATH_13,
+		CONTOUR_PATH_14,
+		CONTOUR_PATH_15
+	FROM tb_manufact_stp_09_graph
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectMenufacStep09_response" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectMenufacStep09_response */
+	SELECT
+		RESPONSE_PATH_1,
+		RESPONSE_PATH_2,
+		RESPONSE_PATH_3,
+		RESPONSE_PATH_4,
+		RESPONSE_PATH_5,
+		RESPONSE_PATH_6,
+		RESPONSE_PATH_7,
+		RESPONSE_PATH_8,
+		RESPONSE_PATH_9,
+		RESPONSE_PATH_10,
+		RESPONSE_PATH_11,
+		RESPONSE_PATH_12,
+		RESPONSE_PATH_13,
+		RESPONSE_PATH_14,
+		RESPONSE_PATH_15
+	FROM tb_manufact_stp_09_graph
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<insert id="insertMenufacStep09" parameterType="DataMap">
+	/* pharm.manufacturing.insertMenufacStep09 */
+	INSERT INTO TB_MANUFACT_STP_09_GRAPH(
+		PRJCT_ID,
+		PARETO_PATH_1,
+		PARETO_PATH_2,
+		PARETO_PATH_3,
+		PARETO_PATH_4,
+		PARETO_PATH_5,
+		PARETO_PATH_6,
+		PARETO_PATH_7,
+		PARETO_PATH_8,
+		PARETO_PATH_9,
+		PARETO_PATH_10,
+		CONTOUR_PATH_1,
+		CONTOUR_PATH_2,
+		CONTOUR_PATH_3,
+		CONTOUR_PATH_4,
+		CONTOUR_PATH_5,
+		CONTOUR_PATH_6,
+		CONTOUR_PATH_7,
+		CONTOUR_PATH_8,
+		CONTOUR_PATH_9,
+		CONTOUR_PATH_10,
+		CONTOUR_PATH_11,
+		CONTOUR_PATH_12,
+		CONTOUR_PATH_13,
+		CONTOUR_PATH_14,
+		CONTOUR_PATH_15,
+		RESPONSE_PATH_1,
+		RESPONSE_PATH_2,
+		RESPONSE_PATH_3,
+		RESPONSE_PATH_4,
+		RESPONSE_PATH_5,
+		RESPONSE_PATH_6,
+		RESPONSE_PATH_7,
+		RESPONSE_PATH_8,
+		RESPONSE_PATH_9,
+		RESPONSE_PATH_10,
+		RESPONSE_PATH_11,
+		RESPONSE_PATH_12,
+		RESPONSE_PATH_13,
+		RESPONSE_PATH_14,
+		RESPONSE_PATH_15,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+		)
+	VALUES
+		(
+		#{prjct_id},
+		#{pareto_1},
+		#{pareto_2},
+		#{pareto_3},
+		#{pareto_4},
+		#{pareto_5},
+		#{pareto_6},
+		#{pareto_7},
+		#{pareto_8},
+		#{pareto_9},
+		#{pareto_10},
+		#{contour_1},
+		#{contour_2},
+		#{contour_3},
+		#{contour_4},
+		#{contour_5},
+		#{contour_6},
+		#{contour_7},
+		#{contour_8},
+		#{contour_9},
+		#{contour_10},
+		#{contour_11},
+		#{contour_12},
+		#{contour_13},
+		#{contour_14},
+		#{contour_15},
+		#{response_1},
+		#{response_2},
+		#{response_3},
+		#{response_4},
+		#{response_5},
+		#{response_6},
+		#{response_7},
+		#{response_8},
+		#{response_9},
+		#{response_10},
+		#{response_11},
+		#{response_12},
+		#{response_13},
+		#{response_14},
+		#{response_15},
+		'Y',
+		#{ss_user_no},
+		NOW())
+	</insert>
+
+	<select id="selectStp10DesignList" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectStp10DesignList */
+	SELECT
+		DESIGN_SEQ,
+		PRJCT_ID,
+		Y_VARIABLE,
+		EFFECT,
+		IPT_START_Y,
+		IPT_END_Y
+	FROM TB_MANUFACT_STP_10_DESIGN
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	ORDER BY DESIGN_SEQ
+
+	</select>
+
+	<select id="selectStp10DesignImg" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectStp10DesignImg */
+	SELECT
+		DESIGN_IMG_SEQ,
+		PRJCT_ID,
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3
+	FROM TB_MANUFACT_STP_10_DESIGN_IMG
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<insert id="insertStp10Design" parameterType="dataMap">
+	/* pharm.manufacturing.insertStp10Design */
+	INSERT INTO TB_MANUFACT_STP_10_DESIGN (PRJCT_ID, Y_VARIABLE, EFFECT, IPT_START_Y, IPT_END_Y, USE_YN, REGIST_NO, REGIST_DT)
+	VALUES (#{prjct_id}, #{y_variable}, #{effect}, #{ipt_start_y}, #{ipt_end_y}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertStp10DesignImg" parameterType="dataMap">
+	/* pharm.manufacturing.insertStp10DesignImg */
+	INSERT INTO TB_MANUFACT_STP_10_DESIGN_IMG (PRJCT_ID, DESIGN_IMG_PATH_1, DESIGN_IMG_PATH_2, DESIGN_IMG_PATH_3, USE_YN, REGIST_NO, REGIST_DT)
+	VALUES (#{prjct_id}, #{design_img_path_1}, #{design_img_path_2}, #{design_img_path_3}, 'Y', #{ss_user_no}, NOW())
+
+	</insert>
+
+	<insert id="insertStp10result" parameterType="dataMap">
+	/* pharm.manufacturing.insertStp10result */
+	INSERT INTO TB_MANUFACT_STP_10_RESULT(
+		PRJCT_ID,
+		EXCIPENT_NM,
+		EXCIPENT_MIN,
+		EXCIPENT_MAX,
+		CONTROL_SPACE_MIN,
+		CONTROL_SPACE_MAX,
+		DESIGN_SPACE_MIN,
+		DESIGN_SPACE_MAX,
+		KNOWLEDGE_SPACE_MIN,
+		KNOWLEDGE_SPACE_MAX,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) VALUES (
+		#{prjct_id},
+		#{excipent_nm},
+		#{excipent_min},
+		#{excipent_max},
+		#{control_space_min},
+		#{control_space_max},
+		#{design_space_min},
+		#{design_space_max},
+		#{knowledge_space_min},
+		#{knowledge_space_max},
+		'Y',
+		#{ss_user_no},
+		NOW()
+	)
+
+	</insert>
+
+	<insert id="insertStp10ResultImg" parameterType="dataMap">
+	/* pharm.manufacturing.insertStp10ResultImg */
+	INSERT INTO TB_MANUFACT_STP_10_RESULT_IMG(
+		PRJCT_ID,
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3,
+		CONTOUR_IMG_PATH_1,
+		CONTOUR_IMG_PATH_2,
+		CONTOUR_IMG_PATH_3,
+		CONTOUR_IMG_PATH_4,
+		CONTOUR_IMG_PATH_5,
+		CONTOUR_IMG_PATH_6,
+		CONTOUR_IMG_PATH_7,
+		CONTOUR_IMG_PATH_8,
+		CONTOUR_IMG_PATH_9,
+		CONTOUR_IMG_PATH_10,
+		CONTOUR_IMG_PATH_11,
+		CONTOUR_IMG_PATH_12,
+		CONTOUR_IMG_PATH_13,
+		CONTOUR_IMG_PATH_14,
+		CONTOUR_IMG_PATH_15,
+		CONTOUR_IMG_PATH_16,
+		CONTOUR_IMG_PATH_17,
+		CONTOUR_IMG_PATH_18,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) VALUES (
+		#{prjct_id},
+		#{design_img_path_1},
+		#{design_img_path_2},
+		#{design_img_path_3},
+		#{contour_img_path_1},
+		#{contour_img_path_2},
+		#{contour_img_path_3},
+		#{contour_img_path_4},
+		#{contour_img_path_5},
+		#{contour_img_path_6},
+		#{contour_img_path_7},
+		#{contour_img_path_8},
+		#{contour_img_path_9},
+		#{contour_img_path_10},
+		#{contour_img_path_11},
+		#{contour_img_path_12},
+		#{contour_img_path_13},
+		#{contour_img_path_14},
+		#{contour_img_path_15},
+		#{contour_img_path_16},
+		#{contour_img_path_17},
+		#{contour_img_path_18},
+		'Y',
+		#{ss_user_no},
+		NOW()
+	)
+	</insert>
+
+	<update id="updateManuStp10Design" parameterType="dataMap">
+	/* pharm.manufacturing.updateManuStp10Design */
+	UPDATE TB_MANUFACT_STP_10_DESIGN SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<update id="updateManuStp10DesignImg" parameterType="dataMap">
+	/* pharm.manufacturing.updateManuStp10DesignImg */
+	UPDATE TB_MANUFACT_STP_10_DESIGN_IMG SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<update id="updateManuStp10Result" parameterType="dataMap">
+	/* pharm.manufacturing.updateManuStp10Result */
+	UPDATE TB_MANUFACT_STP_10_RESULT SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<update id="updateManuStp10ResultImg" parameterType="dataMap">
+	/* pharm.manufacturing.updateManuStp10ResultImg */
+	UPDATE TB_MANUFACT_STP_10_RESULT_IMG SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<select id="selectStp10result" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectStp10result */
+
+	SELECT
+		EXCIPENT_NM,
+		EXCIPENT_MIN,
+		EXCIPENT_MAX,
+		CONTROL_SPACE_MIN,
+		CONTROL_SPACE_MAX,
+		DESIGN_SPACE_MIN,
+		DESIGN_SPACE_MAX,
+		KNOWLEDGE_SPACE_MIN,
+		KNOWLEDGE_SPACE_MAX
+	FROM TB_MANUFACT_STP_10_RESULT
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+
+	<select id="selectStp10ResultImg" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectStp10ResultImg */
+	SELECT
+		PRJCT_ID,
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3,
+		CONTOUR_IMG_PATH_1,
+		CONTOUR_IMG_PATH_2,
+		CONTOUR_IMG_PATH_3,
+		CONTOUR_IMG_PATH_4,
+		CONTOUR_IMG_PATH_5,
+		CONTOUR_IMG_PATH_6,
+		CONTOUR_IMG_PATH_7,
+		CONTOUR_IMG_PATH_8,
+		CONTOUR_IMG_PATH_9,
+		CONTOUR_IMG_PATH_10,
+		CONTOUR_IMG_PATH_11,
+		CONTOUR_IMG_PATH_12,
+		CONTOUR_IMG_PATH_13,
+		CONTOUR_IMG_PATH_14,
+		CONTOUR_IMG_PATH_15,
+		CONTOUR_IMG_PATH_16,
+		CONTOUR_IMG_PATH_17,
+		CONTOUR_IMG_PATH_18
+	FROM TB_MANUFACT_STP_10_RESULT_IMG
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<insert id="insertUnit_Img" parameterType="DataMap">
+	/* pharm.manufacturing.insertUnit_Img */
+	INSERT INTO TB_MANUFACT_STP_05(
+		PRJCT_ID,
+		CHECK_YN,
+		UNIT,
+		CPP_TYPE,
+		RISK,
+		UNIT_PNG,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	)VALUES
+	(
+	#{prjct_id},
+	#{checkYn},
+	#{unit},
+	#{cpp_type},
+	#{risk_dtl},
+	#{img_src},
+	'Y',
+	#{ss_user_no},
+	NOW()
+	)
+
+	</insert>
+
+	<select id="selectStp05List" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectStp05List */
+	SELECT
+		PRJCT_ID,
+		CHECK_YN,
+		UNIT,
+		CPP_TYPE,
+		RISK,
+		UNIT_PNG
+	FROM TB_MANUFACT_STP_05
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectDistinctUnitList" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectDistinctUnitList */
+		SELECT
+			DISTINCT(UNIT) AS UNIT,
+			UNIT_PNG,
+			CHECK_YN
+		FROM TB_MANUFACT_STP_05
+		WHERE PRJCT_ID = #{prjct_id}
+			AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectDistinctCppList" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectDistinctCppList */
+	SELECT
+		DISTINCT(CPP_TYPE) AS CPP_TYPE,
+		UNIT
+	FROM TB_MANUFACT_STP_05
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+
+	<select id="selectMenufactStep06List" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectMenufactStep06List  */
+	SELECT
+		STP_06_SEQ,
+		PRJCT_ID,
+		CHECK_YN,
+		PROCESS,
+		CPP_FACTOR,
+		USE_RANGE_S,
+		USE_RANGE_E,
+		IPT_USE_RANGE_S,
+		IPT_USE_RANGE_E,
+		USE_YN
+	FROM TB_MANUFACT_STP_06
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+		AND CHECK_YN = 'Y'
+	</select>
+
+	<select id="selectCqaValList" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectCqaValList  */
+	SELECT
+		IFNULL(GROUP_CONCAT(CASE WHEN PHA_COL_1 = 'H' THEN '높음' WHEN PHA_COL_1 = 'M' THEN '중간' WHEN PHA_COL_1 = 'L' THEN '낮음' ELSE PHA_COL_1 END), '') AS PHA_COL_1,
+		IFNULL(GROUP_CONCAT(CASE WHEN PHA_COL_2 = 'H' THEN '높음' WHEN PHA_COL_2 = 'M' THEN '중간' WHEN PHA_COL_2 = 'L' THEN '낮음' ELSE PHA_COL_2 END), '') AS PHA_COL_2,
+		IFNULL(GROUP_CONCAT(CASE WHEN PHA_COL_3 = 'H' THEN '높음' WHEN PHA_COL_3 = 'M' THEN '중간' WHEN PHA_COL_3 = 'L' THEN '낮음' ELSE PHA_COL_3 END), '') AS PHA_COL_3,
+		IFNULL(GROUP_CONCAT(CASE WHEN PHA_COL_4 = 'H' THEN '높음' WHEN PHA_COL_4 = 'M' THEN '중간' WHEN PHA_COL_4 = 'L' THEN '낮음' ELSE PHA_COL_4 END), '') AS PHA_COL_4,
+		IFNULL(GROUP_CONCAT(CASE WHEN PHA_COL_5 = 'H' THEN '높음' WHEN PHA_COL_5 = 'M' THEN '중간' WHEN PHA_COL_5 = 'L' THEN '낮음' ELSE PHA_COL_5 END), '') AS PHA_COL_5,
+		IFNULL(GROUP_CONCAT(CASE WHEN PHA_COL_6 = 'H' THEN '높음' WHEN PHA_COL_6 = 'M' THEN '중간' WHEN PHA_COL_6 = 'L' THEN '낮음' ELSE PHA_COL_6 END), '') AS PHA_COL_6,
+		IFNULL(GROUP_CONCAT(CASE WHEN PHA_COL_7 = 'H' THEN '높음' WHEN PHA_COL_7 = 'M' THEN '중간' WHEN PHA_COL_7 = 'L' THEN '낮음' ELSE PHA_COL_7 END), '') AS PHA_COL_7,
+		IFNULL(GROUP_CONCAT(CASE WHEN PHA_COL_8 = 'H' THEN '높음' WHEN PHA_COL_8 = 'M' THEN '중간' WHEN PHA_COL_8 = 'L' THEN '낮음' ELSE PHA_COL_8 END), '') AS PHA_COL_8
+	FROM TB_MANUFACT_STP_03
+	WHERE PRJCT_ID = #{prjct_id}
+	 AND USE_YN = 'Y'
+
+	</select>
+
+
+	<select id="selectDistinctUnitStp05" parameterType="dataMap" resultType="dataMap">
+	/* pharm.manufacturing.selectDistinctUnitStp05  */
+	 SELECT
+		DISTINCT(UNIT) AS PROCESS_NAME
+	 FROM TB_MANUFACT_STP_05
+ 	 WHERE PRJCT_ID = #{prjct_id}
+	  AND USE_YN = 'Y' AND CHECK_YN = 'Y'
+	</select>
+
+	<!-- 프로젝트 복사 시작  -->
+	<update id="manuCopyPrjctMst" parameterType="dataMap">
+	/* pharmai.manufacturing.copyPrjctMst */
+	INSERT INTO TB_PRJ_MST(
+	PRJCT_ID
+	, PRJCT_NM
+	, PRJCT_TYPE
+	, STEP_CD
+	, USE_YN
+	, REGIST_NO
+	, REGIST_DT
+	)
+	SELECT
+	 #{new_prjct_id} AS PRJCT_ID
+	, CONCAT(PRJCT_NM , '_Copy') AS PRJCT_NM
+	, PRJCT_TYPE
+	, '03'
+	, 'Y'
+	, #{ss_user_no}
+	, NOW()
+	FROM TB_PRJ_MST
+	WHERE PRJCT_ID = #{c_prjct_id}
+	AND USE_YN = 'Y'
+	</update>
+
+	<update id="manuStp01Copy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp01Copy */
+	INSERT INTO tb_manufact_stp_01 (
+		PRJCT_ID,
+		ROUTES_TYPE,
+		DOSAGE_FORM_TYPE,
+		CHECK_YN,
+		MANUFACTURING_METHOD,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	)
+	SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		ROUTES_TYPE,
+		DOSAGE_FORM_TYPE,
+		CHECK_YN,
+		MANUFACTURING_METHOD,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_01
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+
+	</update>
+
+	<update id="manuStp02Copy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp02Copy */
+	INSERT INTO tb_manufact_stp_02 (
+		PRJCT_ID,
+		CHECK_YN,
+		PROCESS_NAME,
+		INPUT_MATERIAL,
+		PROCESS_PARAM,
+		OUTPUT_MATERIAL,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	)
+	SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		CHECK_YN,
+		PROCESS_NAME,
+		INPUT_MATERIAL,
+		PROCESS_PARAM,
+		OUTPUT_MATERIAL,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	 FROM tb_manufact_stp_02
+	 WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+	</update>
+
+	<update id="manuStp03Copy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp03Copy */
+	INSERT INTO tb_manufact_stp_03 (
+		PRJCT_ID,
+		TYPE,
+		FP_CQAS_STATUS,
+		PHA_COL_1,
+		PHA_COL_2,
+		PHA_COL_3,
+		PHA_COL_4,
+		PHA_COL_5,
+		PHA_COL_6,
+		PHA_COL_7,
+		PHA_COL_8,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		TYPE,
+		FP_CQAS_STATUS,
+		PHA_COL_1,
+		PHA_COL_2,
+		PHA_COL_3,
+		PHA_COL_4,
+		PHA_COL_5,
+		PHA_COL_6,
+		PHA_COL_7,
+		PHA_COL_8,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_03
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+
+
+	</update>
+
+	<update id="manuStp04Copy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp04Copy */
+	INSERT INTO tb_manufact_stp_04 (
+		PRJCT_ID,
+		FMEA_UNIT,
+		RISK_STATUS,
+		FMEA_CPPS,
+		FMEA_FAILURE_MODE,
+		FMEA_CQAS_QTTP,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		FMEA_UNIT,
+		RISK_STATUS,
+		FMEA_CPPS,
+		FMEA_FAILURE_MODE,
+		FMEA_CQAS_QTTP,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_04
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+
+	</update>
+
+	<update id="manuStp05Copy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp05Copy */
+	INSERT INTO tb_manufact_stp_05 (
+		PRJCT_ID,
+		CHECK_YN,
+		UNIT,
+		CPP_TYPE,
+		RISK,
+		UNIT_PNG,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		CHECK_YN,
+		UNIT,
+		CPP_TYPE,
+		RISK,
+		UNIT_PNG,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_05
+	WHERE PRJCT_ID = #{c_prjct_id}
+			AND USE_YN = 'Y'
+
+	</update>
+
+	<update id="manuStp06Copy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp06Copy */
+	INSERT INTO tb_manufact_stp_06 (
+		PRJCT_ID,
+		CHECK_YNM
+		PROCESS,
+		CPP_FACTOR,
+		USE_RANGE_S,
+		USE_RANGE_E,
+		IPT_USE_RANGE_S,
+		IPT_USE_RANGE_E,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		CHECK_YNM
+		PROCESS,
+		CPP_FACTOR,
+		USE_RANGE_S,
+		USE_RANGE_E,
+		IPT_USE_RANGE_S,
+		IPT_USE_RANGE_E,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_06
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+	</update>
+
+	<update id="manuStp07Copy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp07Copy */
+	INSERT INTO tb_manufact_stp_07 (
+		PRJCT_ID,
+		CHECK_YN,
+		CQA_NM,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		CHECK_YN,
+		CQA_NM,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_07
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+	</update>
+
+	<update id="manuStp08Copy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp08Copy */
+	INSERT INTO tb_manufact_stp_08 (
+		PRJCT_ID,
+		SORT_ORDR,
+		TYPE,
+		C1,
+		C2,
+		C3,
+		C4,
+		C5,
+		C6,
+		C7,
+		C8,
+		C9,
+		C10,
+		C11,
+		C12,
+		C13,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		SORT_ORDR,
+		TYPE,
+		C1,
+		C2,
+		C3,
+		C4,
+		C5,
+		C6,
+		C7,
+		C8,
+		C9,
+		C10,
+		C11,
+		C12,
+		C13,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_08
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+	</update>
+
+	<update id="manuStp09Copy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp09Copy */
+	INSERT INTO tb_manufact_stp_09_graph (
+		PRJCT_ID,
+		PARETO_PATH_1,
+		PARETO_PATH_2,
+		PARETO_PATH_3,
+		PARETO_PATH_4,
+		PARETO_PATH_5,
+		PARETO_PATH_6,
+		PARETO_PATH_7,
+		PARETO_PATH_8,
+		PARETO_PATH_9,
+		PARETO_PATH_10,
+		CONTOUR_PATH_1,
+		CONTOUR_PATH_2,
+		CONTOUR_PATH_3,
+		CONTOUR_PATH_4,
+		CONTOUR_PATH_5,
+		CONTOUR_PATH_6,
+		CONTOUR_PATH_7,
+		CONTOUR_PATH_8,
+		CONTOUR_PATH_9,
+		CONTOUR_PATH_10,
+		CONTOUR_PATH_11,
+		CONTOUR_PATH_12,
+		CONTOUR_PATH_13,
+		CONTOUR_PATH_14,
+		CONTOUR_PATH_15,
+		RESPONSE_PATH_1,
+		RESPONSE_PATH_2,
+		RESPONSE_PATH_3,
+		RESPONSE_PATH_4,
+		RESPONSE_PATH_5,
+		RESPONSE_PATH_6,
+		RESPONSE_PATH_7,
+		RESPONSE_PATH_8,
+		RESPONSE_PATH_9,
+		RESPONSE_PATH_10,
+		RESPONSE_PATH_11,
+		RESPONSE_PATH_12,
+		RESPONSE_PATH_13,
+		RESPONSE_PATH_14,
+		RESPONSE_PATH_15,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		PARETO_PATH_1,
+		PARETO_PATH_2,
+		PARETO_PATH_3,
+		PARETO_PATH_4,
+		PARETO_PATH_5,
+		PARETO_PATH_6,
+		PARETO_PATH_7,
+		PARETO_PATH_8,
+		PARETO_PATH_9,
+		PARETO_PATH_10,
+		CONTOUR_PATH_1,
+		CONTOUR_PATH_2,
+		CONTOUR_PATH_3,
+		CONTOUR_PATH_4,
+		CONTOUR_PATH_5,
+		CONTOUR_PATH_6,
+		CONTOUR_PATH_7,
+		CONTOUR_PATH_8,
+		CONTOUR_PATH_9,
+		CONTOUR_PATH_10,
+		CONTOUR_PATH_11,
+		CONTOUR_PATH_12,
+		CONTOUR_PATH_13,
+		CONTOUR_PATH_14,
+		CONTOUR_PATH_15,
+		RESPONSE_PATH_1,
+		RESPONSE_PATH_2,
+		RESPONSE_PATH_3,
+		RESPONSE_PATH_4,
+		RESPONSE_PATH_5,
+		RESPONSE_PATH_6,
+		RESPONSE_PATH_7,
+		RESPONSE_PATH_8,
+		RESPONSE_PATH_9,
+		RESPONSE_PATH_10,
+		RESPONSE_PATH_11,
+		RESPONSE_PATH_12,
+		RESPONSE_PATH_13,
+		RESPONSE_PATH_14,
+		RESPONSE_PATH_15,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_09_graph
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+
+	</update>
+
+
+	<update id="manuStp10DesignCopy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp10DesignCopy */
+	INSERT INTO tb_manufact_stp_10_design (
+		PRJCT_ID,
+		EFFECT,
+		IPT_START_Y,
+		IPT_END_Y,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		EFFECT,
+		IPT_START_Y,
+		IPT_END_Y,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_10_design
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+	</update>
+
+	<update id="manuStp10DesignImgCopy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp10DesignImgCopy */
+	INSERT INTO tb_manufact_stp_10_design_img (
+		PRJCT_ID,
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_10_design_img
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+
+	</update>
+
+	<update id="manuStp10ResultCopy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp10ResultCopy */
+	INSERT INTO tb_manufact_stp_10_result (
+		PRJCT_ID,
+		EXCIPENT_NM,
+		EXCIPENT_MIN,
+		EXCIPENT_MAX,
+		CONTROL_SPACE_MIN,
+		CONTROL_SPACE_MAX,
+		DESIGN_SPACE_MIN,
+		DESIGN_SPACE_MAX,
+		KNOWLEDGE_SPACE_MIN,
+		KNOWLEDGE_SPACE_MAX,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID,
+		EXCIPENT_NM,
+		EXCIPENT_MIN,
+		EXCIPENT_MAX,
+		CONTROL_SPACE_MIN,
+		CONTROL_SPACE_MAX,
+		DESIGN_SPACE_MIN,
+		DESIGN_SPACE_MAX,
+		KNOWLEDGE_SPACE_MIN,
+		KNOWLEDGE_SPACE_MAX,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_10_result
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+
+	</update>
+
+	<update id="manuStp10ResultImgCopy" parameterType="dataMap">
+	/* pharmai.manufacturing.manuStp10ResultImgCopy */
+	INSERT INTO tb_manufact_stp_10_result_img (
+		PRJCT_ID,
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3,
+		CONTOUR_IMG_PATH_1,
+		CONTOUR_IMG_PATH_2,
+		CONTOUR_IMG_PATH_3,
+		CONTOUR_IMG_PATH_4,
+		CONTOUR_IMG_PATH_5,
+		CONTOUR_IMG_PATH_6,
+		CONTOUR_IMG_PATH_7,
+		CONTOUR_IMG_PATH_8,
+		CONTOUR_IMG_PATH_9,
+		CONTOUR_IMG_PATH_10,
+		CONTOUR_IMG_PATH_11,
+		CONTOUR_IMG_PATH_12,
+		CONTOUR_IMG_PATH_13,
+		CONTOUR_IMG_PATH_14,
+		CONTOUR_IMG_PATH_15,
+		CONTOUR_IMG_PATH_16,
+		CONTOUR_IMG_PATH_17,
+		CONTOUR_IMG_PATH_18,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) SELECT
+		#{new_prjct_id} AS PRJCT_ID
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3,
+		CONTOUR_IMG_PATH_1,
+		CONTOUR_IMG_PATH_2,
+		CONTOUR_IMG_PATH_3,
+		CONTOUR_IMG_PATH_4,
+		CONTOUR_IMG_PATH_5,
+		CONTOUR_IMG_PATH_6,
+		CONTOUR_IMG_PATH_7,
+		CONTOUR_IMG_PATH_8,
+		CONTOUR_IMG_PATH_9,
+		CONTOUR_IMG_PATH_10,
+		CONTOUR_IMG_PATH_11,
+		CONTOUR_IMG_PATH_12,
+		CONTOUR_IMG_PATH_13,
+		CONTOUR_IMG_PATH_14,
+		CONTOUR_IMG_PATH_15,
+		CONTOUR_IMG_PATH_16,
+		CONTOUR_IMG_PATH_17,
+		CONTOUR_IMG_PATH_18,
+		USE_YN,
+		#{ss_user_no},
+		NOW()
+	FROM tb_manufact_stp_10_result_img
+	WHERE PRJCT_ID = #{c_prjct_id}
+		AND USE_YN = 'Y'
+
+	</update>
+
+
+
+
+
+
+
+
+</mapper>

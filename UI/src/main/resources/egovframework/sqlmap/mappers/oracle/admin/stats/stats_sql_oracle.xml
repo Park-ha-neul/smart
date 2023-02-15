@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.stats">
+
+	<select id="selectTotCntAdminEventLog" parameterType="dataMap" resultType="int">
+	/* admin.stats.selectTotCntAdminEventLog */
+	SELECT COUNT(1) TOT_CNT
+	FROM TBW_ADMIN_EVENT_LOG L
+				,TBW_MENU M LEFT OUTER JOIN TBW_CODE C ON M.MENU_TY_CODE = C.CODE AND C.GROUP_ID = 'R010010'
+				,TBW_USER U LEFT OUTER JOIN TBW_CODE C2 ON U.ORGAN_CODE = C2.CODE AND C2.GROUP_ID = 'R010080'
+		WHERE L.MENU_ID = M.MENU_ID
+		AND L.REGISTER_NO = U.USER_NO
+	<if test="sch_organ_code != null and sch_organ_code != ''">
+		AND U.ORGAN_CODE = #{sch_organ_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_text != null and sch_text != ''">
+		AND U.USER_NM LIKE '%' || #{sch_text, jdbcType=VARCHAR} || '%'
+	</if>
+	<if test="sch_start_event_de_tmp != null and sch_start_event_de_tmp != ''">
+		AND L.EVENT_DE <![CDATA[ >= ]]> #{sch_start_event_de_tmp, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_end_event_de_tmp != null and sch_end_event_de_tmp != ''">
+		AND L.EVENT_DE <![CDATA[ <= ]]> #{sch_end_event_de_tmp, jdbcType=VARCHAR}
+	</if>
+	</select>
+
+	<select id="selectPageListAdminEventLog" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectPageListAdminEventLog */
+	SELECT *
+	FROM (
+		SELECT ROWNUM AS RNUM, AA.*
+		FROM (
+			SELECT
+					M.MENU_NM ||
+					CASE WHEN M.FNCT_NM IS NULL OR M.FNCT_NM = ''
+						THEN ''
+						ELSE '('
+					END ||
+					M.FNCT_NM ||
+					CASE WHEN M.FNCT_NM IS NULL OR M.FNCT_NM = ''
+						THEN ''
+						ELSE ')'
+					END
+					AS MENU_NM
+					,C.CODE_NM AS MENU_TY_NM
+					,U.USER_NM
+					,C2.CODE_NM AS ORGAN_NM
+					,TO_CHAR(L.REGIST_DT, 'YYYY.MM.DD HH24:MI:SS') AS EVENT_YMDHMS
+					,L.IP
+			FROM TBW_ADMIN_EVENT_LOG L
+					,TBW_MENU M LEFT OUTER JOIN TBW_CODE C ON M.MENU_TY_CODE = C.CODE AND C.GROUP_ID = 'R010010'
+					,TBW_USER U LEFT OUTER JOIN TBW_CODE C2 ON U.ORGAN_CODE = C2.CODE AND C2.GROUP_ID = 'R010080'
+			WHERE L.MENU_ID = M.MENU_ID
+			AND L.REGISTER_NO = U.USER_NO
+		<if test="sch_organ_code != null and sch_organ_code != ''">
+			AND U.ORGAN_CODE = #{sch_organ_code, jdbcType=VARCHAR}
+		</if>
+		<if test="sch_text != null and sch_text != ''">
+			AND U.USER_NM LIKE '%' || #{sch_text, jdbcType=VARCHAR} || '%'
+		</if>
+		<if test="sch_start_event_de_tmp != null and sch_start_event_de_tmp != ''">
+			AND L.EVENT_DE <![CDATA[ >= ]]> #{sch_start_event_de_tmp, jdbcType=VARCHAR}
+		</if>
+		<if test="sch_end_event_de_tmp != null and sch_end_event_de_tmp != ''">
+			AND L.EVENT_DE <![CDATA[ <= ]]> #{sch_end_event_de_tmp, jdbcType=VARCHAR}
+		</if>
+			ORDER BY L.REGIST_DT DESC
+		) AA
+	) AAA
+	WHERE RNUM <![CDATA[ > ]]> #{limitStart, jdbcType=INTEGER} AND ROWNUM <![CDATA[ <= ]]> #{limitCount, jdbcType=INTEGER}
+	</select>
+
+	<select id="selectListVisitDaliyPV" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectListVisitDaliyPV */
+	select '2020', '01', '01', '3' from dual
+<!-- 	SELECT SUBSTRING(B1.YMD, 1, 4) AS YY -->
+<!-- 		, SUBSTRING(B1.YMD, 5, 2) AS MM -->
+<!-- 		, SUBSTRING(B1.YMD, 7, 2) AS DD -->
+<!-- 		, IFNULL(B2.CNT, 0) AS CNT -->
+<!-- 	FROM ( -->
+<!-- 		SELECT DATE_FORMAT(DATE_ADD(CONCAT(REPLACE(#{sch_date, jdbcType=VARCHAR}, '.', ''), '01'), INTERVAL SEQ - 1 DAY), '%Y%m%d') AS YMD -->
+<!-- 		FROM seq_1_to_31 -->
+<!-- 		WHERE SEQ <![CDATA[ <= ]]> (SELECT DATE_FORMAT(LAST_DAY(CONCAT(REPLACE(#{sch_date, jdbcType=VARCHAR}, '.', ''), '01')), '%e')) -->
+<!-- 	) B1 -->
+<!-- 	LEFT OUTER JOIN ( -->
+<!-- 		SELECT A1.YMD -->
+<!-- 			, COUNT(1) AS CNT -->
+<!-- 		FROM ( -->
+<!-- 			SELECT DATE_FORMAT(REGIST_DT, '%Y%m%d') AS YMD -->
+<!-- 				, IP -->
+<!-- 			FROM TBW_PAGE_VIEW -->
+<!-- 			WHERE DATE_FORMAT(REGIST_DT, '%Y%m') = REPLACE(#{sch_date, jdbcType=VARCHAR}, '.', '') -->
+<!-- 			GROUP BY DATE_FORMAT(REGIST_DT, '%Y%m%d'), IP -->
+<!-- 		) A1 -->
+<!-- 		GROUP BY A1.YMD -->
+<!-- 	) B2 -->
+<!-- 	ON B1.YMD = B2.YMD -->
+	</select>
+
+	<select id="selectListVisitMonthPV" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectListVisitMonthPV */
+	SELECT SUBSTRING(B1.YM, 1, 4) AS YY
+		, SUBSTRING(B1.YM, 5, 2) AS MM
+		, IFNULL(B2.CNT, 0) AS CNT
+	FROM (
+		SELECT CONCAT(#{sch_date, jdbcType=VARCHAR}, RIGHT(CONCAT('0', SEQ), 2)) AS YM
+		FROM seq_1_to_12
+	) B1
+	LEFT OUTER JOIN (
+		SELECT A1.YM
+			, COUNT(1) AS CNT
+		FROM (
+			SELECT DATE_FORMAT(REGIST_DT, '%Y%m') AS YM
+				, IP
+			FROM TBW_PAGE_VIEW
+			WHERE DATE_FORMAT(REGIST_DT, '%Y') = #{sch_date, jdbcType=VARCHAR}
+			GROUP BY DATE_FORMAT(REGIST_DT, '%Y%m%d'), IP
+		) A1
+		GROUP BY A1.YM
+	) B2
+	ON B1.YM = B2.YM
+	</select>
+</mapper>

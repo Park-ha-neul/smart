@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.stats">
+
+	<select id="selectTotCntAdminEventLog" parameterType="dataMap" resultType="int">
+	/* admin.stats.selectTotCntAdminEventLog */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_ADMIN_EVENT_LOG L
+			LEFT OUTER JOIN TB_MENU M ON L.MENU_PK = M.MENU_PK
+			LEFT OUTER JOIN TB_CODE C ON M.MENU_TY_CODE = C.CODE AND C.GROUP_ID = 'R000070'
+			LEFT OUTER JOIN TB_USER U ON L.REGISTER_NO = U.USER_NO
+		WHERE 1=1
+	<if test="sch_text != null and sch_text != ''">
+		AND U.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_start_event_de_tmp != null and sch_start_event_de_tmp != ''">
+	<![CDATA[
+		AND L.EVENT_DE >= #{sch_start_event_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_end_event_de_tmp != null and sch_end_event_de_tmp != ''">
+	<![CDATA[
+		AND L.EVENT_DE <= #{sch_end_event_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	</select>
+
+	<select id="selectPageListAdminEventLog" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectPageListAdminEventLog */
+	SELECT CASE
+		WHEN M.FNCT_NM IS NULL OR M.FNCT_NM = '' THEN M.MENU_NM
+		ELSE CONCAT(M.MENU_NM, '(', M.FNCT_NM, ')')
+	   END AS MENU_NM
+		,C.CODE_NM AS MENU_TY_NM
+		,U.USER_NM
+		,DATE_FORMAT(L.REGIST_DT, '%Y.%m.%d %H:%i:%S') AS EVENT_YMDHMS
+		,L.IP
+		,L.PARAM_VALUE
+		,M.URL
+	FROM TB_ADMIN_EVENT_LOG L
+		LEFT OUTER JOIN TB_MENU M ON L.MENU_PK = M.MENU_PK
+		LEFT OUTER JOIN TB_CODE C ON M.MENU_TY_CODE = C.CODE AND C.GROUP_ID = 'R000070'
+		LEFT OUTER JOIN TB_USER U ON L.REGISTER_NO = U.USER_NO
+	WHERE 1=1
+	<if test="sch_text != null and sch_text != ''">
+		AND U.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_start_event_de_tmp != null and sch_start_event_de_tmp != ''">
+	<![CDATA[
+		AND L.EVENT_DE >= #{sch_start_event_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_end_event_de_tmp != null and sch_end_event_de_tmp != ''">
+	<![CDATA[
+		AND L.EVENT_DE <= #{sch_end_event_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	ORDER BY L.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectTotCntErrorEventLog" parameterType="dataMap" resultType="int">
+	/* admin.stats.selectTotCntErrorEventLog */
+		SELECT COUNT(1) TOT_CNT
+	FROM TB_ERROR_EVENT_LOG L
+			LEFT OUTER JOIN TB_MENU M ON L.MENU_PK = M.MENU_PK
+			LEFT OUTER JOIN TB_CODE C ON M.MENU_TY_CODE = C.CODE AND C.GROUP_ID = 'R000070'
+			LEFT OUTER JOIN TB_USER U ON L.REGISTER_NO = U.USER_NO
+		WHERE 1=1
+	<if test="sch_text != null and sch_text != ''">
+		AND U.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_start_event_de_tmp != null and sch_start_event_de_tmp != ''">
+	<![CDATA[
+		AND L.EVENT_DE >= #{sch_start_event_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_end_event_de_tmp != null and sch_end_event_de_tmp != ''">
+	<![CDATA[
+		AND L.EVENT_DE <= #{sch_end_event_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if
+		test="sch_end_event_de_tmp != null and sch_end_event_de_tmp != ''">
+	<![CDATA[
+		AND L.EVENT_DE <= #{sch_end_event_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	</select>
+
+	<select id="selectPageListErrorEventLog" parameterType="dataMap" resultType="dataMap">
+		/* admin.stats.selectPageListErrorEventLog */
+			SELECT CASE
+		WHEN M.FNCT_NM IS NULL OR M.FNCT_NM = '' THEN M.MENU_NM
+		ELSE CONCAT(M.MENU_NM, '(', M.FNCT_NM, ')')
+	   END AS MENU_NM
+		,C.CODE_NM AS MENU_TY_NM
+		,U.USER_NM
+		,DATE_FORMAT(L.REGIST_DT, '%Y.%m.%d %H:%i:%S') AS EVENT_YMDHMS
+		,L.REQUST_URL
+		,L.IP
+		,L.PARAM_VALUE
+		,L.ERROR_VALUE
+	FROM TB_ERROR_EVENT_LOG L
+		LEFT OUTER JOIN TB_MENU M ON L.MENU_PK = M.MENU_PK
+		LEFT OUTER JOIN TB_CODE C ON M.MENU_TY_CODE = C.CODE AND C.GROUP_ID = 'R000070'
+		LEFT OUTER JOIN TB_USER U ON L.REGISTER_NO = U.USER_NO
+	WHERE 1=1
+	<if test="sch_text != null and sch_text != ''">
+		AND U.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_start_event_de_tmp != null and sch_start_event_de_tmp != ''">
+	<![CDATA[
+		AND L.EVENT_DE >= #{sch_start_event_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_end_event_de_tmp != null and sch_end_event_de_tmp != ''">
+	<![CDATA[
+		AND L.EVENT_DE <= #{sch_end_event_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	ORDER BY L.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectListUV" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectListUV */
+		SELECT C.CODE_NM AS SYS_NM
+				,M.MENU_NM
+				,SUM(V.ACCES_CNT) AS ACCES_CNT
+		FROM TB_UNIQUE_VISITR V
+			LEFT OUTER JOIN TB_CODE C ON V.SYS_CODE = C.CODE AND C.GROUP_ID = 'R000030'
+			LEFT OUTER JOIN TB_MENU M ON V.MENU_PK = M.MENU_PK
+		WHERE 1=1
+	<if test="sch_sys_code != null and sch_sys_code != ''">
+		AND V.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_start_de_tmp != null and sch_start_de_tmp != ''">
+	<![CDATA[
+		AND V.ACCES_DE >= #{sch_start_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_end_de_tmp != null and sch_end_de_tmp != ''">
+	<![CDATA[
+		AND V.ACCES_DE <= #{sch_end_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_text != null and sch_text != ''">
+		AND	M.MENU_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+		GROUP BY C.CODE_NM, M.MENU_NM
+		ORDER BY M.MENU_NM
+	</select>
+
+	<select id="selectListVisitDaliyPV" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectListVisitDaliyPV */
+	SELECT SUBSTRING(B1.YMD, 1, 4) AS YY
+		, SUBSTRING(B1.YMD, 5, 2) AS MM
+		, SUBSTRING(B1.YMD, 7, 2) AS DD
+		, IFNULL(B2.CNT, 0) AS CNT
+	FROM (
+		SELECT DATE_FORMAT(DATE_ADD(CONCAT(REPLACE(#{sch_date, jdbcType=VARCHAR}, '.', ''), '01'), INTERVAL SEQ - 1 DAY), '%Y%m%d') AS YMD
+		FROM seq_1_to_31
+		WHERE SEQ <![CDATA[ <= ]]> (SELECT DATE_FORMAT(LAST_DAY(CONCAT(REPLACE(#{sch_date, jdbcType=VARCHAR}, '.', ''), '01')), '%e'))
+	) B1
+	LEFT OUTER JOIN (
+		SELECT A1.YMD
+			, COUNT(1) AS CNT
+		FROM (
+			SELECT DATE_FORMAT(REGIST_DT, '%Y%m%d') AS YMD
+				, IP
+			FROM TB_PAGE_VIEW
+			WHERE DATE_FORMAT(REGIST_DT, '%Y%m') = REPLACE(#{sch_date, jdbcType=VARCHAR}, '.', '')
+			GROUP BY DATE_FORMAT(REGIST_DT, '%Y%m%d'), IP
+		) A1
+		GROUP BY A1.YMD
+	) B2
+	ON B1.YMD = B2.YMD
+	</select>
+
+	<select id="selectListVisitMonthPV" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectListVisitMonthPV */
+	SELECT SUBSTRING(B1.YM, 1, 4) AS YY
+		, SUBSTRING(B1.YM, 5, 2) AS MM
+		, IFNULL(B2.CNT, 0) AS CNT
+	FROM (
+		SELECT CONCAT(#{sch_date, jdbcType=VARCHAR}, RIGHT(CONCAT('0', SEQ), 2)) AS YM
+		FROM seq_1_to_12
+	) B1
+	LEFT OUTER JOIN (
+		SELECT A1.YM
+			, COUNT(1) AS CNT
+		FROM (
+			SELECT DATE_FORMAT(REGIST_DT, '%Y%m') AS YM
+				, IP
+			FROM TB_PAGE_VIEW
+			WHERE DATE_FORMAT(REGIST_DT, '%Y') = #{sch_date, jdbcType=VARCHAR}
+			GROUP BY DATE_FORMAT(REGIST_DT, '%Y%m%d'), IP
+		) A1
+		GROUP BY A1.YM
+	) B2
+	ON B1.YM = B2.YM
+	</select>
+
+		<select id="selectListPV" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectListPV */
+		SELECT C.CODE_NM AS SYS_NM
+				,M.MENU_NM AS MENU_NM
+				,SUM(V.ACCES_CNT) AS ACCES_CNT
+		FROM TB_PAGE_VIEW V
+			LEFT OUTER JOIN TB_CODE C ON V.SYS_CODE = C.CODE AND C.GROUP_ID = 'R000030'
+			LEFT OUTER JOIN TB_MENU M ON V.MENU_PK = M.MENU_PK
+		WHERE 1=1
+	<if test="sch_sys_code != null and sch_sys_code != ''">
+		AND V.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_start_de_tmp != null and sch_start_de_tmp != ''">
+	<![CDATA[
+		AND V.ACCES_DE >= #{sch_start_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_end_de_tmp != null and sch_end_de_tmp != ''">
+	<![CDATA[
+		AND V.ACCES_DE <= #{sch_end_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_text != null and sch_text != ''">
+		AND	M.MENU_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+		GROUP BY C.CODE_NM, M.MENU_NM
+		ORDER BY M.MENU_NM
+	</select>
+
+	<select id ="selectTotCntSatisfactionStatus" parameterType="dataMap" resultType="int">
+	/* admin.stats.selectTotCntSatisfactionStatus */
+
+	SELECT COUNT(1) AS TOT_CNT
+		FROM TB_STSFDG TS
+			LEFT OUTER JOIN TB_CODE TC ON TS.SYS_CODE = TC.CODE AND TC.GROUP_ID = #{up_code_sys, jdbcType=VARCHAR}
+			LEFT OUTER JOIN TB_MENU TM ON TS.MENU_PK = TM.MENU_PK
+			WHERE 1=1
+			<if test = 'sch_sys_code != null and sch_sys_code !=""'>
+					AND TC.CODE = #{sch_sys_code, jdbcType=VARCHAR}
+			</if>
+			<if test = 'sch_start_de_tmp != null and  sch_start_de_tmp !=""'>
+					<![CDATA[
+					AND DATE_FORMAT(TS.REGIST_DT, '%Y.%m.%d') >= #{sch_start_de_tmp, jdbcType=VARCHAR}
+					]]>
+			</if>
+			<if test = 'sch_end_de_tmp != null and  sch_end_de_tmp !=""'>
+					<![CDATA[
+					AND DATE_FORMAT(TS.REGIST_DT, '%Y.%m.%d') <= #{sch_end_de_tmp, jdbcType=VARCHAR}
+					]]>
+			</if>
+	</select>
+
+	<select id="selectListSatisfactionStatus" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectListSatisfactionStatus */
+		SELECT TC.CODE_NM AS SYS_NM
+			, TM.MENU_NM AS MENU_NM
+			, TS.STSFDG_SCORE AS SYSFDG_SCORE
+			, CONCAT(TS.URL, TS.QUERY) AS URL_QUERY
+			, DATE_FORMAT(TS.REGIST_DT,'%Y.%m.%d') AS REGIST_DT
+			FROM TB_STSFDG TS
+				LEFT OUTER JOIN TB_CODE TC ON TS.SYS_CODE = TC.CODE AND TC.GROUP_ID = #{up_code_organ, jdbcType=VARCHAR}
+				LEFT OUTER JOIN TB_MENU TM ON TS.MENU_PK = TM.MENU_PK
+			WHERE 1=1
+			<if test = 'sch_sys_code != null and sch_sys_code !=""'>
+					AND TC.CODE = #{sch_sys_code, jdbcType=VARCHAR}
+			</if>
+			<if test = 'sch_start_de_tmp != null and  sch_start_de_tmp !=""'>
+				<![CDATA[
+				AND DATE_FORMAT(TS.REGIST_DT, '%Y.%m.%d') >= #{sch_start_de_tmp, jdbcType=VARCHAR}
+				]]>
+			</if>
+			<if test = 'sch_end_de_tmp != null and  sch_end_de_tmp !=""'>
+				<![CDATA[
+				AND DATE_FORMAT(TS.REGIST_DT, '%Y.%m.%d') <= #{sch_end_de_tmp, jdbcType=VARCHAR}
+				]]>
+			</if>
+			ORDER BY TS.REGIST_DT DESC
+
+	<![CDATA[
+	LIMIT #{limitStart, jdbcType=INTEGER}, #{limitCount, jdbcType=INTEGER}
+	]]>
+	</select>
+
+		<select id="selectTotCntSatisfactionAvg" parameterType="dataMap" resultType="int">
+	/* admin.stats.selectTotCntSatisfactionAvg */
+	SELECT COUNT(1)
+	FROM (
+		SELECT SYS_CODE
+			, MENU_PK
+			, ROUND(AVG(STSFDG_SCORE),1) AVG_STSFDG_SCORE
+			, URI
+			FROM TB_STSFDG
+			WHERE 1=1
+			<if test = 'sch_start_de_tmp != null and  sch_start_de_tmp !=""'>
+			<![CDATA[
+				AND DATE_FORMAT(REGIST_DT, '%Y.%m.%d') >= #{sch_start_de_tmp, jdbcType=VARCHAR}
+			]]>
+			</if>
+			<if test = 'sch_end_de_tmp != null and  sch_end_de_tmp !=""'>
+			<![CDATA[
+				AND DATE_FORMAT(REGIST_DT, '%Y.%m.%d') <= #{sch_end_de_tmp, jdbcType=VARCHAR}
+			]]>
+		</if>
+	GROUP BY SYS_CODE, MENU_PK, URI
+	ORDER BY SYS_CODE, MENU_PK
+	)TS
+	LEFT OUTER JOIN TB_CODE TC ON TS.SYS_CODE = TC.CODE AND TC.GROUP_ID = #{up_code_sys, jdbcType=VARCHAR}
+	LEFT OUTER JOIN TB_MENU TM ON TS.MENU_PK = TM.MENU_PK
+		WHERE 1=1
+		<if test = 'sch_sys_code != null and sch_sys_code !=""'>
+				AND TC.CODE = #{sch_sys_code, jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="selectListSatisfactionAvg" parameterType="dataMap" resultType="dataMap">
+	/* admin.stats.selectListSatisfactionAvg */
+	SELECT 	TC.CODE_NM AS SYS_NM
+	      , TM.MENU_NM AS MENU_NM
+	      , TS.AVG_STSFDG_SCORE AS AVG_STSFDG_SCORE
+	      , TS.URI AS URI
+	FROM (
+			SELECT	SYS_CODE
+				,	MENU_PK
+				,	ROUND(AVG(STSFDG_SCORE), 1) AVG_STSFDG_SCORE
+				,	URI
+			FROM TB_STSFDG
+			WHERE 1=1
+			<if test = 'sch_start_de_tmp != null and  sch_start_de_tmp !=""'>
+			<![CDATA[
+				AND DATE_FORMAT(REGIST_DT, '%Y.%m.%d') >= #{sch_start_de_tmp, jdbcType=VARCHAR}
+			]]>
+			</if>
+			<if test = 'sch_end_de_tmp != null and  sch_end_de_tmp !=""'>
+				<![CDATA[
+				AND DATE_FORMAT(REGIST_DT, '%Y.%m.%d') <= #{sch_end_de_tmp, jdbcType=VARCHAR}
+				]]>
+			</if>
+			GROUP BY SYS_CODE, MENU_PK, URI
+			ORDER BY SYS_CODE, MENU_PK
+	)TS
+	LEFT OUTER JOIN TB_CODE TC ON TS.SYS_CODE = TC.CODE AND TC.GROUP_ID = #{up_code_sys, jdbcType=VARCHAR}
+	LEFT OUTER JOIN TB_MENU TM ON TS.MENU_PK = TM.MENU_PK
+		WHERE 1=1
+		<if test = 'sch_sys_code != null and sch_sys_code !=""'>
+				AND TC.CODE = #{sch_sys_code, jdbcType=VARCHAR}
+		</if>
+	<![CDATA[
+	LIMIT #{limitStart, jdbcType=INTEGER}, #{limitCount, jdbcType=INTEGER}
+	]]>
+	</select>
+
+</mapper>

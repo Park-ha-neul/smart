@@ -1,0 +1,217 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 300;
+	src: local('※'),
+		url('../fonts/NotoSansKR-DemiLight.woff2') format('woff2'),
+		url('../fonts/NotoSansKR-DemiLight.woff') format('woff'),
+		url('../fonts/NotoSansKR-DemiLight.otf') format('opentype');
+}
+
+@font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 400;
+	src: local('※'),
+		url('../fonts/NotoSansKR-Light.eot'),
+		url('../fonts/NotoSansKR-Light.eot#iefix') format('embedded-opentype'),
+		url('../fonts/NotoSansKR-Light.woff') format('woff'),
+		url('../fonts/NotoSansKR-Light.otf') format('opentype');
+	/*unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7A3, U+D7B0-D7FF;*/
+ }
+
+ @font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 500;
+	src: local('※'),
+		url('../fonts/NotoSansKR-Regular.eot'),
+		url('../fonts/NotoSansKR-Regular.eot#iefix') format('embedded-opentype'),
+		url('../fonts/NotoSansKR-Regular.woff') format('woff'),
+		url('../fonts/NotoSansKR-Regular.otf') format('opentype');
+	/*unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7A3, U+D7B0-D7FF;*/
+ }
+
+ @font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 600;
+	src: local('※'),
+		url('../fonts/NotoSansKR-Medium.eot'),
+		url('../fonts/NotoSansKR-Medium.eot#iefix') format('embedded-opentype'),
+		url('../fonts/NotoSansKR-Medium.woff') format('woff'),
+		url('../fonts/NotoSansKR-Medium.otf') format('opentype');
+	/*unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7A3, U+D7B0-D7FF;*/
+ }
+
+ @font-face {
+	font-family: 'Noto Sans KR';
+	font-style: normal;
+	font-weight: 700;
+	src: local('※'),
+		url('../fonts/NotoSansKR-Bold.eot'),
+		url('../fonts/NotoSansKR-Bold.eot#iefix') format('embedded-opentype'),
+		url('../fonts/NotoSansKR-Bold.woff') format('woff'),
+		url('../fonts/NotoSansKR-Bold.otf') format('opentype');
+	/*unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7A3, U+D7B0-D7FF;*/
+ }
+
+ /********* reset.css **********/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ul, ol, li,
+fieldset, form, label, legend, input, select, textarea, button,
+table, tr, td, thead, tbody, tfoot,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup, main,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 15px;
+	font-weight: 300;
+	font-family: 'Noto Sans KR';
+	box-sizing:border-box;
+
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+input[type=text]::-ms-clear {
+	display: none;
+	width: 0;
+	height: 0;
+}
+ input[type=password]::-ms-reveal {
+ 	display: none;
+ 	width: 0;
+ 	height:0;
+ }
+ input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px #f3f2f2 inset;
+ }
+ input:focus::-webkit-input-placeholder { color: transparent; }
+ input:focus::-moz-placeholder { color: transparent; }
+ input:focus:-ms-input-placeholder { color: transparent; }
+  input:focus::-ms-input-placeholder { color: transparent; }
+h1,h2,h3,h4,h5,h6 {font-size:1em; font-weight:normal;}
+ul,ol,li {list-style-type:none;}
+ul:after,ol:after{display: block; content:""; clear: both;}
+a {color: #333; text-decoration:none; display: block;}
+img {max-width:100%; max-height:100%; border:0 none; vertical-align:top;}
+address {font-style:normal;}
+fieldset{border: none;}
+legend{border: none; position: absolute; overflow: hidden; width: 1px; height: 1px; margin: -1px; clip: rect(0,0,0,0);font-size: 1px;}
+/* 에디터 삽입 컨텐츠 내 테이블 스타일 적용을 위해 주석처리.
+table {width:100%; border-spacing: 0; border-collapse:collapse; table-layout:fixed;}
+*/
+button {margin:0; padding:0; background-color:transparent; border:0 none; box-sizing:border-box; font-family:inherit; font-size:inherit; cursor:pointer;}
+input {border: 0 none; padding:0; box-sizing:border-box; font-family:inherit; font-size: inherit;}
+input:focus,button:focus {outline:none;}
+input[type="text"], input[type="password"], input[type="email"], input[type="search"], input[type="image"],input[type="tel"], textarea {-webkit-appearance:none; -webkit-border-radius:0;} /* IOS default style reset */
+input[type="reset"] {cursor: pointer;}
+input{-webkit-appearance: none; -moz-appearance: none; appearance: none;}
+input:disabled {background-color: #e5f0ff !important;}
+/* input:read-only {background-color: #edeef0 !important;} */
+input::-webkit-input-placeholder { /* Chrome/Opera/Safari */ color: #777;}
+input::-moz-placeholder { /* Firefox 19+ */ color: #777;}
+input:-ms-input-placeholder { /* IE 10+ */ color: #777;}
+input:-moz-placeholder { /* Firefox 18- */ color: #777;}
+textarea {width:100%; font-family: inherit; font-size: inherit; box-sizing:border-box; resize: none;}
+textarea::-webkit-input-placeholder { /* Chrome/Opera/Safari */ color: #777;}
+textarea::-moz-placeholder { /* Firefox 19+ */ color: #777;}
+textarea:-ms-input-placeholder { /* IE 10+ */ color: #777;}
+textarea:-moz-placeholder { /* Firefox 18- */ color: #777;}
+select {background-color: #fff; -webkit-border-radius: 0; /* IOS default style reset */ color: #555; font-family: inherit; font-size: inherit; cursor:pointer;}
+select::-ms-expand {background-color: #fff; border-width: 0;}
+
+/* 에디터 삽입 컨텐츠 리셋스타일 제거. */
+.editor_view ol, .editor_view ol > li {list-style-type: decimal;}
+.editor_view ul, .editor_view ul > li {list-style-type: disc;}
+.editor_view ol, .editor_view ul {padding-left: 19px;}
+.editor_view i, .editor_view em {font-style: italic;}
+.editor_view b, .editor_view strong {font-weight: bold;}
+
+
+.id_input{
+	opacity: 0.6
+
+}
+.pwd_input{
+	opacity: 0.6
+}
+.login-bg video{width:100%;height:969px;object-fit: cover; z-index: -100; right: 0; bottom: 0; overflow: hidden; left: 0; min-height: 100%; min-width: 100%; top: 0; z-index: 0; object-fit: cover; }
+ body{background: #e6eaef no-repeat center center fixed; max-width: 2000px; overflow-x: hidden;}
+#wrapper{display: table; width: 100%; height: 100%; }
+.cell{display: table-cell;  vertical-align: middle;}
+.contents{max-width: 600px; margin: auto; position: absolute; top:240px; left: 35% }
+.contents h2{font-size: 88px; font-weight: bold;  font-family: arial; color: #fff; text-align: center; height: 82px;}
+.l_box {padding: 100px 100px 100px 100px; background: #fff; box-shadow: 2px #00000029; width: 800px; margin-left: -100px; opacity: 0.9}
+.contents .s_box{box-shadow: 0px 0px 3px #c0c0c0; padding: 40px 50px; background: #fff; z-index: 2; position: relative; max-width: 600px;  margin-left: -1 margin-left: -250px margin-left: -250px margin-left: -250px0px}
+.contents h3{font-size: 0; line-height: 0;}
+.contents h3 img{vertical-align: bottom;}
+.contents h3 span{display: inline-block; vertical-align: bottom; line-height: 15px; padding-left: 15px; color: #3f3f3f;}
+.input_box{padding: 28px 0 15px 0;}
+.id_name{position: absolute; z-index: 1; left: 118px; color: #999; top: 124px;}
+.id_pass{position: absolute; z-index: 1; left: 118px; color: #999; top: 182px;}
+.input_box input{width: 100%; height: 48px; margin-bottom: 10px; border-radius: 25px; position: relative; color: #999; padding-left: 60px; background:#f3f2f2}
+.input_box div img{position: absolute; z-index: 5; left: 25px; top: 16px;}
+form button{width: 100%; height: 52px; text-align: center; background:#ff4242; font-size: 18px; font-weight: 500; color: #fff; margin-bottom: 15px; border-radius: 32px;}
+input[type="checkbox"]{background: url(../images/login/check2.png) no-repeat center; width: 22px; height: 22px; vertical-align: middle;}
+input[type="checkbox"]:checked{background: url(../images/login/check.png) no-repeat center;}
+.check_label{vertical-align: middle; padding-left: 5px; font-size: 14px; column-rule-color: #999;}
+.input_box div{position: relative;}
+.clear_btn{position: absolute; right: 35px; top: 14px; background: url(../images/login/x_btn.png) no-repeat center center;  width: 24px; height: 24px; font-size: 0; cursor: pointer; display: none;}
+.clear_btn2{position: absolute; right: 35px; top: 14px; background: url(../images/login/x_btn.png) no-repeat center center;  width: 24px; height: 24px; font-size: 0; cursor: pointer; display: none;}
+.active{display: block;}
+
+
+@media screen and (max-width: 720px){
+	.contents{width: calc(100% - 60px); margin: 0 30px; max-width: none;}
+	.contents > h2{font-size: 94px; height: 86px;}
+	.contents h3 span{font-size: 13px;}
+}
+
+@media screen and (max-width: 626px){
+	/* .contents > div{width: 400px;} */
+	.contents > h2{font-size: 82px; height: 75px; }
+	}
+
+@media screen and (max-width: 528px){
+	/* .contents > div{width: 400px;} */
+	.contents > h2{font-size: 63px; height: 59px; }
+}
+/* @media screen and (max-width: 508px){
+    .contents{width: calc(100% - 40px); margin: 0 20px; max-width: none;}
+    .contents > div{padding: 30px;}
+    h3 img{ display: block;}
+    .input_box{padding: 15px 0;}
+    .pwd_input{margin-bottom: 0 !important;}
+    h3 span{display: block; line-height: 13px; padding-top: 13px; padding-left: 0 !important; font-size: 13px;}
+    .input_box input{font-size: 13px !important;}
+    .contents div label{font-size: 13px !important;}
+    .clear_btn,.clear_btn2{right: 18px;}
+} */
+
+
+
+
+
+ @media screen and (max-width: 454px){
+	.contents{width: calc(100% - 40px); margin: 0 20px; max-width: none;}
+	.contents > div{padding: 30px;}
+	.contents > h2{font-size: 49px; height: 46px; }
+	h3 img{width: 100px; display: block;}
+	h3 span{display: block; line-height: 13px !important; padding-top: 13px; padding-left: 0 !important; font-size: 13px;}
+	.clear_btn,.clear_btn2{right: 13px;}
+}

@@ -1,0 +1,7 @@
+"AUTHOR_ID","AUTHOR_NM","RM","REGISTER_NO","REGIST_DT","UPDUSR_NO","UPDT_DT"
+ADMIN,CMS-슈퍼관리자,슈퍼관리자(최고관리자),1,,1,
+ROLE10,게시판 담당자,,1,,78,
+ROLE20,"000 담당자",,1,,1,"2020-02-17 09:38:25.0"
+ROLE30,센터&amp;기관 담당자,,1,,78,
+ROLE40,기타 담당자,,1,,78,
+ROLE50,test,,1,,78,

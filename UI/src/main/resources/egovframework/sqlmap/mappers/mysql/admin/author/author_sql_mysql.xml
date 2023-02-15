@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin.author">
+
+	<select id="selectTotCntAuthor" parameterType="dataMap" resultType="int">
+	/* admin.author.selectTotCntAuthor */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_AUTHOR A
+	WHERE 1 = 1
+	<if test="sch_auth_nm != null and sch_auth_nm != ''">
+		AND A.AUTHOR_NM LIKE CONCAT('%', #{sch_auth_nm, jdbcType=VARCHAR}, '%')
+	</if>
+	</select>
+
+	<select id="selectPageListAuthor" parameterType="dataMap" resultType="dataMap">
+	/* admin.author.selectPageListAuthor */
+	SELECT A.AUTHOR_ID
+		, A.AUTHOR_NM
+		, A.RM
+		, A.REGISTER_NO
+		, B.USER_NM AS REGISTER_NM
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, A.REGIST_DT
+	FROM TB_AUTHOR A
+	LEFT OUTER JOIN TB_USER B
+	ON A.REGISTER_NO = B.USER_NO
+	WHERE 1 = 1
+	<if test="sch_auth_nm != null and sch_auth_nm != ''">
+		AND A.AUTHOR_NM LIKE CONCAT('%', #{sch_auth_nm, jdbcType=VARCHAR}, '%')
+	</if>
+	ORDER BY A.AUTHOR_NM
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<insert id="insertAuthor" parameterType="dataMap">
+	/* admin.author.insertAuthor */
+	INSERT INTO TB_AUTHOR(
+		AUTHOR_ID
+		, AUTHOR_NM
+		, RM
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{author_id, jdbcType=VARCHAR}
+		, #{author_nm, jdbcType=VARCHAR}
+		, #{rm, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=INTEGER}
+		, NOW()
+	)
+	</insert>
+
+	<select id="selectAuthor" parameterType="dataMap" resultType="dataMap">
+	/* admin.author.selectAuthor */
+	SELECT AUTHOR_ID
+		, A.AUTHOR_NM
+		, A.RM
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, DATE_FORMAT(A.UPDT_DT, '%Y.%m.%d') AS UPDT_YMD
+	FROM TB_AUTHOR A
+	WHERE A.AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateAuthor" parameterType="dataMap">
+	/* admin.author.updateAuthor */
+	UPDATE TB_AUTHOR
+	SET AUTHOR_NM = #{author_nm, jdbcType=VARCHAR}
+		, RM = #{rm, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=INTEGER}
+		, UPDT_DT = NOW()
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteAuthor" parameterType="dataMap">
+	/* admin.author.deleteAuthor */
+	DELETE FROM TB_AUTHOR
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteUserAuthor" parameterType="dataMap">
+	/* admin.author.deleteUserAuthor */
+	DELETE FROM TB_USER_AUTHOR
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteAuthorMenu" parameterType="dataMap">
+	/* admin.author.deleteAuthorMenu */
+	DELETE FROM TB_AUTHOR_MENU
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</delete>
+
+	<select id="selectExistYnAuthor" parameterType="dataMap" resultType="string">
+	/* admin.author.selectExistYnAuthor */
+	SELECT CASE WHEN COUNT(*) <![CDATA[ > ]]> 0 THEN 'Y' ELSE 'N' END EXIST_YN
+	FROM TB_AUTHOR
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectTotCntUser" parameterType="dataMap" resultType="int">
+	/* admin.author.selectTotCntUser */
+	SELECT 	COUNT(1)
+	FROM 	TB_USER_AUTHOR A
+			LEFT OUTER JOIN TB_USER B ON A.USER_NO = B.USER_NO
+	WHERE 	A.AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+		<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'user_id'">
+			AND B.USER_ID LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'user_nm'">
+			AND B.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	</select>
+
+	<select id="selectPageListUser" parameterType="dataMap" resultType="dataMap">
+	/* admin.author.selectPageListUser */
+	SELECT 	A.USER_NO
+			, B.USER_NM
+			, B.USER_ID
+			, C.USER_NM AS REGISTER_NM
+			, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+			, D.CODE_NM AS USER_STTUS_NM
+	FROM 	TB_USER_AUTHOR A
+			LEFT OUTER JOIN TB_USER B ON A.USER_NO = B.USER_NO
+			LEFT OUTER JOIN TB_USER C ON A.REGISTER_NO = C.USER_NO
+			LEFT OUTER JOIN TB_CODE D ON B.USER_STTUS_CODE = D.CODE AND D.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	WHERE 	A.AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'user_id'">
+			AND B.USER_ID LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'user_nm'">
+			AND B.USER_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+			AND B.USER_STTUS_CODE = #{sch_user_sttus_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_user_se_code != null and sch_user_se_code != ''">
+			AND B.USER_SE_CODE = #{sch_user_se_code, jdbcType=VARCHAR}
+	</if>
+	ORDER BY B.USER_NM ASC
+	LIMIT #{limitStart, jdbcType=INTEGER}, #{limitCount, jdbcType=INTEGER}
+	</select>
+
+</mapper>

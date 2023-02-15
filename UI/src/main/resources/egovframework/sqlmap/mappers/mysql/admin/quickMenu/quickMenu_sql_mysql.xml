@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.quickMenu">
+
+	<select id="selectTotCntQuickMenu" parameterType="dataMap"
+		resultType="int">
+		/* admin.quickMenu.selectTotCntQuickMenu */
+	<![CDATA[
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_QUICK_MENU A
+	WHERE 1 = 1
+	]]>
+		<if test="sch_text != null and sch_text != ''">
+			<choose>
+				<when test="sch_type == 'quickMenu_nm'">
+					AND A.QUICKMENU_NM LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+				</when>
+				<when test="sch_type == 'attrb_1'">
+					AND A.ATTRB_1 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+				</when>
+				<when test="sch_type == 'attrb_2'">
+					AND A.ATTRB_2 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+				</when>
+				<when test="sch_type == 'attrb_3'">
+					AND A.ATTRB_3 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+				</when>
+				<when test="sch_type == 'attrb_123'">
+					AND ((A.ATTRB_1 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')) OR
+					(A.ATTRB_2 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%'))
+					OR (A.ATTRB_3 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')))
+				</when>
+			</choose>
+		</if>
+		<if test="sch_sys_code != null and sch_sys_code != ''">
+			AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+		</if>
+		<if
+			test="sch_quick_zone_code != null and sch_quick_zone_code != ''">
+			AND A.ZONE_CODE = #{sch_quick_zone_code, jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="selectPageListQuickMenu" parameterType="dataMap" resultType="dataMap">
+		/* admin.quickMenu.selectPageListQuickMenu */
+	<![CDATA[
+		SELECT
+			A.QUICK_MENU_SEQ AS QUICK_MENU_SEQ
+			,B.CODE_NM AS SYS_NM
+			,A.ZONE_CODE AS ZONE_CODE
+			,C.CODE_NM AS ZONE_NM
+			,A.QUICK_MENU_NM
+			,CASE A.DISP_YN WHEN 'Y' THEN '예' ELSE '아니오' END DISP_YN_NM
+			,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		FROM TB_QUICK_MENU A
+		LEFT OUTER JOIN TB_CODE B ON A.SYS_CODE = B.CODE AND B.GROUP_ID = #{sys_group_id, jdbcType=VARCHAR}
+		LEFT OUTER JOIN TB_CODE C ON A.ZONE_CODE = C.CODE AND C.GROUP_ID = #{zone_group_id, jdbcType=VARCHAR}
+		WHERE 1 = 1
+	]]>
+		<if test="sch_text != null and sch_text != ''">
+			<choose>
+				<when test="sch_type == 'quickMenu_nm'">
+					AND A.QUICK_MENU_NM LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+				</when>
+				<when test="sch_type == 'attrb_1'">
+					AND A.ATTRB_1 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+				</when>
+				<when test="sch_type == 'attrb_2'">
+					AND A.ATTRB_2 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+				</when>
+				<when test="sch_type == 'attrb_3'">
+					AND A.ATTRB_3 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+				</when>
+				<when test="sch_type == 'attrb_123'">
+					AND ((A.ATTRB_1 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')) OR
+					(A.ATTRB_2 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%'))
+					OR (A.ATTRB_3 LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')))
+				</when>
+			</choose>
+		</if>
+		<if test="sch_sys_code != null and sch_sys_code != ''">
+			AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+		</if>
+		<if
+			test="sch_quick_zone_code != null and sch_quick_zone_code != ''">
+			AND A.ZONE_CODE = #{sch_quick_zone_code, jdbcType=VARCHAR}
+		</if>
+		ORDER BY A.QUICK_MENU_SEQ DESC
+	<![CDATA[
+		LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	]]>
+	</select>
+
+	<insert id="insertQuickMenu" parameterType="dataMap">
+	/* admin.quickMenu.insertQuickMenu */
+	<![CDATA[
+	INSERT INTO TB_QUICK_MENU(
+		SYS_CODE
+		,ZONE_CODE
+		,QUICK_MENU_NM
+		,WEB_IMAGE_DOC_ID
+		,MOBILE_IMAGE_DOC_ID
+		,DISP_YN
+		,ATTRB_1
+		,ATTRB_2
+		,ATTRB_3
+		,REGISTER_NO
+		,REGIST_DT
+	)VALUES(
+		#{sys_code, jdbcType=VARCHAR}
+		,#{quick_zone_code, jdbcType=VARCHAR}
+		,#{quickMenu_nm, jdbcType=VARCHAR}
+		,#{web_image_doc_id, jdbcType=VARCHAR}
+		,#{mobile_image_doc_id, jdbcType=VARCHAR}
+		,#{disp_yn, jdbcType=VARCHAR}
+		,#{attrb_1, jdbcType=VARCHAR}
+		,#{attrb_2, jdbcType=VARCHAR}
+		,#{attrb_3, jdbcType=VARCHAR}
+		,#{ss_user_no, jdbcType=VARCHAR}
+		,NOW()
+	)
+	]]>
+	</insert>
+
+	<select id="selectQuickMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.quickMenu.selectQuickMenu */
+	SELECT
+		A.QUICK_MENU_SEQ
+		,A.SYS_CODE
+		,A.ZONE_CODE
+		,B.CODE_NM AS SYS_NM
+		,C.CODE_NM AS ZONE_NM
+		,A.QUICK_MENU_NM
+		,A.WEB_IMAGE_DOC_ID
+		,A.MOBILE_IMAGE_DOC_ID
+		,A.DISP_YN
+		,CASE A.DISP_YN WHEN 'Y' THEN '예' ELSE '아니오' END DISP_YN_NM
+		,A.ATTRB_1
+		,A.ATTRB_2
+		,A.ATTRB_3
+		,X.USER_NM AS REGISTER_NM
+		,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d %h:%i') AS REGIST_YMD
+		,Y.USER_NM AS UPDUSR_NM
+		,DATE_FORMAT(A.UPDT_DT, '%Y.%m.%d %h:%i') AS UPDT_YMD
+	FROM TB_QUICK_MENU A
+		LEFT OUTER JOIN TB_CODE B ON A.SYS_CODE = B.CODE AND B.GROUP_ID = #{sys_group_id, jdbcType=VARCHAR}
+		LEFT OUTER JOIN TB_CODE C ON A.ZONE_CODE = C.CODE AND C.GROUP_ID = #{zone_group_id, jdbcType=VARCHAR}
+		LEFT OUTER JOIN TB_USER X ON A.REGISTER_NO = X.USER_NO
+		LEFT OUTER JOIN TB_USER Y ON A.UPDUSR_NO = Y.USER_NO
+	WHERE
+		A.QUICK_MENU_SEQ = #{quickMenu_seq, jdbcType=INTEGER}
+	</select>
+
+	<update id="updateQuickMenu" parameterType="dataMap">
+	/* admin.quickMenu.updateQuickMenu */
+	<![CDATA[
+	UPDATE TB_QUICK_MENU
+	SET
+		SYS_CODE = #{sys_code, jdbcType=VARCHAR}
+		,ZONE_CODE = #{quick_zone_code, jdbcType=VARCHAR}
+		,QUICK_MENU_NM = #{quickMenu_nm, jdbcType=VARCHAR}
+		,WEB_IMAGE_DOC_ID = #{web_image_doc_id, jdbcType=VARCHAR}
+		,MOBILE_IMAGE_DOC_ID = #{mobile_image_doc_id, jdbcType=VARCHAR}
+		,DISP_YN = #{disp_yn, jdbcType=VARCHAR}
+		,ATTRB_1 = #{attrb_1, jdbcType=VARCHAR}
+		,ATTRB_2 = #{attrb_2, jdbcType=VARCHAR}
+		,ATTRB_3 = #{attrb_3, jdbcType=VARCHAR}
+		,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		,UPDT_DT = SYSDATE()
+	]]>
+		WHERE
+		QUICK_MENU_SEQ = #{quickMenu_seq, jdbcType=INTEGER}
+	</update>
+
+	<delete id="deleteQuickMenu" parameterType="dataMap">
+		/* admin.quickMenu.deleteQuickMenu */
+	<![CDATA[
+	DELETE FROM TB_QUICK_MENU WHERE QUICK_MENU_SEQ = #{quickMenu_seq, jdbcType=VARCHAR}
+	]]>
+	</delete>
+
+	<select id="selectQuickMenuImgs" parameterType="quickMenuImgFileVo" resultType="quickMenuImgFileVo">
+	/* admin.quickMenu.selectQuickMenuImgs */
+	<![CDATA[
+		SELECT
+			QUICK_MENU_IMAGE_SEQ
+			, LINK_URL
+			, ATTRB_1
+			, ATTRB_2
+			, ATTRB_3
+			, FILE_ID
+			, DOC_ID
+			, FILE_NM
+			, FILE_SIZE
+			, FILE_EXTSN_NM AS FILE_EXT_NM
+			, FILE_PARTN_COURS AS FILE_RLTV_PATH
+			, FILE_ABSLT_COURS AS FILE_ASLT_PATH
+			, CNTNTS_TY AS CONTENT_TYPE
+			, SORT_ORDR AS SRT_ORD
+			, REGISTER_NO AS RGSTP_ID
+			, REGIST_DT AS RGST_DTTM
+			, DISP_YN
+		FROM TB_QUICK_MENU_IMAGE
+		WHERE DOC_ID = #{docId, jdbcType=VARCHAR}
+		ORDER BY SORT_ORDR
+	]]>
+	</select>
+
+	<select id="selectQuickMenuImg" parameterType="ntsysFileVO"
+		resultType="ntsysFileVO">
+		/* admin.quickMenu.selectQuickMenuImg */
+	<![CDATA[
+		SELECT
+			FILE_ID
+			, DOC_ID
+			, FILE_NM
+			, FILE_SIZE
+			, FILE_EXTSN_NM AS FILE_EXT_NM
+			, FILE_PARTN_COURS AS FILE_RLTV_PATH
+			, FILE_ABSLT_COURS AS FILE_ASLT_PATH
+			, CNTNTS_TY AS CONTENT_TYPE
+			, SORT_ORDR AS SRT_ORD
+			, REGISTER_NO AS RGSTP_ID
+			, REGIST_DT AS RGST_DTTM
+		FROM TB_QUICK_MENU_IMAGE
+		WHERE FILE_ID = #{fileId, jdbcType=VARCHAR}
+		ORDER BY SORT_ORDR
+	]]>
+	</select>
+
+	<insert id="insertQuickMenuImg" parameterType="ntsysFileVO">
+		/* admin.quickMenu.insertQuickMenuImg */
+		INSERT INTO TB_QUICK_MENU_IMAGE(
+		DOC_ID
+		, FILE_ID
+		, FILE_NM
+		, FILE_EXTSN_NM
+		, FILE_SIZE
+		, FILE_PARTN_COURS
+		, FILE_ABSLT_COURS
+		, CNTNTS_TY
+		, SORT_ORDR
+		, REGISTER_NO
+		, REGIST_DT
+		, DISP_YN
+		)
+		SELECT
+		#{docId, jdbcType=VARCHAR}
+		, #{fileId, jdbcType=VARCHAR}
+		, #{fileNm, jdbcType=VARCHAR}
+		, #{fileExtNm, jdbcType=VARCHAR}
+		, #{fileSize, jdbcType=VARCHAR}
+		, #{fileRltvPath, jdbcType=VARCHAR}
+		, #{fileAsltPath, jdbcType=VARCHAR}
+		, #{contentType, jdbcType=VARCHAR}
+		, (SELECT IFNULL(MAX(SORT_ORDR),0)+1 FROM TB_QUICK_MENU_IMAGE A WHERE
+		DOC_ID = #{docId, jdbcType=VARCHAR})
+		, #{ssUserId, jdbcType=VARCHAR}
+		, SYSDATE()
+		, 'Y'
+		FROM DUAL
+	</insert>
+
+	<update id="updateQuickMenuImg" parameterType="dataMap">
+		/* admin.quickMenu.updateQuickMenuImg */
+		<![CDATA[
+		UPDATE TB_QUICK_MENU_IMAGE
+		SET
+			SORT_ORDR = #{sort_ordr, jdbcType=VARCHAR}
+			, LINK_URL = #{link_url, jdbcType=VARCHAR}
+			, ATTRB_1 = #{attrb_1, jdbcType=VARCHAR}
+			, ATTRB_2 = #{attrb_2, jdbcType=VARCHAR}
+			, ATTRB_3 = #{attrb_3, jdbcType=VARCHAR}
+		WHERE FILE_ID = #{file_id, jdbcType=VARCHAR}
+		]]>
+	</update>
+
+
+	<delete id="deleteQuickMenuImg" parameterType="dataMap">
+		/* admin.quickMenu.deleteQuickMenuImg */
+		<![CDATA[
+			DELETE FROM TB_QUICK_MENU_IMAGE
+			WHERE
+				FILE_ID = #{file_id, jdbcType=VARCHAR}
+		]]>
+	</delete>
+
+	<delete id="deleteQuickMenuImgs" parameterType="dataMap">
+		/* admin.quickMenu.deleteQuickMenuImgs */
+		<![CDATA[
+			DELETE FROM TB_QUICK_MENU_IMAGE
+			WHERE
+				DOC_ID = #{docId, jdbcType=VARCHAR}
+		]]>
+	</delete>
+
+
+</mapper>

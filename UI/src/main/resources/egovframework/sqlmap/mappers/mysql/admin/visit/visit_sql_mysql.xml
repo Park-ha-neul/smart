@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.visit">
+
+	<select id="selectTotCntVisit" parameterType="dataMap" resultType="int">
+	/* admin.visit.selectTotCntVisit */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_VISIT_REQST A1
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'nm'">
+		AND (A1.NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%') OR A1.APPLCNT LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%'))
+			</when>
+			<when test="sch_type == 'hp'">
+		AND A1.CTTPC LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'email'">
+		AND A1.EMAIL LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_place_se_code != null and sch_place_se_code != ''">
+		AND A1.PLACE_SE_CODE = #{sch_place_se_code, jdbcType=VARCHAR}
+	</if>
+	</select>
+
+	<select id="selectPageListVisit" parameterType="dataMap" resultType="dataMap">
+	/* admin.visit.selectPageListVisit */
+	SELECT A1.REQST_SEQ
+		, A1.NM
+		, A1.APPLCNT
+		, A1.RSPOFC
+		, A1.HOPE_BEGIN_DT
+		, DATE_FORMAT(A1.HOPE_BEGIN_DT, '%Y.%m.%d %H:%i') AS HOPE_BEGIN_DT_STR
+		, A1.HOPE_END_DT
+		, DATE_FORMAT(A1.HOPE_END_DT, '%Y.%m.%d %H:%i') AS HOPE_END_DT_STR
+		, A1.NMPR
+		, A1.CTTPC
+		, A1.PLACE_SE_CODE
+		, A2.CODE_NM AS PLACE_SE_NM
+		, A1.EMAIL
+		, A1.PURPS
+		, REPLACE(A1.PURPS, '\r', '') AS PURPS_EXCEL
+		, A1.REQUST_MATTER
+		, REPLACE(A1.REQUST_MATTER, '\r', '') AS REQUST_MATTER_EXCEL
+		, A1.MEMO
+		, REPLACE(A1.MEMO, '\r', '') AS MEMO_EXCEL
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	FROM TB_VISIT_REQST A1
+	LEFT OUTER JOIN TB_CODE A2
+	ON A2.GROUP_ID = 'R010470'
+		AND A1.PLACE_SE_CODE = A2.CODE
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'nm'">
+		AND (A1.NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%') OR A1.APPLCNT LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%'))
+			</when>
+			<when test="sch_type == 'hp'">
+		AND A1.CTTPC LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'email'">
+		AND A1.EMAIL LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_place_se_code != null and sch_place_se_code != ''">
+		AND A1.PLACE_SE_CODE = #{sch_place_se_code, jdbcType=VARCHAR}
+	</if>
+	ORDER BY A1.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectVisit" parameterType="dataMap" resultType="dataMap">
+	/* admin.visit.selectVisit */
+	SELECT A1.REQST_SEQ
+		, A1.NM
+		, A1.APPLCNT
+		, A1.RSPOFC
+		, A1.HOPE_BEGIN_DT
+		, DATE_FORMAT(A1.HOPE_BEGIN_DT, '%Y.%m.%d %H:%i') AS HOPE_BEGIN_DT_STR
+		, A1.HOPE_END_DT
+		, DATE_FORMAT(A1.HOPE_END_DT, '%Y.%m.%d %H:%i') AS HOPE_END_DT_STR
+		, A1.NMPR
+		, A1.CTTPC
+		, A1.PLACE_SE_CODE
+		, A2.CODE_NM AS PLACE_SE_NM
+		, A1.EMAIL
+		, A1.PURPS
+		, REPLACE(A1.PURPS, '\r', '') AS PURPS_EXCEL
+		, A1.REQUST_MATTER
+		, REPLACE(A1.REQUST_MATTER, '\r', '') AS REQUST_MATTER_EXCEL
+		, A1.MEMO
+		, REPLACE(A1.MEMO, '\r', '') AS MEMO_EXCEL
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	FROM TB_VISIT_REQST A1
+	LEFT OUTER JOIN TB_CODE A2
+	ON A2.GROUP_ID = 'R010470'
+		AND A1.PLACE_SE_CODE = A2.CODE
+	WHERE A1.REQST_SEQ = #{reqst_seq, jdbcType=INTEGER}
+	</select>
+	
+	<update id="updateVisit" parameterType="dataMap">
+	/* admin.visit.updateVisit */
+	UPDATE TB_VISIT_REQST
+	SET MEMO = #{memo, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE REQST_SEQ = #{reqst_seq, jdbcType=INTEGER}
+	</update>
+	
+	<delete id="deleteVisit" parameterType="dataMap">
+	/* admin.visit.deleteVisit */
+	DELETE FROM TB_VISIT_REQST
+	WHERE REQST_SEQ = #{reqst_seq, jdbcType=INTEGER}
+	</delete>
+</mapper>

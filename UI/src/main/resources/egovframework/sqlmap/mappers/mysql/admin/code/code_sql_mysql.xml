@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin.code">
+
+	<select id="selectTotCntGroupCode" parameterType="dataMap" resultType="int">
+	/* admin.code.selectTotCntGroupCode */
+	SELECT
+		COUNT(1) TOT_CNT
+	FROM
+		TB_CODE_GROUP A LEFT OUTER JOIN TB_USER B
+		ON A.REGISTER_NO = B.USER_NO
+	WHERE 1 = 1
+	<if test="sch_grp_code_nm != null and sch_grp_code_nm != ''">
+	AND   A.GROUP_NM LIKE CONCAT('%', #{sch_grp_code_nm, jdbcType=VARCHAR}, '%')
+	</if>
+	</select>
+
+	<select id="selectPageListGroupCode" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectPageListGroupCode */
+	SELECT
+		A.GROUP_ID
+		,A.GROUP_NM
+		,A.GROUP_NM_ENG
+		,A.RM
+		,B.USER_NM AS REGISTER_NM
+		,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	FROM
+		TB_CODE_GROUP A LEFT OUTER JOIN TB_USER B
+		ON A.REGISTER_NO = B.USER_NO
+	WHERE 1 = 1
+	<if test="sch_grp_code_nm != null and sch_grp_code_nm != ''">
+	AND   A.GROUP_NM LIKE CONCAT('%', #{sch_grp_code_nm, jdbcType=VARCHAR}, '%')
+	</if>
+	ORDER BY A.GROUP_ID DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectGroupCode" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectGroupCode */
+	SELECT
+		GROUP_ID
+		,GROUP_NM
+		,GROUP_NM_ENG
+		,RM
+	FROM
+		TB_CODE_GROUP
+	WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectListCode" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectListCode */
+	SELECT
+		GROUP_ID
+		,CODE
+		,CODE_NM
+		,CODE_NM_ENG
+		,ATTRB_1
+		,ATTRB_2
+		,ATTRB_3
+		,USE_YN
+		,SORT_ORDR
+	FROM TB_CODE
+	WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	ORDER BY SORT_ORDR
+	</select>
+
+	<delete id="deleteGroupCode" parameterType="dataMap">
+	/* admin.code.deleteGroupCode */
+	DELETE FROM TB_CODE_GROUP
+	WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteCode" parameterType="dataMap">
+	/* admin.code.deleteCode */
+	DELETE FROM TB_CODE
+	WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	</delete>
+
+	<select id="selectExistYnGroupCode" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectExistYnGroupCode */
+	SELECT
+		CASE WHEN COUNT(*) <![CDATA[ > ]]> 0 THEN 'Y' ELSE 'N' END EXIST_YN
+	FROM TB_CODE_GROUP
+	WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	</select>
+
+	<insert id="insertGroupCode" parameterType="dataMap">
+	/* admin.code.insertGroupCode */
+	INSERT INTO TB_CODE_GROUP (
+		GROUP_ID
+		,GROUP_NM
+		,GROUP_NM_ENG
+		,RM
+		,REGISTER_NO
+		,REGIST_DT
+	) VALUES (
+		#{group_id, jdbcType=VARCHAR}
+		,#{group_nm, jdbcType=VARCHAR}
+		,#{group_nm_eng, jdbcType=VARCHAR}
+		,#{rm, jdbcType=VARCHAR}
+		,#{ss_user_no, jdbcType=VARCHAR}
+		,NOW()
+	)
+	</insert>
+
+	<update id="updateGroupCode" parameterType="dataMap">
+	/* admin.code.updateGroupCode */
+	UPDATE TB_CODE_GROUP
+	SET GROUP_NM = #{group_nm, jdbcType=VARCHAR}
+		,GROUP_NM_ENG = #{group_nm_eng, jdbcType=VARCHAR}
+		,RM = #{rm, jdbcType=VARCHAR}
+		,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		,UPDT_DT = NOW()
+	WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	</update>
+
+	<insert id="insertCode" parameterType="dataMap">
+	/* admin.code.insertCode */
+	INSERT INTO TB_CODE(
+		GROUP_ID
+		,GROUP_NM
+		,CODE
+		,CODE_NM
+		,CODE_NM_ENG
+		,ATTRB_1
+		,ATTRB_2
+		,ATTRB_3
+		,SORT_ORDR
+		,USE_YN
+		,REGISTER_NO
+		,REGIST_DT
+	) VALUES (
+		#{group_id, jdbcType=VARCHAR}
+		,#{group_nm, jdbcType=VARCHAR}
+		,#{code, jdbcType=VARCHAR}
+		,#{code_nm, jdbcType=VARCHAR}
+		,#{code_nm_eng, jdbcType=VARCHAR}
+		,#{attrb_1, jdbcType=VARCHAR}
+		,#{attrb_2, jdbcType=VARCHAR}
+		,#{attrb_3, jdbcType=VARCHAR}
+		,#{sort_ordr, jdbcType=VARCHAR}
+		,#{use_yn, jdbcType=VARCHAR}
+		,#{ss_user_no, jdbcType=VARCHAR}
+		,NOW()
+	)
+	</insert>
+
+	<select id="selectMaxGroupId" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectMaxGroupId */
+		SELECT
+			MAX(SUBSTR(GROUP_ID, 2, LENGTH(GROUP_ID)-1)) AS MAX_GROUP_ID
+		FROM TB_CODE_GROUP
+	</select>
+
+	<select id="selectExistYnGroupId" parameterType="dataMap" resultType="dataMap">
+	/* admin.code.selectExistYnGroupId */
+	SELECT CASE WHEN COUNT(1) = 0 THEN 'N' ELSE 'Y' END AS EXIST_YN
+	FROM TB_CODE A
+	WHERE UPPER(A.GROUP_ID) = UPPER(#{group_id, jdbcType=VARCHAR})
+	</select>
+
+</mapper>

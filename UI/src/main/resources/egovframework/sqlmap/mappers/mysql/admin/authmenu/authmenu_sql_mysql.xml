@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin.authmenu">
+
+	<select id="selectTotCntAuthMenu" parameterType="dataMap" resultType="int">
+	/* admin.authmenu.selectTotCntAuthMenu */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_AUTHOR A
+	LEFT OUTER JOIN TB_USER B
+		ON A.REGISTER_NO = B.USER_NO
+	WHERE 1 = 1
+	<if test="sch_auth_nm != null and sch_auth_nm != ''">
+	AND A.AUTHOR_NM LIKE CONCAT('%', #{sch_auth_nm, jdbcType=VARCHAR}, '%')
+	</if>
+	</select>
+
+	<select id="admin.authmenu.selectPageListAuthMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.authmenu.selectPageListAuthMenu */
+	SELECT AUTHOR_ID
+		, A.AUTHOR_NM
+		, A.RM
+		, A.REGISTER_NO
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS RGST_YMD
+		, B.USER_NM
+		, A.REGIST_DT
+	FROM TB_AUTHOR A
+	LEFT OUTER JOIN TB_USER B
+	ON A.REGISTER_NO = B.USER_NO
+	WHERE 1 = 1
+	<if test="sch_auth_nm != null and sch_auth_nm != ''">
+		AND A.AUTHOR_NM LIKE CONCAT('%', #{sch_auth_nm, jdbcType=VARCHAR}, '%')
+	</if>
+	ORDER BY AUTHOR_NM
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<select id="admin.authmenu.selectInfoAuthMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.authmenu.selectInfoAuthMenu */
+	SELECT A.AUTHOR_NM
+	FROM TB_AUTHOR A
+	WHERE A.AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</select>
+
+	<select id="admin.authmenu.selectListAuthMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.authmenu.selectListAuthMenu */
+	SELECT	A.MENU_ID,
+			A.MENU_PK,
+			A.MENU_TY_CODE,
+			A.MENU_LEVEL,
+			CASE WHEN A.FNCT_NM IS NULL OR A.FNCT_NM = '' THEN A.MENU_NM
+				ELSE CONCAT(A.MENU_NM, '(', A.FNCT_NM, ')')
+		 	END AS MENU_NM,
+			A.URL,
+			A.SORT_ORDR,
+			A.USE_YN,
+			A.SORT_ORDR_1,
+			A.SORT_ORDR_2,
+			A.SORT_ORDR_3,
+			A.SORT_ORDR_4,
+			A.SORT_ORDR_5,
+			A.REGISTER_NO,
+			A.REGIST_DT,
+			A.UPDUSR_NO,
+			A.UPDT_DT,
+			CASE WHEN B.MENU_PK IS NULL THEN 'N'
+				ELSE 'Y'
+			END AUTH_YN,
+			C.AUTHOR_NM
+	FROM	TB_MENU A
+			LEFT OUTER JOIN TB_AUTHOR_MENU B	ON A.MENU_PK = B.MENU_PK AND B.AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+			LEFT OUTER JOIN TB_AUTHOR C			ON B.AUTHOR_ID = C.AUTHOR_ID
+	<if test = 'sch_parent_menu_id != null and sch_parent_menu_id != ""'>
+	WHERE A.MENU_ID LIKE CONCAT(#{sch_parent_menu_id, jdbcType=VARCHAR},'%')
+	</if>
+	ORDER BY SORT_ORDR_1 ASC ,SORT_ORDR_2 ASC ,SORT_ORDR_3 ASC ,SORT_ORDR_4 ASC ,SORT_ORDR_5 ASC,SORT_ORDR_6 ASC
+	</select>
+
+	<insert id="admin.authmenu.insertAuthMenu" parameterType="dataMap">
+	/* admin.authmenu.insertAuthMenu */
+	<![CDATA[
+	INSERT INTO TB_AUTHOR_MENU(
+		AUTHOR_ID
+		,MENU_PK
+		,REGISTER_NO
+		,REGIST_DT
+	) VALUES (
+		#{author_id, jdbcType=VARCHAR}
+		,#{menu_pk, jdbcType=VARCHAR}
+		,#{ss_user_id, jdbcType=INTEGER}
+		,SYSDATE()
+	)
+	]]>
+	</insert>
+
+	<delete id="admin.authmenu.deleteAuthMenu" parameterType="dataMap">
+	/* admin.authmenu.deleteAuthMenu */
+	DELETE  A
+	FROM	TB_AUTHOR_MENU A LEFT OUTER JOIN TB_MENU B ON A.MENU_PK = B.MENU_PK
+	WHERE	A.AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	<if test = 'sch_parent_menu_id != null and sch_parent_menu_id != ""'>
+			AND	B.MENU_ID LIKE CONCAT(#{sch_parent_menu_id, jdbcType=VARCHAR},'%')
+	</if>
+	</delete>
+
+</mapper>

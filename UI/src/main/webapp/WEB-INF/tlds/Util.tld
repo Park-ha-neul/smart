@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee  http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+	
+	<description>Util functions library</description>
+	<display-name>Util functions</display-name>
+	<tlib-version>1.1</tlib-version>
+	<short-name>Util</short-name>
+
+	<function>
+		<description>줄바꿈, 띄어쓰기 html 태그로 변경</description>
+		<name>getHtml</name>
+		<function-class>egovframework.framework.common.util.JstlCustomUtil</function-class>
+		<function-signature>java.lang.String getHtml(java.lang.String)</function-signature>
+		<example>
+		 ${ Util:getHtml(str) }
+		</example>  
+	</function>
+
+</taglib>

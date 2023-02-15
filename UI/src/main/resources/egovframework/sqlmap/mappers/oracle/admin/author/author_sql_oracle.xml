@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin.author">
+
+	<select id="selectTotCntAuthor" parameterType="dataMap" resultType="int">
+	/* admin.author.selectTotCntAuthor */
+	SELECT COUNT(1) TOT_CNT
+	FROM TBW_AUTHOR A
+	WHERE 1 = 1
+	<if test="sch_auth_nm != null and sch_auth_nm != ''">
+	AND   A.AUTHOR_NM LIKE '%' || #{sch_auth_nm, jdbcType=VARCHAR} || '%'
+	</if>
+	</select>
+
+	<select id="selectPageListAuthor" parameterType="dataMap" resultType="dataMap">
+	/* admin.author.selectPageListAuthor */
+	SELECT *
+	FROM (
+		SELECT ROWNUM AS RNUM, AA.*
+		FROM (
+			SELECT A.AUTHOR_ID
+				, A.AUTHOR_NM
+				, A.RM
+				, A.REGISTER_NO
+				, B.USER_NM AS REGISTER_NM
+				, TO_CHAR(A.REGIST_DT, 'YYYY.MM.DD') AS REGIST_YMD
+				, A.REGIST_DT
+			FROM TBW_AUTHOR A
+			LEFT OUTER JOIN TBW_USER B
+			ON A.REGISTER_NO = B.USER_NO
+			WHERE 1 = 1
+			<if test="sch_auth_nm != null and sch_auth_nm != ''">
+			AND   A.AUTHOR_NM LIKE '%' || #{sch_auth_nm, jdbcType=VARCHAR} || '%'
+			</if>
+			ORDER BY A.AUTHOR_NM
+		) AA
+	) AAA
+	WHERE RNUM <![CDATA[ > ]]> #{limitStart, jdbcType=INTEGER} AND ROWNUM <![CDATA[ <= ]]> #{limitCount, jdbcType=INTEGER}
+	</select>
+
+	<insert id="insertAuthor" parameterType="dataMap">
+	/* admin.author.insertAuthor */
+	INSERT INTO TBW_AUTHOR(
+		AUTHOR_ID
+		, AUTHOR_NM
+		, RM
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{author_id, jdbcType=VARCHAR}
+		, #{author_nm, jdbcType=VARCHAR}
+		, #{rm, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=INTEGER}
+		, SYSDATE
+	)
+	</insert>
+
+	<select id="selectAuthor" parameterType="dataMap" resultType="dataMap">
+	/* admin.author.selectAuthor */
+	SELECT AUTHOR_ID
+		, A.AUTHOR_NM
+		, A.RM
+		, TO_CHAR(A.REGIST_DT, 'YYYY.MM.DD') AS REGIST_YMD
+		, TO_CHAR(A.UPDT_DT, 'YYYY.MM.DD') AS UPDT_YMD
+	FROM
+		TBW_AUTHOR A
+	WHERE A.AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateAuthor" parameterType="dataMap">
+	/* admin.author.updateAuthor */
+	UPDATE TBW_AUTHOR
+	SET AUTHOR_NM = #{author_nm, jdbcType=VARCHAR}
+		, RM = #{rm, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=INTEGER}
+		, UPDT_DT = SYSDATE
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteAuthor" parameterType="dataMap">
+	/* admin.author.deleteAuthor */
+	DELETE FROM TBW_AUTHOR
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteUserAuthor" parameterType="dataMap">
+	/* admin.author.deleteUserAuthor */
+	DELETE FROM TBW_USER_AUTHOR
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteAuthorMenu" parameterType="dataMap">
+	/* admin.author.deleteAuthorMenu */
+	DELETE FROM TBW_AUTHOR_MENU
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</delete>
+
+	<select id="selectExistYnAuthor" parameterType="dataMap" resultType="string">
+	/* admin.author.selectExistYnAuthor */
+	SELECT CASE WHEN COUNT(*) <![CDATA[ > ]]> 0 THEN 'Y' ELSE 'N' END EXIST_YN
+	FROM TBW_AUTHOR
+	WHERE AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+	</select>
+
+</mapper>

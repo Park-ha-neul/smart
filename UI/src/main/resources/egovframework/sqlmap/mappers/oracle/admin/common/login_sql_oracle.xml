@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="login">
+
+	<select id="selectUserInfo" parameterType="dataMap" resultType="dataMap">
+	/* login.selectUserInfo : 사용자 로그인 정보 조회*/
+	SELECT A.USER_ID
+		, A.USER_NO
+		, A.USER_NM
+		, B.AUTHOR_ID
+		, A.ORGAN_CODE
+		, A.INTRCP_YN
+		, A.THEMA_OPTION
+	FROM TBW_USER A
+	LEFT OUTER JOIN TBW_USER_AUTHOR B
+	ON A.USER_NO = B.USER_NO
+	WHERE A.USER_ID = #{id, jdbcType=VARCHAR}
+		AND	A.PASSWORD =  #{pwd, jdbcType=VARCHAR}
+		AND A.USER_STTUS_CODE  = '10'
+	</select>
+
+	<update id="updateAccessCnt" parameterType="dataMap">
+	/* common.updateAccessCnt : 로그인 실패시 카운팅 추가 */
+	UPDATE TBW_USER
+	SET ACCES_CO = NVL(ACCES_CO, 0) + 1
+		, ACCES_DT = SYSDATE
+		, INTRCP_YN = CASE WHEN NVL(ACCES_CO, 0)<![CDATA[ > ]]> 4 THEN 'Y' ELSE 'N' END
+	WHERE USER_ID = #{id, jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateAccessCntInit" parameterType="dataMap">
+	/* common.updateAccessCntInit : 로그인 실패 카운팅 초기화 */
+	UPDATE TBW_USER
+	SET ACCES_CO = 0
+		, ACCES_DT = SYSDATE
+		, INTRCP_YN = 'N'
+	WHERE USER_ID = #{id, jdbcType=VARCHAR}
+	</update>
+
+</mapper>

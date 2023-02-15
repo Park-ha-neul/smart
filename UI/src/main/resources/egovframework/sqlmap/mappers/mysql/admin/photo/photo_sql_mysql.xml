@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.photo">
+
+	<select id="selectTotCntPhotoMgt" parameterType="dataMap" resultType="int">
+	/* admin.photo.selectTotCntPhotoMgt */
+	SELECT COUNT(1) AS TOT_CNT
+	FROM TB_PHOTO_GROUP
+		WHERE 1 = 1
+	<if test="sch_sys_code != null and sch_sys_code != ''">
+		AND SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_text != null and sch_text != ''">
+		AND SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_start_photo_potogrf_de_tmp != null and sch_start_photo_potogrf_de_tmp != ''">
+		AND PHOTO_POTOGRF_DE <![CDATA[ >= ]]> #{sch_start_photo_potogrf_de_tmp, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_end_photo_potogrf_de_tmp != null and sch_end_photo_potogrf_de_tmp != ''">
+		AND PHOTO_POTOGRF_DE <![CDATA[ <= ]]> #{sch_end_photo_potogrf_de_tmp, jdbcType=VARCHAR}
+	</if>
+	ORDER BY PHOTO_SEQ DESC
+	</select>
+
+	<select id="selectPageListPhotoMgt" parameterType="dataMap" resultType="dataMap">
+	/* admin.photo.selectPageListPhotoMgt */
+		SELECT PG.PHOTO_SEQ
+			, C.CODE_NM AS SYS_NM
+			, PG.SJ
+			, DATE_FORMAT(STR_TO_DATE(PG.PHOTO_POTOGRF_DE, '%Y%m%d'), '%Y.%m.%d') AS PHOTO_POTOGRF_DE
+			, DATE_FORMAT(PG.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		FROM TB_PHOTO_GROUP PG
+		LEFT OUTER JOIN TB_CODE C
+		ON PG.SYS_CODE = C.CODE
+			AND C.GROUP_ID = #{sys_group_id, jdbcType=VARCHAR}
+		WHERE 1 = 1
+		<if test="sch_sys_code != null and sch_sys_code != ''">
+			AND PG.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+		</if>
+		<if test="sch_text != null and sch_text != ''">
+			AND PG.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+		</if>
+		<if test="sch_start_photo_potogrf_de_tmp != null and sch_start_photo_potogrf_de_tmp != ''">
+			AND PG.PHOTO_POTOGRF_DE <![CDATA[ >= ]]> #{sch_start_photo_potogrf_de_tmp, jdbcType=VARCHAR}
+		</if>
+		<if test="sch_end_photo_potogrf_de_tmp != null and sch_end_photo_potogrf_de_tmp != ''">
+			AND PG.PHOTO_POTOGRF_DE <![CDATA[ <= ]]> #{sch_end_photo_potogrf_de_tmp, jdbcType=VARCHAR}
+		</if>
+		ORDER BY PG.PHOTO_SEQ DESC
+		LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<resultMap id="resultMap_photoDetailMap" type="dataMap">
+		<result property="SYS_NM"					column="SYS_NM" />
+		<result property="SJ"								column="SJ" />
+		<result property="IMAGE_DOC_ID"			column="IMAGE_DOC_ID" />
+		<result property="PHOTO_POTOGRF_DE"	column="PHOTO_POTOGRF_DE" />
+		<result property="RM"								column="RM" />
+		<result property="REGIST_YMD"				column="REGIST_YMD" />
+	</resultMap>
+
+	<select id="selectPhotoGroup" parameterType="dataMap" resultMap="resultMap_photoDetailMap">
+	/* admin.photo.selectPhotoGroup */
+	SELECT PG.SYS_CODE
+		, C.CODE_NM AS SYS_NM
+		, PG.SJ
+		, PG.IMAGE_DOC_ID
+		, DATE_FORMAT(STR_TO_DATE(PG.PHOTO_POTOGRF_DE, '%Y%m%d'), '%Y.%m.%d') AS PHOTO_POTOGRF_DE
+		, PG.RM
+		, DATE_FORMAT(PG.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	FROM TB_PHOTO_GROUP PG
+	LEFT OUTER JOIN TB_CODE C
+	ON PG.SYS_CODE = C.CODE
+		AND C.GROUP_ID = #{sys_group_id, jdbcType=VARCHAR}
+	WHERE PG.PHOTO_SEQ = #{photo_seq, jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deletePhotoGroup" parameterType="dataMap">
+	/* admin.photo.deletePhotoGroup */
+	DELETE FROM TB_PHOTO_GROUP WHERE PHOTO_SEQ = #{photo_seq, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deletePhotoMeta" parameterType="dataMap">
+	/* admin.photo.deletePhotoMeta */
+	DELETE FROM TB_PHOTO_META WHERE PHOTO_SEQ = #{photo_seq, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deletePhotoMetaByFileId" parameterType="dataMap">
+	/* admin.photo.deletePhotoMetaByFileId */
+	DELETE FROM TB_PHOTO_META WHERE PHOTO_SEQ = #{photo_seq, jdbcType=VARCHAR}
+	AND FILE_ID = #{file_id, jdbcType=VARCHAR}
+	</delete>
+
+	<update id="updatePhotoGroup" parameterType="dataMap">
+	/* admin.photo.updatePhotoGroup */
+	UPDATE TB_PHOTO_GROUP
+	SET SYS_CODE = #{sys_code, jdbcType=VARCHAR}
+			,SJ = #{sj, jdbcType=VARCHAR}
+			<if test="photo_potogrf_de != null and photo_potogrf_de != ''">
+			,PHOTO_POTOGRF_DE = #{photo_potogrf_de, jdbcType=VARCHAR}
+			</if>
+			<if test="rm != null and rm != ''">
+			,RM = #{rm, jdbcType=VARCHAR}
+			</if>
+			,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+			,UPDT_DT = NOW()
+	WHERE PHOTO_SEQ = #{photo_seq, jdbcType=VARCHAR}
+	</update>
+
+	<update id="updatePhotoMeta" parameterType="dataMap">
+	/* admin.photo.updatePhotoMeta */
+	UPDATE TB_PHOTO_META
+	SET CAPTION = #{caption_update, jdbcType=VARCHAR}
+			,KWRD = #{kwrd_update, jdbcType=VARCHAR}
+			,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+			,UPDT_DT = NOW()
+	WHERE FILE_ID = #{file_id_update, jdbcType=VARCHAR}
+	</update>
+
+	<insert id="insertPhotoGroup" parameterType="ntsysFileVO">
+		/* admin.photo.insertPhotoGroup */
+		INSERT INTO TB_PHOTO_GROUP
+		(PHOTO_SEQ
+		,SYS_CODE
+		,SJ
+		,IMAGE_DOC_ID
+		<if test="photo_potogrf_de != null and photo_potogrf_de != ''">
+		,PHOTO_POTOGRF_DE
+		</if>
+		<if test="rm != null and rm != ''">
+		,RM
+		</if>
+		,REGISTER_NO
+		,REGIST_DT)
+		VALUES
+		(#{photo_seq, jdbcType=VARCHAR}
+		,#{sys_code, jdbcType=VARCHAR}
+		,#{sj, jdbcType=VARCHAR}
+		,#{image_doc_id, jdbcType=VARCHAR}
+		<if test="photo_potogrf_de != null and photo_potogrf_de != ''">
+		,#{photo_potogrf_de, jdbcType=VARCHAR}
+		</if>
+		<if test="rm != null and rm != ''">
+		,#{rm, jdbcType=VARCHAR}
+		</if>
+		,#{ss_user_no, jdbcType=VARCHAR}
+		,NOW())
+	</insert>
+
+	<insert id="insertPhotoMeta" parameterType="ntsysFileVO">
+		/* admin.photo.insertPhotoMeta */
+		INSERT INTO TB_PHOTO_META
+		(FILE_ID
+		,IMAGE_DOC_ID
+		,PHOTO_SEQ
+		,CAPTION
+		,META_INFO
+		,KWRD
+		,WIDTH
+		,HEIGHT
+		,REGISTER_NO
+		,REGIST_DT)
+		VALUES
+		(#{file_id, jdbcType=VARCHAR}
+		,#{image_doc_id, jdbcType=VARCHAR}
+		,#{photo_seq, jdbcType=VARCHAR}
+		,#{caption, jdbcType=VARCHAR}
+		,#{meta_info, jdbcType=VARCHAR}
+		,#{kwrd, jdbcType=VARCHAR}
+		,#{width, jdbcType=VARCHAR}
+		,#{height, jdbcType=VARCHAR}
+		,#{ss_user_no, jdbcType=VARCHAR}
+		,NOW())
+	</insert>
+
+	<resultMap id="photoFileMap" type="dataMap">
+		<result property="FILE_ID"				column="FILE_ID" />
+		<result property="DOC_ID"					column="DOC_ID" />
+		<result property="FILE_NM"				column="FILE_NM" />
+		<result property="FILE_SIZE"			column="FILE_SIZE" />
+		<result property="FILE_EXT_NM"		column="FILE_EXT_NM" />
+		<result property="FILE_RLTV_PATH"	column="FILE_RLTV_PATH" />
+		<result property="FILE_ASLT_PATH"	column="FILE_ASLT_PATH" />
+		<result property="CONTENT_TYPE"		column="CONTENT_TYPE" />
+		<result property="SRT_ORD"				column="SRT_ORD" />
+		<result property="RGSTP_ID"				column="RGSTP_ID" />
+		<result property="RGST_DTTM"			column="RGST_DTTM" />
+		<result property="CAPTION"				column="CAPTION" />
+		<result property="META_INFO"			column="META_INFO" />
+		<result property="KWRD"						column="KWRD" />
+		<result property="WIDTH"					column="WIDTH" />
+		<result property="HEIGHT"					column="HEIGHT" />
+	</resultMap>
+
+	<select id="selectListPhotoFiles" parameterType="dataMap" resultMap="photoFileMap">
+	/* admin.photo.selectListPhotoFiles */
+		SELECT
+			F.FILE_ID
+			, F.DOC_ID
+			, F.FILE_NM
+			, F.FILE_SIZE
+			, F.FILE_EXTSN_NM AS FILE_EXT_NM
+			, F.FILE_PARTN_COURS AS FILE_RLTV_PATH
+			, F.FILE_ABSLT_COURS AS FILE_ASLT_PATH
+			, F.CNTNTS_TY AS CONTENT_TYPE
+			, F.SORT_ORDR AS SRT_ORD
+			, F.REGISTER_NO AS RGSTP_ID
+			, F.REGIST_DT AS RGST_DTTM
+			, PM.CAPTION
+			, PM.META_INFO
+			, PM.KWRD
+			, PM.WIDTH
+			, PM.HEIGHT
+		FROM TB_FILE F
+				,TB_PHOTO_META PM
+		WHERE F.FILE_ID = PM.FILE_ID
+		AND F.DOC_ID = #{doc_id, jdbcType=VARCHAR}
+		ORDER BY F.SORT_ORDR
+	</select>
+
+</mapper>

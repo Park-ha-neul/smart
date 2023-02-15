@@ -1,0 +1,46 @@
+.upload-btn-wrapper {
+			position: relative;
+			overflow: hidden;
+		}
+		.upload-btn-wrapper input[type=file] {
+			font-size: 100px;
+			position: absolute;
+			left: 0;
+			top: 0;
+			opacity: 0;
+		}
+
+		#fileDragDesc {
+			width: 100%;
+			height: 100%;
+			margin-left: auto;
+			margin-right: auto;
+			padding: 5px;
+			text-align: center;
+			vertical-align:middle;
+			font-size:22px;
+			padding-top:35px;
+		}
+
+		#fileDragDescModal {
+			width: 100%;
+			height: 100%;
+			margin-left: auto;
+			margin-right: auto;
+			padding: 5px;
+			text-align: center;
+			vertical-align:middle;
+			font-size:15px;
+			padding-top:30px;
+			background: #777777;
+			color: #ffffff;
+		}
+
+	.dropZone11{
+			border:2px dotted #ffffff;
+			width:100%;
+			height:110px;
+			margin-top:5px;
+			color:#92AAB0;
+			background: 0% 0% no-repeat padding-box padding-box rgb(247, 247, 247);
+		}

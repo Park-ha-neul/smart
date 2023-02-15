@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="login">
+
+    <select id="registerCheckUserId" parameterType="dataMap" resultType="int">
+    	SELECT COUNT(1)
+    	FROM TB_USER A
+    	WHERE A.USER_ID = #{id, jdbcType=VARCHAR}
+    </select>
+
+	<insert id="registerUserAuthor" parameterType="dataMap">
+	/* login.registerUserAuthor : 사용자 권한 생성 */
+	INSERT INTO TB_USER_AUTHOR(
+		USER_NO,
+		AUTHOR_ID,
+		REGISTER_NO,
+		REGIST_DT
+	) VALUES (
+		#{user_no, jdbcType=VARCHAR},
+		'ADMIN_PAI',
+		'1',
+		NOW()
+	)
+	</insert>
+
+	<insert id="registerUser" parameterType="dataMap">
+	<selectKey keyProperty="user_no" order="BEFORE" resultType="int">
+		SELECT FN_NEXTVAL('SQ_USER_NO') AS USER_NO
+	</selectKey>
+	/* login.registerUser : 회원가입 */
+	INSERT INTO TB_USER (
+		USER_NO,
+		USER_SE_CODE,
+		USER_ID,
+		PASSWORD,
+		USER_NM,
+		USER_STTUS_CODE,
+		REGISTER_NO,
+		REGIST_DT,
+		UPDT_DT
+	) VALUES (
+		#{user_no, jdbcType=INTEGER},
+		'20',
+		#{id, jdbcType=VARCHAR},
+		#{pwd, jdbcType=VARCHAR},
+		#{name, jdbcType=VARCHAR},
+		'10',
+		'1',
+		NOW(),
+		NOW()
+	)
+	</insert>
+
+	<select id="selectUserInfo" parameterType="dataMap" resultType="dataMap">
+	/* login.selectUserInfo : 사용자 로그인 정보 조회*/
+	SELECT
+		A.USER_ID
+		,A.USER_NO
+		,A.USER_NM
+		,A.LOGIN_FAILR_CNT
+		,A.THEMA_OPTION
+		,A.CUR_PRJCT_ID
+		,A.CUR_STEP_CD
+		,A.CUR_PRJCT_TYPE
+	FROM TB_USER A
+	WHERE A.USER_ID = #{id, jdbcType=VARCHAR}
+	AND	A.PASSWORD = #{pwd, jdbcType=VARCHAR}
+	AND A.USER_STTUS_CODE  = '10'
+	</select>
+
+	<select id="checkIfUserExists" parameterType="dataMap" resultType="String">
+	/* login.checkIfUserExists : 사용자 존재 여부 체크 */
+	SELECT A.LOGIN_FAILR_CNT
+	  FROM TB_USER A
+    LEFT OUTER JOIN TB_USER_AUTHOR B
+      ON A.USER_NO = B.USER_NO
+	 WHERE A.USER_ID = #{id, jdbcType=VARCHAR}
+	   AND A.USER_STTUS_CODE  = '10'
+	   LIMIT 1
+	</select>
+
+	<update id="updateLoginFailCount" parameterType="dataMap">
+	/* login.updateLoginFailCount */
+	UPDATE	TB_USER
+	SET 	LOGIN_FAILR_CNT = #{fail_cnt, jdbcType=VARCHAR}
+		, 	UPDT_DT = SYSDATE()
+	WHERE 	USER_ID = #{id, jdbcType=VARCHAR}
+  </update>
+
+	<select id="selectListUserAuthId" parameterType="dataMap" resultType="String">
+	/* login.selectUserInfo : 사용자 권한 정보 조회*/
+	<![CDATA[
+	  SELECT 	A.AUTHOR_ID
+		FROM TB_USER_AUTHOR A
+		WHERE A.USER_NO = #{ss_user_no}
+	]]>
+	</select>
+
+	<select id="initlUserPasswordCheck" parameterType="dataMap" resultType="dataMap">
+	/* login.initlUserPasswordCheck */
+	SELECT	USER_ID
+		,	USER_NO
+		,	USER_NM
+		,	PASSWORD_INITL_YN
+	FROM	TB_USER
+	WHERE	USER_ID = #{user_id, jdbcType=VARCHAR}
+	</select>
+</mapper>

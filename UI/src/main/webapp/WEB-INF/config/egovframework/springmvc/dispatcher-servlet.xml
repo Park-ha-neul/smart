@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
+		xmlns:task="http://www.springframework.org/schema/task"
+		xmlns:websocket="http://www.springframework.org/schema/websocket"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+				http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+				http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd
+				http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd">
+
+	<context:component-scan base-package="egovframework">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+	</context:component-scan>
+
+	<!-- 해당 context-*.xml 파일에서 사용할수 있는 변수 선언하는 프로퍼티 정보 -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			 <value>classpath:/egovframework/egovProps/globals.properties</value>
+		</property>
+	</bean>
+
+<!-- 		<websocket:message-broker application-destination-prefix="/app"> -->
+<!-- 			<websocket:stomp-endpoint path="/websocket"> -->
+<!-- 				<websocket:sockjs/> -->
+<!-- 			</websocket:stomp-endpoint> -->
+<!-- 			<websocket:simple-broker prefix="/topic"/> -->
+<!-- 		</websocket:message-broker> -->
+
+	<!-- responseBody json 형식으로 리턴 -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+					<property name="supportedMediaTypes">
+						<list>
+							<value>application/json; charset=UTF-8</value>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" />
+
+	<!-- Tiles 뷰 리졸버 -->
+	<bean id="tielsViewResolver"
+		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.tiles3.TilesView" />
+		<property name="order" value="1" />
+	</bean>
+	<!-- Tiles 설정 파일 -->
+	<bean id="tilesConfigurer"
+		class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>/WEB-INF/tiles/tiles-layout.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" p:order="2"
+		p:viewClass="org.springframework.web.servlet.view.JstlView"
+		p:prefix="/WEB-INF/jsp/egovframework/" p:suffix=".jsp"/>
+
+	<!-- 기존의 simpleMappingExceptionResolver를 사용하지 않고 별도로 만듬 -->
+	<!-- controller 단에서 발생하는 error로그를 쌓기 위해 사용; 모든 에러타입 한군데서 관리 -->
+<!-- 	<bean id="customExceptionResolver" class="egovframework.framework.common.util.ExceptionResolver">
+		<property name="defaultErrorView" value="error/bizError" />
+	</bean> -->
+
+	<!-- 기존의 simpleMappingExceptionResolver를 사용하지 않고 별도로 만듬 -->
+	<!-- controller 단에서 발생하는 error로그를 쌓기 위해 사용; 모든 에러타입 한군데서 관리 -->
+	<bean id="customExceptionResolver" class="egovframework.framework.common.util.ExceptionResolver">
+		<property name="defaultErrorView" value="admin/error/bizError" />
+	</bean>
+
+	<!-- url이 mapping에 적용되면 location쪽에서 로드해라라는 뜻; webjars 사용할경우 실제 js가 배포될 위치 설정 -->
+	<mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars" />
+
+	<mvc:interceptors>
+		<!-- 접근 ip 주석, 로그인 컨트롤러에 적용 --> <!--
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/common/noAccess.do"/>
+			<mvc:exclude-mapping path="/websocket/**"/>
+			<bean class="egovframework.framework.interceptor.CheckInterceptor" />
+		</mvc:interceptor> -->
+
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="egovframework.framework.interceptor.DebugInterceptor" />
+		</mvc:interceptor>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/admin/**" />
+			<mvc:exclude-mapping path="/common/**"/>
+			<bean class="egovframework.framework.interceptor.PageViewInterceptor" />
+		</mvc:interceptor>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/common/**"/>
+			<mvc:exclude-mapping path="/admin/login.do"/>
+			<mvc:exclude-mapping path="/admin/logout.do"/>
+			<mvc:exclude-mapping path="/admin/initlUserPasswordCheckAjax.do"/>
+			<mvc:exclude-mapping path="/admin/registerUserAjax.do"/>
+			<mvc:exclude-mapping path="/admin/registerCheckUserIdAjax.do"/>
+			<mvc:exclude-mapping path="/admin/user/selectUserMgtAjax.do"/>
+			<mvc:exclude-mapping path="/admin/user/updateUserMgtAjax.do"/>
+			<bean class="egovframework.framework.interceptor.LoginCheckInterceptor" />
+		</mvc:interceptor>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/admin/**" />
+			<mvc:mapping path="/pharmai/**" />
+			<mvc:exclude-mapping path="/common/**"/>
+			<mvc:exclude-mapping path="/admin/login.do"/>
+			<mvc:exclude-mapping path="/admin/logout.do"/>
+			<mvc:exclude-mapping path="/admin/initlUserPasswordCheckAjax.do"/>
+			<mvc:exclude-mapping path="/admin/registerUserAjax.do"/>
+			<mvc:exclude-mapping path="/admin/registerCheckUserIdAjax.do"/>
+			<mvc:exclude-mapping path="/admin/user/selectUserMgtAjax.do"/>
+			<mvc:exclude-mapping path="/admin/user/updateUserMgtAjax.do"/>
+			<bean class="egovframework.framework.interceptor.AuthCheckInterceptor" />
+		</mvc:interceptor>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/admin/**" />
+			<mvc:mapping path="/pharmai/**" />
+			<mvc:exclude-mapping path="/**/**Ajax.do"/>
+			<mvc:exclude-mapping path="/common/**"/>
+			<mvc:exclude-mapping path="/admin/login.do"/>
+			<mvc:exclude-mapping path="/admin/logout.do"/>
+			<mvc:exclude-mapping path="/admin/registerUserAjax.do"/>
+			<mvc:exclude-mapping path="/admin/registerCheckUserIdAjax.do"/>
+			<bean class="egovframework.framework.interceptor.CommonInterceptor" />
+		</mvc:interceptor>
+
+		<!-- 캐시 관련 설정 -->
+<!-- 		<mvc:interceptor> -->
+<!-- 			<mvc:mapping path="/admin/**" /> -->
+<!-- 			<bean id="responseCachingFilter" class="org.springframework.web.servlet.mvc.WebContentInterceptor"> -->
+<!-- 				<property name="cacheSeconds" value="0" /> -->
+<!-- 				<property name="useExpiresHeader" value="true" /> -->
+<!-- 				<property name="useCacheControlHeader" value="true" /> -->
+<!-- 				<property name="useCacheControlNoStore" value="true" /> -->
+<!-- 				<property name="cacheMappings"> -->
+<!-- 					<props> -->
+<!-- 					  cache for one month -->
+<!-- 						<prop key="/**/*.htm">2592000</prop> -->
+<!-- 					</props> -->
+<!-- 				</property> -->
+<!-- 			</bean> -->
+<!-- 		</mvc:interceptor> -->
+
+	</mvc:interceptors>
+</beans>

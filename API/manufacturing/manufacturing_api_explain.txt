@@ -1,0 +1,165 @@
+## 제조공정 api 설명
+###############################
+#1. api1(manufacturing_method)#
+##############################
+: 제형 api1번에서 나온 결과값(property), 투여경로에 따른 제조방법 출력
+```
+# DB 명 : method.db
+# step1. 투여경로에 따른 테이블 조회(oral, parenteral, local)
+# step2. 각 테이블에서 특성에 대한 조건이 2개 이상 해당하는 부분의 제조방법 출력
+
+input)
+[[{'properties':{'pH Mass Solubility': [-222.83, -28.96, 340.45, 480.17, -383.73, -397.63, 358.04, 480.22, 458.53, -163.85],'logP': 0.25,'Bioavailability': ['Orally bioavailable', '0.67'],'Molecular weight(g/mol)': 194.19},'routes': 'oral','formulation': 'Capsule, Oral Capsule','primary': 12}]]
+output)
+{
+	"method": [
+		"액상제조법",
+		"분말제조법",
+		"동결건조제조법"
+	]
+}
+```
+#############################
+#2. api2(manufacturing_list)#
+#############################
+: 투여경로, 제형, 제조방법에 따른 제조공정 목록 출력
+```
+# DB 명 : list.db
+# step1. 투여경로에 따른 테이블 조회(oral, parenteral, local)
+# step2. 입력받은 제형과 제조방법에 해당하는 제조공정(level), 제조공정에 대한 설명(material, processing, quaility)을 level_id 순서에 따라 출력
+
+input)
+[[{'routes' : 'oral','formulation' : 'Capsule, Oral Capsule','method': '직타'}]]
+output)
+{"manufacturing list": [
+	{
+		"사과": {
+			"material": "설명",
+			"processing": "설명1",
+			"quaility": "설명2"
+		}
+	}
+}
+```
+##############################
+#3. api3(manufacturing_guide)#
+##############################
+# DB 명 : guide.db
+: 투여경로, 제형, 선택한 제조방법, 선택한 제조공정에 따른 PHA 테이블 가이드 출력
+```
+# step1. 투여경로에 따른 테이블 조회(oral, parenteral, local)
+# step2. 입력받은 제형과 제조방법에 따라 PHA 테이블 가이드(process, cqas, degree{낮음, 중간, 높음}) 출력
+
+input)
+[[{'routes' : 'local','formulation' : 'Ophthalmic Solution','method' : '에멀전제조법','level' : ['사과', '조제(용해)'],'cqas' : ['성상', '용출시험', '확인시험']}]]
+output)
+{"guide": {
+	"사과": [{"성상": "낮음"},{"확인": "낮음"},{"함량": "중간"},{"유연물질": "낮음"},{"함량균일성": "중간"},{"용출": "낮음"}
+]},
+"pha": [{
+			"cqas": ["사과","혼합","과립","건조","정립","활택"]
+		},
+		{
+			"cpp": ["성상","용출시험","확인시험"]
+		}]
+}
+```
+#############################
+#4. api4(manufacturing_fmea)#
+#############################
+# DB 명 : fmea.db, process.db
+: 투여경로, 제형, 선택한 제조방법, 제조공정에 따른 FMEA 테이블, 유닛 공정 이미지 목록/상세
+```
+## fmea 테이블 출력
+# step1. 투여경로에 따른 테이블 조회(oral, parenteral, local)
+# step2. 제형, 제조방법, 제조공정명에 따른 설명(cpps, failure, effect)을 id 순서대로 출력
+
+## 유닛 공정 이미지 목록/상세
+# step1. 투여경로에 따른 테이블 조회(oral, parenteral, local)
+# step2. 제형, 제조방법, 제조공정명과 fmea 테이블에서 나온 cpps 에 따른 risk 를 cpp_id 순서대로 출력
+# step3. 제조공정명에 따른 img 출력(process_img 테이블 조회, 아래와 같은 output 형식으로 출력)
+
+# input)
+[[{'routes' : 'oral','formulation' : 'Capsule, Oral Capsule','method' : '직타','level' : ['사과', '혼합'], 'path' : 'C:/data/aip/activate/manufacturing/api4/img2/'}]]
+# output)
+{
+	"fmea": [{
+			"unit": "사과",
+			"cpps": "sifting",
+			"failure": "큰 Sleve size",
+			"effect": "설명"
+		},
+		{}
+	],
+	"process img": [{
+		"png": "/home/data/t3q/uploads/pharmAi/{프로젝트id}/manufacturing/process_img/test.png",
+		"unit": "사과",
+		"cpp": ["Sifting", "Mill type", "Mill speed"],
+		"Risks": {
+			"Sifting": ["Uneven particle distribution", "테스트", "테스트2", "테스트3"],
+			"Mill type": ["테스트1", "테스트2", "테스트3", "테스트4"],
+			"Mill speed": []
+		}
+	}]
+}
+```
+
+#################################
+#4-1. api4(manufacturing_factor)#
+#################################
+# DB 명 : method.db
+: 투여경로, 제형, 선택한 제조방법, 제조공정에 따른 FMEA 테이블, 유닛 공정 이미지 목록/상세, CPP FACTOR USE RANGE 출력
+```
+## fmea 테이블 출력
+# step1. 투여경로에 따른 테이블 조회(oral, parenteral, local)
+# step2. 제형, 제조방법, 제조공정명에 따른 설명(cpps, failure, effect)을 id 순서대로 출력
+
+## 유닛 공정 이미지 목록/상세
+# step1. 투여경로에 따른 테이블 조회(oral, parenteral, local)
+# step2. 제형, 제조방법, 제조공정명과 fmea 테이블에서 나온 cpps 에 따른 risk 를 cpp_id 순서대로 출력
+# step3. 제조공정명에 따른 img 출력(process_img 테이블 조회, 아래와 같은 output 형식으로 출력)
+
+# input)
+[[{'routes' : 'oral','formulation' : 'Capsule, Oral Capsule','method' : '직타','level' : ['사과', '혼합']]]
+# output)
+{
+	"factor": [
+		{"사과": "Mill speed"},
+		{"사과": "Mill type"},
+		{"혼합": "cpp1"},
+		{"혼합": "cpp2"}
+	]
+}
+```
+
+#############################
+#5. api5(manufacturing_cqas)#
+#############################
+: 제조방법과 투여경로에 따른 CQAs 실험방식 목록 출력(제형도 영향을 끼칠 수 있어서 일단 입력값에 포함시킴
+# CQAs 관련 데이터 아직 받지 못한 상황 : 화면 설계서에 있는 데이터라도 출력될 수 있게끔 진행할 예정(데이터 형식에 대한 답변도 오지 않아 테이블 미리 생성할 수 없는 상태)
+
+input)
+[[{'route' : '경구','formulation' : '정제','method' : '습식과립'}]]
+output)
+{"cqas_list": ["appearance", "dissolution", "hardness"]}
+
+#############################
+#6. api6(manufacturing_DoE)#
+#############################
+: 제형 api5와 동일(R 스크립트), 실험설계법
+
+R 스크립트 저장 경로 : /data/aip/activate/manufacturing/api6/DoE.R
+
+#############################
+#7. api7(manufacturing_graph)#
+#############################
+: 제형 api6과 동일(R 스크립트), 그래프(pareto chart, response, contour)
+
+R 스크립트 저장 경로 : /data/aip/activate/manufacturing/api7/graph.R
+
+#############################
+#8. api8(manufacturing_result)#
+#############################
+: 제형 api7와 동일(R 스크립트), design space(중첩 영역 제외)
+
+R 스크립트 저장 경로 : /data/aip/activate/manufacturing/api8/result.R

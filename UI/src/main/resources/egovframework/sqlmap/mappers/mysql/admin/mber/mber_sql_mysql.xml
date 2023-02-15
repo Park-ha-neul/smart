@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.mber">
+
+	<select id="selectTotCntMber" parameterType="dataMap" resultType="int">
+	/* admin.mber.selectTotCntMber */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_MBER A1
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'nm'">
+		AND A1.NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'hp'">
+		AND A1.MOBLPHON_NO LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+		AND A1.USER_STTUS_CODE =#{sch_user_sttus_code, jdbcType=VARCHAR}
+	</if>
+	</select>
+
+	<select id="selectPageListMber" parameterType="dataMap" resultType="dataMap">
+	/* admin.mber.selectPageListMber */
+	SELECT A1.ID
+		, A1.USER_NO
+		, A1.NM
+		, A1.IHIDNUM
+		, A1.MOBLPHON_NO
+		, A1.USER_STTUS_CODE
+		, A3.CODE_NM AS USER_STTUS_NM
+		, A1.REGISTER_NO
+		, A2.USER_NM AS REGISTER_NM
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		FROM TB_MBER A1
+		LEFT OUTER JOIN TB_USER A2
+		ON A1.REGISTER_NO = A2.USER_NO
+		LEFT OUTER JOIN TB_CODE A3
+		ON A1.USER_STTUS_CODE = A3.CODE
+			AND A3.GROUP_ID = 'R000100'
+		WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'id'">
+		AND A1.ID LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'nm'">
+		AND A1.NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'hp'">
+		AND A1.MOBLPHON_NO LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+		AND A1.USER_STTUS_CODE =#{sch_user_sttus_code, jdbcType=VARCHAR}
+	</if>
+	ORDER BY A1.NM ASC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectMberExistYn" parameterType="dataMap" resultType="string">
+	/* admin.mber.selectMberExistYn */
+	SELECT
+		CASE WHEN COUNT(*) <![CDATA[ > ]]> 0
+			THEN 'Y'
+			ELSE 'N'
+		END EXIST_YN
+	FROM TB_MBER A
+	WHERE A.IHIDNUM = #{ihidnum, jdbcType=VARCHAR}
+		AND A.NM = #{nm, jdbcType=VARCHAR}
+	</select>
+
+	<insert id="insertMber" parameterType="dataMap">
+	<selectKey keyProperty="user_no" order="BEFORE" resultType="int">
+		SELECT FN_NEXTVAL('SQ_USER_NO') AS USER_NO
+	</selectKey>
+	/* admin.mber.insertMber */
+	INSERT INTO TB_MBER (
+		USER_NO
+		, ID
+		, PASSWORD
+		, NM
+		, IHIDNUM
+		, MOBLPHON_NO
+		, USER_STTUS_CODE
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{user_no, jdbcType=INTEGER}
+		, #{id, jdbcType=VARCHAR}
+		, #{password, jdbcType=VARCHAR}
+		, #{nm, jdbcType=VARCHAR}
+		, #{ihidnum, jdbcType=VARCHAR}
+		, #{moblphon_no, jdbcType=VARCHAR}
+		, #{user_sttus_code, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=VARCHAR}
+		, NOW()
+	)
+	</insert>
+
+	<select id="selectMber" parameterType="dataMap" resultType="dataMap">
+	/* admin.mber.selectMber */
+	SELECT A1.USER_NO
+		, A1.ID
+		, A1.NM
+		, A1.IHIDNUM
+		, A1.MOBLPHON_NO
+		, A1.USER_STTUS_CODE
+		, A3.CODE_NM AS USER_STTUS_NM
+		, A1.REGISTER_NO
+		, A2.USER_NM AS REGISTER_NM
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	FROM TB_MBER A1
+	LEFT OUTER JOIN TB_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	LEFT OUTER JOIN TB_CODE A3
+	ON A1.USER_STTUS_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R000100'
+	WHERE A1.USER_NO = #{user_no, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateMber" parameterType="dataMap">
+	/* admin.mber.updateMber */
+	UPDATE TB_MBER
+		SET ID = #{id, jdbcType=VARCHAR}
+			, PASSWORD = #{password, jdbcType=VARCHAR}
+			, NM = #{nm, jdbcType=VARCHAR}
+			, USER_STTUS_CODE = #{user_sttus_code, jdbcType=VARCHAR}
+			, MOBLPHON_NO = #{moblphon_no, jdbcType=VARCHAR}
+			, UPDUSR_NO = #{ss_user_no, jdbcType=INTEGER}
+			, UPDT_DT = NOW()
+		WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteMber" parameterType="dataMap">
+	/* admin.mber.deleteMber */
+	DELETE FROM TB_MBER
+	WHERE USER_NO = #{user_no, jdbcType=VARCHAR}
+	</delete>
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.qrCode">
+
+	<select id="selectTotCntQrCodeMgt" parameterType="dataMap" resultType="int">
+	/* admin.qrCode.selectTotCntQrCodeMgt */
+	SELECT	COUNT(1)
+	FROM	TB_QR_CODE A
+	LEFT OUTER JOIN TB_CODE B	ON A.SYS_CODE = B.CODE AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	WHERE 1=1
+     <if test="sch_sys_code != null and sch_sys_code != ''">
+	 AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	 </if>
+	 <if test="sch_text != null and sch_text != ''">
+	 AND A.SJ LIKE '%' || #{sch_text, jdbcType=VARCHAR} || '%'
+	 </if>
+	ORDER BY A.REGIST_DT DESC
+	</select>
+
+	<select id="selectPageListQrCodeMgt" parameterType="dataMap" resultType="dataMap">
+	/* admin.qrCode.selectPageListQrCodeMgt */
+	SELECT	A.QR_SEQ
+		,	B.CODE_NM AS SYS_CODE_NM
+		,	A.SYS_CODE
+		,	A.SJ
+		,	A.CODE_CN
+		,	A.IMAGE_DOC_ID
+		,	A.QR_IMAGE_DOC_ID
+		,	A.REGISTER_NO
+		,	C.USER_NM
+		,	DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d %H:%i:%s') AS REGIST_DT
+		,	A.UPDUSR_NO
+		,	A.UPDT_DT
+	FROM	TB_QR_CODE A
+	LEFT OUTER JOIN TB_CODE B	ON A.SYS_CODE = B.CODE AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	LEFT OUTER JOIN TB_USER C	ON A.REGISTER_NO = C.USER_NO
+	WHERE 	1=1
+	<if test="sch_sys_code != null and sch_sys_code != ''">
+	AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_text != null and sch_text != ''">
+	AND A.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	ORDER BY A.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectQrCodeMgt" parameterType="dataMap" resultType="dataMap">
+	/* admin.qrCode.selectQrCodeMgt */
+	SELECT	A.QR_SEQ
+		,	B.CODE_NM AS SYS_CODE_NM
+		,	A.SYS_CODE
+		,	A.SJ
+		,	A.CODE_CN
+		,	A.IMAGE_DOC_ID
+		,	A.QR_IMAGE_DOC_ID
+		,	A.REGISTER_NO
+		,	C.USER_NM
+		,	A.REGIST_DT
+		,	A.UPDUSR_NO
+		,	A.UPDT_DT
+		,	CONCAT(D.FILE_PARTN_COURS, D.FILE_NM) AS QR_PATH_URL
+		,	D.FILE_ID AS QR_FILE_ID
+	FROM 	TB_QR_CODE A
+	LEFT OUTER JOIN TB_CODE B 	ON A.SYS_CODE = B.CODE AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	LEFT OUTER JOIN TB_USER C	ON A.REGISTER_NO = C.USER_NO
+	LEFT OUTER JOIN TB_FILE D	ON A.QR_IMAGE_DOC_ID = D.DOC_ID
+	WHERE 	A.QR_SEQ = #{qr_seq, jdbcType=VARCHAR}
+	</select>
+
+	<insert id="insertQrCodeMgt" parameterType="dataMap">
+	/* admin.qrCode.insertQrCodeMgt */
+	INSERT INTO TB_QR_CODE(	SYS_CODE
+						,	SJ
+						,	CODE_CN
+						,	QR_IMAGE_DOC_ID
+						,	IMAGE_DOC_ID
+						,	REGISTER_NO
+						,	REGIST_DT
+	) VALUES (	#{sys_code, jdbcType=VARCHAR}
+			,	#{sj, jdbcType=VARCHAR}
+			,	#{code_cn, jdbcType=VARCHAR}
+			,	#{qr_image_doc_id, jdbcType=VARCHAR}
+			,	#{image_doc_id, jdbcType=VARCHAR}
+			,	#{ss_user_no, jdbcType=VARCHAR}
+			,	SYSDATE()
+	)
+	</insert>
+
+	<update id="updateQrCodeMgt" parameterType="dataMap">
+	/* admin.qrCode.updateQrCodeMgt */
+	UPDATE TB_QR_CODE
+	SET 	SJ = #{sj, jdbcType=VARCHAR}
+		,	CODE_CN = #{code_cn, jdbcType=VARCHAR}
+		,	QR_IMAGE_DOC_ID = #{qr_image_doc_id, jdbcType=VARCHAR}
+		,	IMAGE_DOC_ID = #{image_doc_id, jdbcType=VARCHAR}
+		,	UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		,	UPDT_DT = SYSDATE()
+	WHERE 	QR_SEQ = #{qr_seq, jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteQrCodeMgt" parameterType="dataMap">
+	/* admin.qrCode.deleteQrCodeMgt */
+	DELETE FROM TB_QR_CODE WHERE QR_SEQ = #{qr_seq, jdbcType=VARCHAR}
+	</delete>
+
+	<select id="selectImgExistYn" parameterType="dataMap" resultType="dataMap">
+	/* admin.qrCode.selectImgExistYn */
+	SELECT	A.QR_SEQ
+		,	A.IMAGE_DOC_ID
+		,	A.QR_IMAGE_DOC_ID
+		,	CONCAT(B.FILE_PARTN_COURS, B.FILE_ID, '.', B.FILE_EXTSN_NM) AS IMG_PATH_URL
+		,	CONCAT(B.FILE_ABSLT_COURS, B.FILE_ID, '.', B.FILE_EXTSN_NM) AS IMG_PATH
+		,	B.FILE_ID AS IMG_FILE_ID
+		,	CASE
+				WHEN B.FILE_ID IS NULL OR B.FILE_ID = '' THEN 'N'
+				ELSE 'Y'
+			END EXIST_YN
+	FROM	TB_QR_CODE A
+	LEFT OUTER JOIN TB_FILE B ON A.IMAGE_DOC_ID = B.DOC_ID
+	WHERE	A.QR_SEQ = #{qr_seq, jdbcType=VARCHAR}
+	</select>
+
+</mapper>

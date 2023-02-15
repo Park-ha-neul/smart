@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.diet.month">
+
+	<select id="selectTotCntMonth" parameterType="dataMap" resultType="int">
+	/* admin.diet.month.selectTotCntMonth */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_MNTHNG_DIET A1
+	LEFT OUTER JOIN TB_CODE A2
+	ON A1.DIET_SE_CODE = A2.CODE
+		AND A2.GROUP_ID = 'R010400'
+	WHERE 1 = 1
+	<!-- 관리자가 아닌경우 자신이 해당하는 구분값만 조회한다. -->
+	<if test="ss_author_id != 'ADMIN'">
+		AND A2.ATTRB_1 = #{ss_author_id, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_year != null and sch_year != ''">
+		AND A1.YY = #{sch_year, jdbcType=INTEGER}
+	</if>
+	</select>
+
+	<select id="selectPageListMonth" parameterType="dataMap" resultType="dataMap">
+	/* admin.diet.month.selectPageListMonth */
+	SELECT A1.YY
+		, A1.MT
+		, CONCAT(A1.YY, '.', LPAD(A1.MT, 2, '0')) AS YM
+		, A1.DIET_SE_CODE
+		, A3.CODE_NM AS DIET_SE_NM
+		, A1.IMAGE_DOC_ID
+		, A1.HIT_CNT
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, A1.REGISTER_NO
+		, A2.USER_NM AS REGISTER_NM
+	FROM TB_MNTHNG_DIET A1
+	LEFT OUTER JOIN TB_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	LEFT OUTER JOIN TB_CODE A3
+	ON A1.DIET_SE_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R010400'
+	WHERE 1 = 1
+	<!-- 관리자가 아닌경우 자신이 해당하는 구분값만 조회한다. -->
+	<if test="ss_author_id != 'ADMIN'">
+		AND A3.ATTRB_1 = #{ss_author_id, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_year != null and sch_year != ''">
+		AND A1.YY = #{sch_year, jdbcType=INTEGER}
+	</if>
+	ORDER BY A1.YY DESC, A1.MT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+	
+	<insert id="insertMonth" parameterType="dataMap">
+	/* admin.diet.month.insertMonth */
+	INSERT INTO TB_MNTHNG_DIET (
+		YY
+		, MT
+		, DIET_SE_CODE
+		, IMAGE_DOC_ID
+		, HIT_CNT
+		, RM
+		, REGIST_DT
+		, REGISTER_NO
+	) VALUES (
+		(SELECT SUBSTRING(#{ym, jdbcType=INTEGER}, 1, 4))
+		, (SELECT SUBSTRING(#{ym, jdbcType=INTEGER}, 6, 7))
+		, #{diet_se_code, jdbcType=VARCHAR}
+		, #{image_doc_id, jdbcType=INTEGER}
+		, 0
+		, #{rm, jdbcType=VARCHAR}
+		, NOW()
+		, #{ss_user_no, jdbcType=VARCHAR}
+	)
+	</insert>
+	
+	<select id="selectMonth" parameterType="dataMap" resultType="dataMap">
+	/* admin.diet.month.selectMonth */
+	SELECT A1.YY
+		, A1.MT
+		, CONCAT(A1.YY, '.', LPAD(A1.MT, 2, '0')) AS YM
+		, A1.DIET_SE_CODE
+		, A4.CODE_NM AS DIET_SE_NM
+		, A1.IMAGE_DOC_ID
+		, CONCAT(A3.FILE_PARTN_COURS, A3.FILE_ID, '.', A3.FILE_EXTSN_NM) AS FILE_PATH
+		, A3.FILE_NM
+		, A3.FILE_EXTSN_NM
+		, A3.FILE_SIZE
+		, A3.FILE_ID
+		, A1.HIT_CNT
+		, A1.RM
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, A1.REGISTER_NO
+		, A2.USER_NM AS REGISTER_NM
+	FROM TB_MNTHNG_DIET A1
+	LEFT OUTER JOIN TB_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	LEFT OUTER JOIN TB_FILE A3
+	ON A1.IMAGE_DOC_ID = A3.DOC_ID
+	LEFT OUTER JOIN TB_CODE A4
+	ON A1.DIET_SE_CODE = A4.CODE
+		AND A4.GROUP_ID = 'R010400'
+	WHERE CONCAT(A1.YY, A1.MT) = #{ym, jdbcType=VARCHAR}
+		AND A1.DIET_SE_CODE = #{diet_se_code, jdbcType=VARCHAR}
+	<!-- 관리자가 아닌경우 자신이 해당하는 구분값만 조회한다. -->
+	<if test="ss_author_id != 'ADMIN'">
+		AND A4.ATTRB_1 = #{ss_author_id, jdbcType=VARCHAR}
+	</if>
+	</select>
+	
+	<update id="updateMonth" parameterType="dataMap">
+	/* admin.diet.month.updateMonth */
+	UPDATE TB_MNTHNG_DIET
+	SET IMAGE_DOC_ID = #{image_doc_id, jdbcType=INTEGER}
+		, RM = #{rm, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE CONCAT(YY, MT) = #{ym, jdbcType=VARCHAR}
+		AND DIET_SE_CODE = #{diet_se_code, jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="deleteMonth" parameterType="dataMap">
+	/* admin.diet.month.deleteMonth */
+		DELETE FROM TB_MNTHNG_DIET
+		WHERE CONCAT(YY, MT) = #{ym, jdbcType=VARCHAR}
+			AND DIET_SE_CODE = #{diet_se_code, jdbcType=VARCHAR}
+	</delete>
+	
+	<select id="selectListExistYm" parameterType="dataMap" resultType="dataMap">
+	/* admin.diet.month.selectListExistYm */
+	SELECT D1.YY
+		, GROUP_CONCAT(D1.EXIST_YN ORDER BY D1.MT) AS EXIST_LIST
+	FROM (
+		SELECT C1.YY
+			, C1.MT
+			, IF(C2.YY IS NULL, 'N', 'Y') AS EXIST_YN
+		FROM (
+			SELECT * 
+			FROM (
+				SELECT A1.YY
+					, A1.DIET_SE_CODE
+				FROM TB_MNTHNG_DIET A1
+				WHERE A1.DIET_SE_CODE = #{diet_se_code, jdbcType=VARCHAR}
+				GROUP BY A1.YY
+			) B1
+			INNER JOIN (
+				SELECT 1 AS MT 
+				UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+				UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7
+				UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10
+				UNION ALL SELECT 11 UNION ALL SELECT 12
+			) B2
+		) C1
+		LEFT OUTER JOIN TB_MNTHNG_DIET C2
+		ON C1.YY = C2.YY
+			AND C1.MT = C2.MT
+			AND C1.DIET_SE_CODE = C2.DIET_SE_CODE
+	) D1
+	GROUP BY D1.YY
+	</select>
+</mapper>

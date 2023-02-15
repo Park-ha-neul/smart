@@ -1,0 +1,302 @@
+## 제형설계 api 설명
+###############################
+#1. api1(formulation_prediction)#
+##############################
+: 물질의 구조, 특성 분석 예측 모델을 통한 투여경로 추천
+```
+# step1. type 에 따라 분류 (type 총 : 3개, 화학명{chemical name}, 화학식{smiles string}, 분자구조{sdf file})
+# step2. type 에 따라 ai 모델 돌리기
+# step3. ai 모델을 통해 나온 분자 특성에 따른 투여경로 추천
+
+input)
+# 플랫폼에서 INPUT 값, 로컬에서 돌리려면 경로 변경 필요
+[[{'reqid' : 'dd','type':'chemical', 'value':'Caffeine', 'path':'/home/data/t3q/uploads/pharmAi/t3q/test/test2/'}]]
+output)
+{
+	"molecule": {
+	  "smiles" : "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+	  "generated molecule": "/home/data/t3q/uploads/pharmAi/프로젝트id/api번호/api하위구분(tab)/폴더명/2021-06-30_1017.png"
+	},
+	"properties": {
+	  "pH Mass Solubility": [-44.72, 6.57, 33.54, -2.5, 48.63, 14.22, 17.91, 13.4, 46.8, 60.89],
+	  "pH logD": [-1.12, -0.36, -0.85, -0.66, -0.59, -1.24, -0.96, -0.24, -0.67, -0.5],
+	  "pKa": 17.97,
+	  "pKb": 0.03,
+	  "Caco2 Permeability": ["Permeable with Papp > 8 * 10^-6 (cm/s)", 1.0],
+	  "Boiling point(°C)": 340.98,
+	  "logP": -7.95,
+	  "Bioavailability": ["Orally bioavailable", 1.00],
+	  "Dosage Form": ["Dosage Form: Non-oral", 1.0],
+	  "Molecular weight(g/mol)": 194.19,
+	  "Lipinski's Rule of 5": ["Yes"]
+   },
+   "dosage": {
+	  "Molecular weight": ["oral", "parenteral", "local"],
+	  "Log P": ["oral", "parenteral", "local"],
+	  "Log D(pH7)": ["parenteral"],
+	  "pH 3 solubility": ["oral", "parenteral", "local"],
+	  "pH 7 solubility": ["oral", "parenteral", "local"],
+	  "Pearmeability (Caco-2)":["oral", "parenteral", "local"],
+	  "Bioavailability": ["oral"]
+	},
+	"count": {
+	  "oral" : 5,
+	  "parenteral" : 3,
+	  "local" : 2
+	}
+}
+```
+#############################
+#2. api2(formulation_routes)#
+#############################
+: 투여경로에 따른 제형 추천 -> RULE-BASE
+```
+# 데이터가 현재는 파일로 되어있음 -> 이를 DB화 하는 부분 추후 진행 필요
+
+# 데이터 생성 PROCESS
+## step1. formulation.db에 투여경로마다 테이블 생성
+## step2. 컬럼생성 (formulation/cqas/include) -> api4번 데이터와 연관있음
+
+# 개발 PROCESS
+## step1. 입력받은 투여경로에 맞는 테이블 찾기
+## step2. 쿼리문으로 해당하는 컬럼(formulation) 출력
+
+input)
+[[{'routes':'oral'}]]
+output) -> excipient list 내용만 UI 에서는 필요로 하지만, 추후 화면 변화를 위해 혹시 몰라서 include 데이터까지 전달
+{
+	"excipient list": [
+		"Capsule, Oral Capsule",
+		"Tablet",
+		"Oral Suspension, Suspension",
+		"Oral Solution",
+		"Granule",
+		"Powder",
+		"Gel",
+		"Sublingual",
+		"Sublingual Spray",
+		"Bucal Tablet, Bucal Film"
+	],
+	"include": [
+		"Capsule, Oral Capsule",
+		"Tablet ",
+		"Oral Suspension, Suspension",
+		"Oral solution, Elixir, Drop, Liquid, Syrup",
+		"Granule, Gum, Troche",
+		"Powder",
+		"Gel",
+		"Sublingual Tablet Subblingual Film, \nSubblingual Powder",
+		"Subblingual Spray",
+		"Bucal Tablet & Bucal Film, Film"
+	]
+}
+```
+##############################
+#3. api3(formulation_excipient)#
+##############################
+: 선택한 제형 및 화학식에 따라 사용가능한 부형제 목록 출력 (부형제 종류 및 사용가능 범위, 최대치 사용량) -> RULE-BASE
+```
+# 데이터가 현재는 파일로 되어있음 -> 이를 DB화 하는 부분 추후 진행 필요
+
+# 개발 process
+## step1. smiles 에 해당하는 /data/aip/activate/rxlist_new.csv : ingredient 와 kind 추출
+## step2. 추출한 ingredient 를 /data/aip/activate/Change_Log.csv : 최소값, 최대값 추출
+## step3. 예외처리 데이터 : /data/aip/activate/routes.csv
+
+input)
+[[{'smiles': 'CN1C=NC2=C1C(=O)N(C(=O)N2C)C','formulation' : 'Capsule, Oral Capsule','primary': {'value': 12,'unit': 'ml'}}]]
+output)
+{{
+	"formulation_list": [
+		{
+			"excipients": "acacia",
+			"kind": "Flavoring agents",
+			"max": {
+				"unit": "mg",
+				"value": "32"
+			},
+			"use range": {
+				"max": "32",
+				"min": "0"
+			}
+		},
+		{
+			"excipients": "anhydrous lactose",
+			"kind": "filler",
+			"max": {
+				"unit": "",
+				"value": ""
+			},
+			"use range": {
+				"max": "",
+				"min": ""
+			}
+		}
+	]
+}
+```
+#############################
+#4. api4(formulation_CQAs)#
+#############################
+: 선택한 제형에 따른 CQAs 출력(실험방식) -> RULE-BASE
+```
+# 데이터가 현재는 파일로 되어있음 -> 이를 DB화 하는 부분 추후 진행 필요
+
+# 개발 PROCESS
+## step1. formulation.db 에 존재하는 모든 테이블 조회 (union)
+## step2. 입력받은 제형에 해당하는 cqas 출력
+
+# input)
+[[{'formulation': 'Patch'}]]
+
+# output)
+{
+	"CQAs List": [
+		"content uniformity, disintegrant test, dissolution test"
+	]
+}
+```
+
+##########################
+#5. api5(formulation_DoE)#
+##########################
+: 부형제 선택에 따른 (사용범위 입력) 및 CQAs 선택에 따른 실험치 입력 데이터 출력
+
+# 개발 PROCESS
+## step1. 입력으로 받는 선택한 부형제 및 사용범위를 csv 로 저장 (python -> R 로 파라미터 넘기는 방법 x, R 에서 csv 파일을 읽어서 진행)
+## step2. R 스크립트 로드 및 실행 (위의 csv 파일들 로드)
+## step3. R 내부에서 결과값을 csv 로 저장함
+## step4. python 에서 csv 읽어서 결과값 출력
+
+R 스크립트 저장 경로 : /data/aip/activate/api5/DoE.R
+
+input)
+[[{'formulation':[{'excipients': 'acacia','input range': {'min' : 40, 'max' : 100},'kind' : 'z','max' : {'value' : 10, 'unit' : 'mg'},'use range': {'min' : 10, 'max' : 90}},{'excipients': 'anhydrous lactose','input range': {'min' : 2, 'max' : 6},'kind' : 'z','max' : {'value' : 10, 'unit' : 'mg'},'use range': {'min' : 10, 'max' : 90}},{'excipients': 'adipic acid','input range': {'min' : 3, 'max' : 7},'kind' : 'z','max' : {'value' : 10, 'unit' : 'mg'},'use range': {'min' : 10, 'max' : 90}}],'CQAs': ['test1', 'test2', 'test3']}]]
+output)
+{
+	"experiment data": [
+		{
+			"acacia": "55",
+			"adipic acid": "3",
+			"anhydrous lactose": "2"
+		},
+		{
+			"acacia": "55",
+			"adipic acid": "7",
+			"anhydrous lactose": "2"
+		}
+	],
+	"header": [
+		"acacia",
+		"anhydrous lactose",
+		"adipic acid",
+		"content uniformity",
+		"disintegrant test",
+		"dissolution test"
+	]
+}
+
+#############################
+#6. api6(formulation_graph)#
+#############################
+: 실험치 입력 데이터에 따른 그래프 생성 및 개별 응답값에 대한 목표치 (pareto chart, response plot, contour plot)
+
+# 개발 PROCESS
+## step1. 입력으로 받는 선택한 부형제 및 사용범위를 csv 로 저장 (python -> R 로 파라미터 넘기는 방법 x, R 에서 csv 파일을 읽어서 진행)
+## step2. 입력으로 받는 path 도 csv 로 저장 (위의 csv 와 다른 파일)
+## step3. R 스크립트 로드 및 실행 (위의 csv 파일들 로드)
+## step4. R 내부에서 결과값을 csv 로 저장함
+## step5. python 에서 csv 읽어서 결과값 출력
+
+R 스크립트 저장 경로 : /data/aip/activate/api6/graph.R
+
+input)
+[[{'header' : ['appearance', 'identification', 'dissolution test', 'assay', 'impurities'], 'experiment data': '/home/data/t3q/uploads/pharmAi/t3q/api6/api6_experiment.csv','formulation':[{'excipients': 'x_test1','input range': {'min' : 40, 'max' : 100},'kind' : 'z','max' : {'value' : 10, 'unit' : 'mg'},'use range': {'min' : 10, 'max' : 90}},{'excipients': 'x_test2','input range': {'min' : 2, 'max' : 6},'kind' : 'z','max' : {'value' : 10, 'unit' : 'mg'},'use range': {'min' : 10, 'max' : 90}},{'excipients': 'x_test3','input range': {'min' : 3, 'max' : 7},'kind' : 'z','max' : {'value' : 10, 'unit' : 'mg'},'use range': {'min' : 10, 'max' : 90}}],'pareto-path' : '/home/data/t3q/uploads/pharmAi/t3q/api6/pareto/','contour-path' : '/home/data/t3q/uploads/pharmAi/t3q/api6/contour/','response-path' : '/home/data/t3q/uploads/pharmAi/t3q/api6/response/'}]]
+output)
+{
+	"contour": [
+		"{입력받은 path}/{생성된 이미지명}.png"}
+	],
+	"effects": [
+		{
+			"Y1": {
+				"appearance": {
+					"max": 432,
+					"min": 2
+				}
+			}
+		},
+		{
+			"Y2": {
+				"identification": {
+					"max": 14.55,
+					"min": 7.05
+				}
+			}
+		}
+	],
+	"pareto": [
+		"{입력받은 path}/{생성된 이미지명}.png"}
+	]
+	"response": [
+	    "{입력받은 path}/{생성된 이미지명}.png"}
+	]
+}
+
+#############################
+#7. api7(formulation_excipient)#
+#############################
+: 실험치 입력 데이터 및 개별 응답값에 대한 목표치에 따른 design space(중첩 영역 제외) 생성 및 결과값 데이터 출력 (contour plot, design space 내용 정보 출력)
+
+# 개발 PROCESS
+## step1. 입력으로 받는 선택한 부형제 및 사용범위를 csv 로 저장 (python -> R 로 파라미터 넘기는 방법 x, R 에서 csv 파일을 읽어서 진행)
+## step2. 입력으로 받는 path 도 csv 로 저장 (위의 csv 와 다른 파일)
+## step3. 입력으로 받는 '개별 응답값에 대한 목표치'도 csv 로 저장 (또 다른 csv 파일)
+## step4. R 스크립트 로드 및 실행 (위의 csv 파일들 로드)
+## step5. R 내부에서 결과값을 csv 로 저장함
+## step6. python 에서 csv 읽어서 결과값 출력
+
+R 스크립트 저장 경로 : /data/aip/activate/api7/graph.R
+
+input)
+[[{'header' : ['appearance','identification','dissolution test','assay','impurities'], 'experiment data': '/home/data/t3q/uploads/pharmAi/t3q/api7/api7_experiment.csv','formulation':[{'excipients':'acacia','kind':'Flavoring agents','max':{'value':'32','unit':'mg'},'use range':{'min':'0','max':'32'},'input range':{'min':'2','max':'3'}},{'excipients':'anhydrous lactose','kind':'filler','max':{'value':'','unit':''},'use range':{'min':'','max':''},'input range':{'min':'5','max':'6'}}, {'excipients':'final','kind':'Flavoring agents','max':{'value':'32','unit':'mg'},'use range':{'min':'0','max':'32'},'input range':{'min':'2','max':'3'}}],'design-path' : '/home/data/t3q/uploads/pharmAi/t3q/api7/design/','result-path' : '/home/data/t3q/uploads/pharmAi/t3q/api7/result/', 'response': [{'Y1': [{'appearance': {'min': 3,'max': 422}}],'Y2': [{'identification': {'min': 7.05,'max': 14.00}}],'Y3': [{'dissolution test ': {'min': 0.06,'max': 0.22}}], 'Y4': [{'assay ': {'min': 70,'max': 90}}], 'Y5': [{'impurities': {'min': 0.03,'max': 0.328}}]}]}]]
+output)
+{
+	"design": [
+		"{입력받은 path}/{생성된 이미지명}.png"}
+	"excipient": [
+		{
+			"부형제명": {
+				"최대": 3.24,
+				"최소": 1.56
+			}
+		}, {}, {}
+	],
+	"factor": [
+		{
+			"X1": {
+				"acacia": {
+					"control space": {
+						"max": 3.24,
+						"min": 1.56
+					},
+					"design space": {
+						"max": 2.9,
+						"min": 1.9
+					},
+					"knowledge space": {
+						"max": "3",
+						"min": "2"
+					}
+				}
+			}
+		}
+	],
+	"final": {
+		"contour": [
+			"{입력받은 path}/{생성된 이미지명}.png"}
+		],
+		"design": [
+			"{입력받은 path}/{생성된 이미지명}.png"}
+	}
+}

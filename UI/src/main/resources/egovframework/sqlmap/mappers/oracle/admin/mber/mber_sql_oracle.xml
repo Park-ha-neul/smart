@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.mber">
+
+	<select id="selectTotCntMber" parameterType="dataMap" resultType="int">
+	/* admin.mber.selectTotCntMber */
+	SELECT COUNT(1) TOT_CNT
+	FROM TBW_MBER A1
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'id'">
+		AND A1.ID LIKE '%' || #{sch_text} || '%'
+			</when>
+			<when test="sch_type == 'nm'">
+		AND A1.NM LIKE '%' || #{sch_text} || '%'
+			</when>
+		</choose>
+	</if>
+	<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+		AND A1.USER_STTUS_CODE = #{sch_user_sttus_code}
+	</if>
+	</select>
+
+	<select id="selectPageListMber" parameterType="dataMap" resultType="dataMap">
+	/* admin.mber.selectPageListMber */
+	SELECT *
+	FROM (
+		SELECT ROWNUM AS RNUM, AA.*
+		FROM (
+			SELECT A1.USER_NO
+				, A1.ID
+				, A1.NM
+				, A1.USER_STTUS_CODE
+				, A3.CODE_NM AS USER_STTUS_NM
+				, A1.REGISTER_NO
+				, A2.USER_NM AS REGISTER_NM
+				, A1.REGIST_DT
+				, TO_CHAR(A1.REGIST_DT, 'YYYY.MM.DD') AS REGIST_YMD
+				FROM TBW_MBER A1
+				LEFT OUTER JOIN TBW_USER A2
+				ON A1.REGISTER_NO = A2.USER_NO
+				LEFT OUTER JOIN TBW_CODE A3
+				ON A1.USER_STTUS_CODE = A3.CODE
+					AND A3.GROUP_ID = 'R010050'
+				WHERE 1 = 1
+			<if test="sch_text != null and sch_text != ''">
+				<choose>
+					<when test="sch_type == 'id'">
+				AND A1.ID LIKE '%' || #{sch_text} || '%'
+					</when>
+					<when test="sch_type == 'nm'">
+				AND A1.NM LIKE '%' || #{sch_text} || '%'
+					</when>
+				</choose>
+			</if>
+			<if test="sch_user_sttus_code != null and sch_user_sttus_code != ''">
+				AND A1.USER_STTUS_CODE = #{sch_user_sttus_code}
+			</if>
+			ORDER BY A1.ID ASC
+		) AA
+	) AAA
+	WHERE RNUM <![CDATA[ > ]]> #{limitStart, jdbcType=INTEGER} AND ROWNUM <![CDATA[ <= ]]> #{limitCount, jdbcType=INTEGER}
+	</select>
+
+	<select id="selectMberExistYn" parameterType="dataMap" resultType="string">
+	/* admin.mber.selectMberExistYn */
+	SELECT
+		CASE WHEN COUNT(*) <![CDATA[ > ]]> 0
+			THEN 'Y'
+			ELSE 'N'
+		END EXIST_YN
+	FROM TBW_MBER A
+	WHERE A.ID = #{id}
+	</select>
+
+	<insert id="insertMber" parameterType="dataMap">
+	<selectKey keyProperty="user_no" order="BEFORE" resultType="int">
+		SELECT FN_NEXTVAL('SQ_USER_NO') AS USER_NO FROM DUAL
+	</selectKey>
+	/* admin.mber.insertMber */
+	INSERT INTO TBW_MBER (
+		USER_NO
+		, ID
+		, NM
+		, PASSWORD
+		, USER_STTUS_CODE
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{user_no}
+		, #{id}
+		, #{nm}
+		, #{password}
+		, #{user_sttus_code}
+		, #{ss_user_no}
+		, SYSDATE
+	)
+	</insert>
+
+	<select id="selectMber" parameterType="dataMap" resultType="dataMap">
+	/* admin.mber.selectMber */
+	SELECT A1.USER_NO
+		, A1.ID
+		, A1.NM
+		, A1.USER_STTUS_CODE
+		, A3.CODE_NM AS USER_STTUS_NM
+		, A1.REGISTER_NO
+		, A2.USER_NM AS REGISTER_NM
+		, A1.REGIST_DT
+		, TO_CHAR(A1.REGIST_DT, 'YYYY.MM.DD') AS REGIST_YMD
+	FROM TBW_MBER A1
+	LEFT OUTER JOIN TBW_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	LEFT OUTER JOIN TBW_CODE A3
+	ON A1.USER_STTUS_CODE = A3.CODE
+		AND A3.GROUP_ID = 'R010050'
+	WHERE A1.USER_NO = #{user_no}
+	</select>
+
+	<update id="updateMber" parameterType="dataMap">
+	/* admin.mber.updateMber */
+	UPDATE TBW_MBER
+	SET NM = #{nm}
+		, USER_STTUS_CODE = #{user_sttus_code}
+		, UPDUSR_NO = #{ss_user_no}
+		, UPDT_DT = SYSDATE
+	WHERE USER_NO = #{user_no}
+	</update>
+
+	<delete id="deleteMber" parameterType="dataMap">
+	/* admin.mber.deleteMber */
+	DELETE FROM TBW_MBER
+	WHERE USER_NO = #{user_no}
+	</delete>
+</mapper>

@@ -1,0 +1,1703 @@
+-- pharmai.tb_acces_ip definition
+
+CREATE TABLE `tb_acces_ip` (
+  `IP` varchar(100) DEFAULT NULL COMMENT '아이피',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='접근 ip';
+
+
+-- pharmai.tb_admin_event_log definition
+
+CREATE TABLE `tb_admin_event_log` (
+  `EVENT_DE` varchar(8) DEFAULT NULL COMMENT '이벤트 일자',
+  `MENU_PK` varchar(8) DEFAULT NULL COMMENT '메뉴 기본키',
+  `IP` varchar(39) DEFAULT NULL COMMENT '아이피',
+  `PARAM_VALUE` longtext DEFAULT NULL COMMENT 'PARAM 값',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='어드민 이벤트 로그';
+
+
+-- pharmai.tb_author definition
+
+CREATE TABLE `tb_author` (
+  `AUTHOR_ID` varchar(20) NOT NULL COMMENT '권한 아이디',
+  `AUTHOR_NM` varchar(200) DEFAULT NULL COMMENT '권한 명',
+  `RM` varchar(200) DEFAULT NULL COMMENT '비고',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`AUTHOR_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='권한';
+
+
+-- pharmai.tb_author_menu definition
+
+CREATE TABLE `tb_author_menu` (
+  `AUTHOR_MENU_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '권한 메뉴 일련',
+  `AUTHOR_ID` varchar(20) NOT NULL COMMENT '권한 아이디',
+  `MENU_PK` varchar(8) NOT NULL COMMENT '메뉴 아이디',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`AUTHOR_MENU_SEQ`,`AUTHOR_ID`,`MENU_PK`)
+) ENGINE=InnoDB AUTO_INCREMENT=25086 DEFAULT CHARSET=utf8 COMMENT='권한 메뉴';
+
+
+-- pharmai.tb_banner definition
+
+CREATE TABLE `tb_banner` (
+  `BANNER_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '배너 일련',
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '시스템 코드',
+  `ZONE_CODE` varchar(4) DEFAULT NULL COMMENT '구역 코드',
+  `BANNER_NM` varchar(100) DEFAULT NULL COMMENT '배너 명',
+  `WEB_IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '웹 이미지 문서 아이디',
+  `MOBILE_IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '모바일 이미지 문서 아이디',
+  `DISP_YN` varchar(1) DEFAULT NULL COMMENT '전시 가부',
+  `ATTRB_1` varchar(1000) DEFAULT NULL COMMENT '속성1',
+  `ATTRB_2` varchar(1000) DEFAULT NULL COMMENT '속성2',
+  `ATTRB_3` varchar(1000) DEFAULT NULL COMMENT '속성3',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`BANNER_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='배너';
+
+
+-- pharmai.tb_banner_image definition
+
+CREATE TABLE `tb_banner_image` (
+  `BANNER_IMAGE_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '배너 일련',
+  `DOC_ID` varchar(100) DEFAULT NULL COMMENT '문서 아이디',
+  `FILE_ID` varchar(60) DEFAULT NULL COMMENT '파일 아이디',
+  `FILE_NM` varchar(200) DEFAULT NULL COMMENT '파일 명',
+  `FILE_EXTSN_NM` varchar(100) DEFAULT NULL COMMENT '파일 확장자 명',
+  `FILE_SIZE` varchar(100) DEFAULT NULL COMMENT '파일 사이즈',
+  `FILE_PARTN_COURS` varchar(200) DEFAULT NULL COMMENT '파일 상대 경로',
+  `FILE_ABSLT_COURS` varchar(200) DEFAULT NULL COMMENT '파일 절대 경로',
+  `CNTNTS_TY` varchar(100) DEFAULT NULL COMMENT '콘텐츠 유형',
+  `LINK_URL` varchar(1000) DEFAULT NULL COMMENT '링크URL',
+  `SORT_ORDR` int(11) DEFAULT NULL COMMENT '정렬 순서',
+  `DISP_YN` varchar(1) DEFAULT 'Y' COMMENT '전시 가부',
+  `ATTRB_1` varchar(1000) DEFAULT NULL COMMENT '속성 1',
+  `ATTRB_2` varchar(1000) DEFAULT NULL COMMENT '속성 2',
+  `ATTRB_3` varchar(1000) DEFAULT NULL COMMENT '속성 3',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  PRIMARY KEY (`BANNER_IMAGE_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COMMENT='배너 이미지';
+
+
+-- pharmai.tb_bbs definition
+
+CREATE TABLE `tb_bbs` (
+  `BBS_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '게시판 일련',
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '시스템 코드',
+  `BBS_CODE` varchar(5) DEFAULT NULL COMMENT '게시판 코드',
+  `SJ` varchar(500) DEFAULT NULL COMMENT '제목',
+  `CN` longtext DEFAULT NULL COMMENT '내용',
+  `TEXT_CN` longtext DEFAULT NULL COMMENT '텍스트 내용',
+  `THUMB_DOC_ID` varchar(100) DEFAULT NULL COMMENT '썸네일 문서 아이디',
+  `IMAGE_DOC_ID` varchar(100) DEFAULT NULL COMMENT '이미지 문서 아이디',
+  `DOC_ID` varchar(100) DEFAULT NULL COMMENT '문서 아이디',
+  `HIT_CNT` int(11) DEFAULT NULL COMMENT '히트 카운트',
+  `KWRD` varchar(4000) DEFAULT NULL COMMENT '키워드',
+  `MVP_URL` varchar(1000) DEFAULT NULL COMMENT '동영상URL',
+  `LINK_URL` varchar(1000) DEFAULT NULL COMMENT '링크URL',
+  `CMMNTY_ID` varchar(20) DEFAULT NULL COMMENT '커뮤니티 아이디',
+  `BOARD_ID` int(11) DEFAULT NULL COMMENT '전광판 이이디',
+  `IMPRTNC_YN` varchar(1) DEFAULT NULL COMMENT '중요 가부',
+  `IMPRTNC_ORDR` int(11) DEFAULT NULL COMMENT '중요 순서',
+  `DISP_YN` varchar(1) DEFAULT 'Y' COMMENT '전시 가부',
+  `OPEN_YN` varchar(1) DEFAULT NULL COMMENT '개방형 가부',
+  `SEARCH_CN` longtext DEFAULT NULL COMMENT '검색 내용',
+  `RM` varchar(4000) DEFAULT NULL COMMENT '비고',
+  `BEFORE_SEQ` varchar(100) DEFAULT NULL COMMENT '이전 SEQ',
+  `TRNSFER_DT` datetime DEFAULT NULL COMMENT '이관 일시',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`BBS_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='게시판';
+
+
+-- pharmai.tb_bbs_answer definition
+
+CREATE TABLE `tb_bbs_answer` (
+  `ANSWER_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '답변 일련',
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '시스템 코드',
+  `BBS_SEQ` int(11) DEFAULT NULL COMMENT '게시판 일련',
+  `CN` longtext DEFAULT NULL COMMENT '내용',
+  `IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '이미지 문서 아이디',
+  `DOC_ID` varchar(45) DEFAULT NULL COMMENT '문서 아이디',
+  `CMMNTY_ID` varchar(20) DEFAULT NULL COMMENT '커뮤니티 아이디',
+  `BOARD_ID` int(11) DEFAULT NULL COMMENT '전광판 아이디',
+  `TRNSFER_DT` datetime DEFAULT NULL COMMENT '이관 일시',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`ANSWER_SEQ`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='게시판 답변';
+
+
+-- pharmai.tb_bbs_author definition
+
+CREATE TABLE `tb_bbs_author` (
+  `BBS_CODE` varchar(8) NOT NULL COMMENT '게시판 코드',
+  `AUTHOR_ID` varchar(20) NOT NULL COMMENT '권한 아이디',
+  PRIMARY KEY (`BBS_CODE`,`AUTHOR_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='게시판 권한';
+
+
+-- pharmai.tb_bbs_manage definition
+
+CREATE TABLE `tb_bbs_manage` (
+  `BBS_CODE` varchar(5) NOT NULL COMMENT '게시판 코드',
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '기관 코드',
+  `BBS_TY_CODE` varchar(10) DEFAULT NULL COMMENT '게시판 타입 코드',
+  `BBS_NM` varchar(100) DEFAULT NULL COMMENT '게시판 명',
+  `EDITR_YN` varchar(1) DEFAULT NULL COMMENT '에디터 가부',
+  `ATCH_FILE_YN` varchar(1) DEFAULT NULL COMMENT '첨부 파일 가부',
+  `KWRD_YN` varchar(1) DEFAULT NULL COMMENT '키워드 가부',
+  `LINK_URL_YN` varchar(1) DEFAULT NULL COMMENT '링크 URL 가부',
+  `MVP_URL_YN` varchar(1) DEFAULT NULL COMMENT '동영상 URL 가부',
+  `ANSWER_YN` varchar(1) DEFAULT NULL COMMENT '답변  가부',
+  `ANSWER_EDITR_YN` varchar(1) DEFAULT NULL COMMENT '답변 에디터 가부',
+  `ANSWER_ATCH_FILE_YN` varchar(1) DEFAULT NULL COMMENT '답변 첨부 파일 가부',
+  `USE_YN` varchar(1) DEFAULT NULL COMMENT '사용 가부',
+  `REGIST_YN` varchar(1) DEFAULT NULL COMMENT '등록 가부',
+  `MNGR_ANSWER_YN` varchar(1) DEFAULT NULL COMMENT '관리자 답변 가부',
+  `CNTNTS_CN` longtext DEFAULT NULL COMMENT '콘텐츠 내용',
+  `CNTNTS_YN` varchar(1) DEFAULT NULL COMMENT '콘텐츠 가부',
+  `CNTNTS_POSITION_CODE` varchar(10) DEFAULT NULL COMMENT '콘텐츠 위치 코드',
+  `PASSWORD_YN` varchar(1) DEFAULT NULL COMMENT '비밀번호 가부',
+  `NONLOGIN_YN` varchar(1) DEFAULT NULL COMMENT '비로그인 가부',
+  `CAPTCHA_YN` varchar(1) DEFAULT NULL COMMENT '캡차 가부',
+  `IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '이미지 문서 아이디',
+  `RM` longtext DEFAULT NULL COMMENT '비고',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`BBS_CODE`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='게시판 관리';
+
+
+-- pharmai.tb_cntnts definition
+
+CREATE TABLE `tb_cntnts` (
+  `CNTNTS_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '콘텐츠 일련',
+  `CNTNTS_ID` varchar(8) DEFAULT NULL COMMENT '콘텐츠 아이디',
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '시스템 코드 ',
+  `SJ` varchar(200) DEFAULT NULL COMMENT '제목',
+  `CN` longtext DEFAULT NULL COMMENT '내용',
+  `TEXT_CN` longtext DEFAULT NULL COMMENT '텍스트 내용',
+  `DOC_ID` varchar(45) DEFAULT NULL COMMENT '문서 아이디',
+  `IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '이미지 문서 아이디',
+  `HIT_CNT` int(11) DEFAULT NULL COMMENT '히트 카운트',
+  `KWRD` varchar(4000) DEFAULT NULL COMMENT '키워드',
+  `LAST_VER` varchar(10) DEFAULT NULL COMMENT '마지막 버전',
+  `SCRIPT` varchar(4000) DEFAULT NULL COMMENT '스크립트',
+  `DISP_YN` varchar(1) DEFAULT NULL COMMENT '전시 가부',
+  `DELETE_YN` varchar(1) DEFAULT NULL COMMENT '삭제 가부',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`CNTNTS_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='콘텐츠';
+
+
+-- pharmai.tb_cntnts_ver definition
+
+CREATE TABLE `tb_cntnts_ver` (
+  `CNTNTS_SEQ` int(11) DEFAULT NULL COMMENT '콘텐츠 일련',
+  `VER` varchar(10) DEFAULT NULL COMMENT '버전',
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '시스템 코드 ',
+  `SJ` varchar(200) DEFAULT NULL COMMENT '제목',
+  `CN` longtext DEFAULT NULL COMMENT '내용',
+  `TEXT_CN` longtext DEFAULT NULL COMMENT '텍스트 내용',
+  `DOC_ID` varchar(45) DEFAULT NULL COMMENT '문서 아이디',
+  `IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '이미지 문서 아이디',
+  `KWRD` varchar(4000) DEFAULT NULL COMMENT '키워드',
+  `SCRIPT` varchar(4000) DEFAULT NULL COMMENT '스트립트',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='콘텐츠 버전';
+
+
+-- pharmai.tb_code definition
+
+CREATE TABLE `tb_code` (
+  `GROUP_ID` varchar(20) NOT NULL COMMENT '그룹 아이디',
+  `GROUP_NM` varchar(100) DEFAULT NULL COMMENT '그룹 명',
+  `CODE` varchar(10) NOT NULL,
+  `CODE_NM` varchar(100) DEFAULT NULL COMMENT '코드 명',
+  `CODE_NM_ENG` varchar(100) DEFAULT NULL COMMENT '코드 명 영문',
+  `ATTRB_1` varchar(100) DEFAULT NULL COMMENT '속성 1',
+  `ATTRB_2` varchar(100) DEFAULT NULL COMMENT '속성 2',
+  `ATTRB_3` varchar(100) DEFAULT NULL COMMENT '속성 3',
+  `SORT_ORDR` int(11) DEFAULT NULL COMMENT '정렬 순서',
+  `USE_YN` varchar(1) DEFAULT NULL COMMENT '사용 가부',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`GROUP_ID`,`CODE`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='코드';
+
+
+-- pharmai.tb_code_group definition
+
+CREATE TABLE `tb_code_group` (
+  `GROUP_ID` varchar(20) NOT NULL COMMENT '그룹 아이디',
+  `GROUP_NM` varchar(100) DEFAULT NULL COMMENT '그룹 명',
+  `GROUP_NM_ENG` varchar(100) DEFAULT NULL COMMENT '그룹 명 영문',
+  `RM` varchar(200) DEFAULT NULL COMMENT '비고',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`GROUP_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='코드 그룹';
+
+
+-- pharmai.tb_copy_formula_prop definition
+
+CREATE TABLE `tb_copy_formula_prop` (
+  `PROP_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `FORMULATION_PJT_ID` varchar(10) NOT NULL COMMENT 'FORMULATION ID',
+  `PROP_TYPE` varchar(2) NOT NULL COMMENT '(MS/LO)',
+  `PH1` decimal(10,2) DEFAULT NULL COMMENT 'PH1',
+  `PH2` decimal(10,2) DEFAULT NULL COMMENT 'PH2',
+  `PH3` decimal(10,2) DEFAULT NULL COMMENT 'PH3',
+  `PH4` decimal(10,2) DEFAULT NULL COMMENT 'PH4',
+  `PH5` decimal(10,2) DEFAULT NULL COMMENT 'PH5',
+  `PH6` decimal(10,2) DEFAULT NULL COMMENT 'PH6',
+  `PH7` decimal(10,2) DEFAULT NULL COMMENT 'PH7',
+  `PH8` decimal(10,2) DEFAULT NULL COMMENT 'PH8',
+  `PH9` decimal(10,2) DEFAULT NULL COMMENT 'PH9',
+  `PH10` decimal(10,2) DEFAULT NULL COMMENT 'PH10',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`PROP_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8 COMMENT='PHYSICOCHEMICAL PROPERTIES';
+
+
+-- pharmai.tb_copy_formula_prop_dtl definition
+
+CREATE TABLE `tb_copy_formula_prop_dtl` (
+  `PROP_DTL_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `FORMULATION_PJT_ID` varchar(10) NOT NULL COMMENT 'FORMULATION ID',
+  `PKA` varchar(100) DEFAULT NULL COMMENT 'pKa',
+  `PKB` varchar(100) DEFAULT NULL COMMENT 'pKb',
+  `CA_PERM` varchar(100) DEFAULT NULL COMMENT 'Caco2 Permeability',
+  `BOL_POINT` varchar(100) DEFAULT NULL COMMENT 'boiling point',
+  `LOGP` varchar(100) DEFAULT NULL COMMENT 'logP',
+  `BIO` varchar(100) DEFAULT NULL COMMENT 'bioavailability',
+  `DOSAGE_FORM` varchar(100) DEFAULT NULL COMMENT 'Dosage Form',
+  `MOL_WEI` varchar(100) DEFAULT NULL COMMENT 'Molesular weight',
+  `LIP_RULE` varchar(100) DEFAULT NULL COMMENT 'Lipinski`s Rule of 5',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`PROP_DTL_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8 COMMENT='PHYSICOCHEMICAL PROPERTIES DETAIL';
+
+
+-- pharmai.tb_copy_formula_stp_02 definition
+
+CREATE TABLE `tb_copy_formula_stp_02` (
+  `STP_02_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `FORMULATION_PJT_ID` varchar(10) NOT NULL COMMENT 'FORMULATION ID',
+  `ROUTES_TYPE` varchar(20) NOT NULL COMMENT 'OL/LO/PA',
+  `DOSAGE_FORM_TYPE` varchar(100) NOT NULL COMMENT '제형 선택',
+  `VOLUME` varchar(30) NOT NULL COMMENT '주성분용량',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`STP_02_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8 COMMENT='STEP_02 결과';
+
+
+-- pharmai.tb_copy_formula_stp_04 definition
+
+CREATE TABLE `tb_copy_formula_stp_04` (
+  `CQA_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `FORMULATION_PJT_ID` varchar(10) NOT NULL COMMENT 'FORMULATION ID',
+  `CHECK_YN` varchar(1) DEFAULT NULL COMMENT 'CHECK_YN(Y/N)',
+  `CQA_NM` varchar(100) DEFAULT NULL COMMENT 'CQA NAME',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`CQA_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=182 DEFAULT CHARSET=utf8 COMMENT='CQA LIST';
+
+
+-- pharmai.tb_error_event_log definition
+
+CREATE TABLE `tb_error_event_log` (
+  `EVENT_DE` varchar(8) DEFAULT NULL COMMENT '이벤트 일자',
+  `REQUST_URL` varchar(1000) DEFAULT NULL COMMENT '요청URL',
+  `MENU_PK` varchar(8) DEFAULT NULL COMMENT '메뉴 기본키',
+  `IP` varchar(39) DEFAULT NULL COMMENT '아이피',
+  `PARAM_VALUE` longtext DEFAULT NULL COMMENT 'PARAM 값',
+  `ERROR_VALUE` longtext DEFAULT NULL COMMENT 'ERROR 값',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='에러 이벤트 로그';
+
+
+-- pharmai.tb_file definition
+
+CREATE TABLE `tb_file` (
+  `FILE_ID` varchar(60) NOT NULL COMMENT '파일 아이디',
+  `DOC_ID` varchar(45) DEFAULT NULL COMMENT '문서 아이디',
+  `FILE_NM` varchar(200) DEFAULT NULL COMMENT '파일 명',
+  `FILE_EXTSN_NM` varchar(100) DEFAULT NULL COMMENT '파일 확장자 명',
+  `FILE_SIZE` varchar(100) DEFAULT NULL COMMENT '파일 사이즈',
+  `FILE_PARTN_COURS` varchar(200) DEFAULT NULL COMMENT '파일 상대 경로',
+  `FILE_ABSLT_COURS` varchar(200) DEFAULT NULL COMMENT '파일 절대 경로',
+  `CNTNTS_TY` varchar(100) DEFAULT NULL COMMENT '콘텐츠 유형',
+  `SORT_ORDR` int(11) DEFAULT NULL COMMENT '정렬 순서',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  PRIMARY KEY (`FILE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='파일';
+
+
+-- pharmai.tb_formula_dosage definition
+
+CREATE TABLE `tb_formula_dosage` (
+  `PROP_DOSAGE_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `STP_01_SEQ` int(11) NOT NULL COMMENT 'STEP01 SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `PROPERTIES_NM` varchar(30) DEFAULT NULL COMMENT 'PROPERTIES 명',
+  `ORAL_YN` varchar(1) DEFAULT NULL COMMENT 'ORAL_YN(Y/N)',
+  `PARENTERAL_YN` varchar(1) DEFAULT NULL COMMENT 'PARENTERAL_YN(Y/N)',
+  `LOCAL_YN` varchar(1) DEFAULT NULL COMMENT 'LOCAL_YN(Y/N)',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`PROP_DOSAGE_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=491 DEFAULT CHARSET=utf8 COMMENT='PHYSICOCHEMICAL PROPERTIES DOSAGE';
+
+
+-- pharmai.tb_formula_excipient definition
+
+CREATE TABLE `tb_formula_excipient` (
+  `EXCIPIENT_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `STP_02_SEQ` int(11) NOT NULL COMMENT 'STEP02 SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `CHECK_YN` varchar(1) DEFAULT NULL COMMENT 'CHECK_YN(Y/N)',
+  `EXCIPIENT_NM` varchar(100) DEFAULT NULL COMMENT 'EXCIPIENT NAME',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`EXCIPIENT_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=891 DEFAULT CHARSET=utf8 COMMENT='SHAPE LIST';
+
+
+-- pharmai.tb_formula_prop definition
+
+CREATE TABLE `tb_formula_prop` (
+  `PROP_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `STP_01_SEQ` int(11) NOT NULL COMMENT 'STEP01 SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `PROP_TYPE` varchar(2) NOT NULL COMMENT '(MS/LO)',
+  `PH1` decimal(10,2) DEFAULT NULL COMMENT 'PH1',
+  `PH2` decimal(10,2) DEFAULT NULL COMMENT 'PH2',
+  `PH3` decimal(10,2) DEFAULT NULL COMMENT 'PH3',
+  `PH4` decimal(10,2) DEFAULT NULL COMMENT 'PH4',
+  `PH5` decimal(10,2) DEFAULT NULL COMMENT 'PH5',
+  `PH6` decimal(10,2) DEFAULT NULL COMMENT 'PH6',
+  `PH7` decimal(10,2) DEFAULT NULL COMMENT 'PH7',
+  `PH8` decimal(10,2) DEFAULT NULL COMMENT 'PH8',
+  `PH9` decimal(10,2) DEFAULT NULL COMMENT 'PH9',
+  `PH10` decimal(10,2) DEFAULT NULL COMMENT 'PH10',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`PROP_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=144 DEFAULT CHARSET=utf8 COMMENT='PHYSICOCHEMICAL PROPERTIES';
+
+
+-- pharmai.tb_formula_prop_dtl definition
+
+CREATE TABLE `tb_formula_prop_dtl` (
+  `PROP_DTL_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `STP_01_SEQ` int(11) NOT NULL COMMENT 'STEP01 SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `PKA` varchar(100) DEFAULT NULL COMMENT 'pKa',
+  `PKB` varchar(100) DEFAULT NULL COMMENT 'pKb',
+  `CA_PERM` varchar(100) DEFAULT NULL COMMENT 'Caco2 Permeability',
+  `BOL_POINT` varchar(100) DEFAULT NULL COMMENT 'boiling point',
+  `LOGP` varchar(100) DEFAULT NULL COMMENT 'logP',
+  `BIO` varchar(100) DEFAULT NULL COMMENT 'bioavailability',
+  `DOSAGE_FORM` varchar(100) DEFAULT NULL COMMENT 'Dosage Form',
+  `MOL_WEI` varchar(100) DEFAULT NULL COMMENT 'Molesular weight',
+  `LIP_RULE` varchar(100) DEFAULT NULL COMMENT 'Lipinski`s Rule of 5',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`PROP_DTL_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8 COMMENT='PHYSICOCHEMICAL PROPERTIES DETAIL';
+
+
+-- pharmai.tb_formula_stp_01 definition
+
+CREATE TABLE `tb_formula_stp_01` (
+  `STP_01_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `INPUT_TYPE` varchar(1) NOT NULL COMMENT '파일/SMILE/NAME (F/S/N)',
+  `SMILE_STRING` varchar(1000) DEFAULT NULL COMMENT 'INPUT SMILES STRING',
+  `SDF_NM` varchar(200) DEFAULT NULL COMMENT 'FILE NAME',
+  `CHEM_NM` varchar(200) DEFAULT NULL COMMENT 'FILE NAME',
+  `RETURN_SMILE_STRING` varchar(1000) DEFAULT NULL COMMENT 'RETUEN SMILES STRING',
+  `DOC_ID` varchar(45) DEFAULT NULL COMMENT '문서 아이디',
+  `SVG_URL` varchar(200) DEFAULT NULL COMMENT 'SVG 파일 경로',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`STP_01_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8 COMMENT='STEP_01 결과';
+
+
+-- pharmai.tb_formula_stp_02 definition
+
+CREATE TABLE `tb_formula_stp_02` (
+  `STP_02_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `ROUTES_TYPE` varchar(20) NOT NULL COMMENT 'OL/LO/PA',
+  `DOSAGE_FORM_TYPE` varchar(100) NOT NULL COMMENT '제형 선택',
+  `VOLUME` varchar(30) NOT NULL COMMENT '주 성분 용량',
+  `UNIT` varchar(10) DEFAULT NULL COMMENT '용량 단위',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`STP_02_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=utf8 COMMENT='STEP_02 결과';
+
+
+-- pharmai.tb_formula_stp_03 definition
+
+CREATE TABLE `tb_formula_stp_03` (
+  `STP_03_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `SORT_ORDR` int(11) DEFAULT NULL COMMENT '정렬 순서',
+  `CHECK_YN` varchar(1) DEFAULT NULL COMMENT '체크여부(Y/N)',
+  `EXCIPIENT` varchar(50) DEFAULT NULL COMMENT '부형제',
+  `KIND` varchar(50) DEFAULT NULL COMMENT 'KIND',
+  `MAXIMUM` varchar(10) DEFAULT NULL COMMENT '최대치용량',
+  `UNIT` varchar(10) DEFAULT NULL COMMENT '최대치용량 단위',
+  `USE_RANGE_S` varchar(10) DEFAULT NULL COMMENT '사용범위 시작',
+  `USE_RANGE_E` varchar(10) DEFAULT NULL COMMENT '사용범위 종료',
+  `IPT_USE_RANGE_S` varchar(10) DEFAULT NULL COMMENT 'INPUT사용범위 시작',
+  `IPT_USE_RANGE_E` varchar(10) DEFAULT NULL COMMENT 'INPUT 사용범위 종료',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`STP_03_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=662 DEFAULT CHARSET=utf8 COMMENT='STEP_03 결과';
+
+
+-- pharmai.tb_formula_stp_04 definition
+
+CREATE TABLE `tb_formula_stp_04` (
+  `CQA_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `CHECK_YN` varchar(1) DEFAULT NULL COMMENT 'CHECK_YN(Y/N)',
+  `CQA_NM` varchar(100) DEFAULT NULL COMMENT 'CQA NAME',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`CQA_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=241 DEFAULT CHARSET=utf8 COMMENT='CQA LIST';
+
+
+-- pharmai.tb_formula_stp_05 definition
+
+CREATE TABLE `tb_formula_stp_05` (
+  `STP_05_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `SORT_ORDR` int(11) DEFAULT NULL COMMENT '정렬 순서',
+  `C1` varchar(50) DEFAULT NULL COMMENT 'C1',
+  `C2` varchar(50) DEFAULT NULL COMMENT 'C2',
+  `C3` varchar(50) DEFAULT NULL COMMENT 'C3',
+  `C4` varchar(50) DEFAULT NULL COMMENT 'C4',
+  `C5` varchar(50) DEFAULT NULL COMMENT 'C5',
+  `C6` varchar(50) DEFAULT NULL COMMENT 'C6',
+  `C7` varchar(50) DEFAULT NULL COMMENT 'C7',
+  `C8` varchar(50) DEFAULT NULL COMMENT 'C8',
+  `C9` varchar(50) DEFAULT NULL COMMENT 'C9',
+  `C10` varchar(50) DEFAULT NULL COMMENT 'C10',
+  `C11` varchar(50) DEFAULT NULL COMMENT 'C11',
+  `C12` varchar(50) DEFAULT NULL COMMENT 'C12',
+  `C13` varchar(50) DEFAULT NULL COMMENT 'C13',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`STP_05_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=574 DEFAULT CHARSET=utf8 COMMENT='STEP_05 결과';
+
+
+-- pharmai.tb_formula_stp_06_graph definition
+
+CREATE TABLE `tb_formula_stp_06_graph` (
+  `RSLT_GRAPH_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'RESULT GRAPH SEQ',
+  `PRJCT_ID` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT 'PROJECT ID',
+  `PRETO_PATH_1` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PERETO_1 이미지 경로',
+  `PRETO_PATH_2` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PERETO_2 이미지 경로',
+  `PRETO_PATH_3` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PERETO_3 이미지 경로',
+  `PRETO_PATH_4` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PERETO_4 이미지 경로',
+  `PRETO_PATH_5` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PERETO_5 이미지 경로',
+  `CONTOUR_PATH_1` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_2` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_3` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_4` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_5` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_6` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_7` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_8` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_9` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_10` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_11` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_12` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_13` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_14` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_15` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `RESPONSE_PATH_1` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_2` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_3` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_4` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_5` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_6` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_7` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_8` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_9` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_10` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_11` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_12` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_13` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_14` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_15` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `USE_YN` varchar(1) CHARACTER SET utf8 NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
+  `UPDT_DT` datetime DEFAULT NULL,
+  PRIMARY KEY (`RSLT_GRAPH_SEQ`)
+) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='STEP_06 결과(그래프)';
+
+
+-- pharmai.tb_formula_stp_07_design definition
+
+CREATE TABLE `tb_formula_stp_07_design` (
+  `DESIGN_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'DESIGN SEQ',
+  `PRJCT_ID` varchar(10) DEFAULT NULL COMMENT 'PROJECT ID',
+  `Y_VARIABLE` varchar(10) DEFAULT NULL COMMENT 'Y_VARIABLE',
+  `EFFECT` varchar(50) DEFAULT NULL COMMENT 'EFFECT',
+  `IPT_START_Y` varchar(10) DEFAULT NULL COMMENT 'INPUT 목표치 값 시작',
+  `IPT_END_Y` varchar(10) DEFAULT NULL COMMENT 'INPUT 목표치 값 종료',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL,
+  `UPDT_DT` datetime DEFAULT NULL,
+  PRIMARY KEY (`DESIGN_SEQ`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=59 DEFAULT CHARSET=utf8 COMMENT='doe_design';
+
+
+-- pharmai.tb_formula_stp_07_design_img definition
+
+CREATE TABLE `tb_formula_stp_07_design_img` (
+  `DESIGN_IMG_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'DESIGN_IMG_SEQ',
+  `PRJCT_ID` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT 'PRJCT_ID',
+  `DESIGN_IMG_PATH_1` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT '디자인 이미지 경로 1',
+  `DESIGN_IMG_PATH_2` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT '디자인 이미지 경로 2',
+  `DESIGN_IMG_PATH_3` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT '디자인 이미지 경로 3',
+  `USE_YN` varchar(1) CHARACTER SET utf8 NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) CHARACTER SET utf8 DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일시',
+  PRIMARY KEY (`DESIGN_IMG_SEQ`)
+) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+-- pharmai.tb_formula_stp_07_result definition
+
+CREATE TABLE `tb_formula_stp_07_result` (
+  `RESULT_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'RESULT SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT 'PROJECT ID',
+  `EXCIPENT_NM` varchar(50) DEFAULT NULL COMMENT 'EXCIPENT_NM',
+  `EXCIPENT_MIN` varchar(10) DEFAULT NULL COMMENT '실험치 최솟값',
+  `EXCIPENT_MAX` varchar(10) DEFAULT NULL COMMENT '실험치 최댓값',
+  `CONTROL_SPACE_MIN` varchar(10) DEFAULT NULL COMMENT 'CONTROL_최솟값',
+  `CONTROL_SPACE_MAX` varchar(10) DEFAULT NULL COMMENT 'CONTROL_최댓값',
+  `DESIGN_SPACE_MIN` varchar(10) DEFAULT NULL COMMENT 'DESIGN_최댓값',
+  `DESIGN_SPACE_MAX` varchar(10) DEFAULT NULL COMMENT 'DESIGN_최솟값',
+  `KNOWLEDGE_SPACE_MIN` varchar(10) DEFAULT NULL COMMENT 'KNOWLEDGE_최솟값',
+  `KNOWLEDGE_SPACE_MAX` varchar(10) DEFAULT NULL COMMENT 'KNOWLEDGE_최댓값',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL,
+  `UPDT_DT` datetime DEFAULT NULL,
+  PRIMARY KEY (`RESULT_SEQ`)
+) ENGINE=MyISAM AUTO_INCREMENT=66 DEFAULT CHARSET=utf8 COMMENT='result 변수 저장';
+
+
+-- pharmai.tb_formula_stp_07_result_img definition
+
+CREATE TABLE `tb_formula_stp_07_result_img` (
+  `RESULT_IMG_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'RESULT_IMG_SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT 'PROJECT ID',
+  `DESIGN_IMG_PATH_1` varchar(200) DEFAULT NULL COMMENT 'FINAL 디자인 이미지 경로1',
+  `DESIGN_IMG_PATH_2` varchar(200) DEFAULT NULL COMMENT 'FINAL 디자인 이미지 경로2',
+  `DESIGN_IMG_PATH_3` varchar(200) DEFAULT NULL COMMENT 'FINAL 디자인 이미지 경로3',
+  `CONTOUR_IMG_PATH_1` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로1',
+  `CONTOUR_IMG_PATH_2` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로2',
+  `CONTOUR_IMG_PATH_3` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로3',
+  `CONTOUR_IMG_PATH_4` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로4',
+  `CONTOUR_IMG_PATH_5` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로5',
+  `CONTOUR_IMG_PATH_6` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로6',
+  `CONTOUR_IMG_PATH_7` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로7',
+  `CONTOUR_IMG_PATH_8` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로8',
+  `CONTOUR_IMG_PATH_9` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로9',
+  `CONTOUR_IMG_PATH_10` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로10',
+  `CONTOUR_IMG_PATH_11` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로11',
+  `CONTOUR_IMG_PATH_12` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로12',
+  `CONTOUR_IMG_PATH_13` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로13',
+  `CONTOUR_IMG_PATH_14` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로14',
+  `CONTOUR_IMG_PATH_15` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로15',
+  `CONTOUR_IMG_PATH_16` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로16',
+  `CONTOUR_IMG_PATH_17` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로17',
+  `CONTOUR_IMG_PATH_18` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로18',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일시',
+  PRIMARY KEY (`RESULT_IMG_SEQ`)
+) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+
+
+-- pharmai.tb_log_stre_pd definition
+
+CREATE TABLE `tb_log_stre_pd` (
+  `LOG_STRE_PD` varchar(10) NOT NULL COMMENT '로그 저장 기간',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='로그 저장 기간';
+
+
+-- pharmai.tb_m_unity definition
+
+CREATE TABLE `tb_m_unity` (
+  `ID` tinyint(4) NOT NULL,
+  `NAME` tinyint(4) NOT NULL,
+  `USER_ID` tinyint(4) NOT NULL,
+  `PASSWORD` tinyint(4) NOT NULL,
+  `MEMBER_KIND_CODE` tinyint(4) NOT NULL,
+  `MEMBER_TYPE_CODE` tinyint(4) NOT NULL,
+  `MEMBER_TYPE_APPROVAL_DATE` tinyint(4) NOT NULL,
+  `MEMBER_TYPE_APPROVAL_ID` tinyint(4) NOT NULL,
+  `TEMPORARY_KEY` tinyint(4) NOT NULL,
+  `VALIDATE_FLAG` tinyint(4) NOT NULL,
+  `VALIDATE_DATE` tinyint(4) NOT NULL,
+  `ENTRY_STATUS_CODE` tinyint(4) NOT NULL,
+  `ENTRY_ORGAN_CODE` tinyint(4) NOT NULL,
+  `PASSWORD_REISSUE_Q` tinyint(4) NOT NULL,
+  `PASSWORD_REISSUE_A` tinyint(4) NOT NULL,
+  `ENTRY_DATE` tinyint(4) NOT NULL,
+  `LAST_LOGIN_DATE` tinyint(4) NOT NULL,
+  `SOURCE_TABLE` tinyint(4) NOT NULL,
+  `INPUT_ID` tinyint(4) NOT NULL,
+  `INPUT_DATE` tinyint(4) NOT NULL,
+  `UPDATE_ID` tinyint(4) NOT NULL,
+  `UPDATE_DATE` tinyint(4) NOT NULL,
+  `RESIDENT_NO1` tinyint(4) NOT NULL,
+  `RESIDENT_NO2` tinyint(4) NOT NULL,
+  `RESIDENT_NO` tinyint(4) NOT NULL,
+  `VNUMBER` tinyint(4) NOT NULL,
+  `DUPINFO` tinyint(4) NOT NULL,
+  `ESCAPE_DATE` tinyint(4) NOT NULL,
+  `EXCHANGE_KEY` tinyint(4) NOT NULL,
+  `ESCAPE_CAUSE` tinyint(4) NOT NULL,
+  `WOMEN_GROUP_YN` tinyint(4) NOT NULL,
+  `COINFO` tinyint(4) NOT NULL,
+  `PASS_CH_DATE` tinyint(4) NOT NULL,
+  `PW_CHG_FLG` tinyint(4) NOT NULL,
+  `ADMIN_YN` tinyint(4) NOT NULL,
+  `LOGIN_FAIL_CNT` tinyint(4) NOT NULL,
+  `CHARGE_ORGAN_CODE` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- pharmai.tb_m_unity_damo definition
+
+CREATE TABLE `tb_m_unity_damo` (
+  `ID` varchar(10) NOT NULL COMMENT '아이디',
+  `NAME` varchar(256) NOT NULL COMMENT '성명',
+  `USER_ID` varchar(20) DEFAULT NULL COMMENT '인터넷회원 사용자 아이디',
+  `PASSWORD` varchar(128) DEFAULT NULL COMMENT '인터넷회원 로그인 패스워드',
+  `MEMBER_KIND_CODE` varchar(1) NOT NULL DEFAULT 'I' COMMENT '회원 종류 코드',
+  `MEMBER_TYPE_CODE` varchar(1) NOT NULL DEFAULT 'G' COMMENT '회원 구분 코드',
+  `MEMBER_TYPE_APPROVAL_DATE` datetime DEFAULT NULL COMMENT '회원 구분 승인 일시',
+  `MEMBER_TYPE_APPROVAL_ID` varchar(10) DEFAULT NULL COMMENT '회원 구분 승인자 아이디',
+  `SEC_TEMPORARY_KEY` varchar(24) DEFAULT NULL COMMENT '주민등록번호 대체 임시키',
+  `VALIDATE_FLAG` varchar(1) NOT NULL DEFAULT 'N' COMMENT '실명 인증 여부',
+  `VALIDATE_DATE` datetime DEFAULT NULL COMMENT '실명 인증 일시',
+  `ENTRY_STATUS_CODE` varchar(1) NOT NULL DEFAULT 'T' COMMENT '회원 상태 코드',
+  `ENTRY_ORGAN_CODE` varchar(2) DEFAULT NULL COMMENT '회원가입 조직 코드',
+  `PASSWORD_REISSUE_Q` varchar(10) DEFAULT NULL COMMENT '비밀번호 재발급 질문',
+  `PASSWORD_REISSUE_A` varchar(40) DEFAULT NULL COMMENT '비밀번호 재발급 답',
+  `ENTRY_DATE` datetime DEFAULT NULL COMMENT '회원가입 일자',
+  `LAST_LOGIN_DATE` datetime DEFAULT NULL COMMENT '최종 접속 일시',
+  `SOURCE_TABLE` varchar(20) DEFAULT NULL COMMENT '원천 데이터 테이블명',
+  `INPUT_ID` varchar(20) DEFAULT NULL COMMENT '등록자 아이디',
+  `INPUT_DATE` datetime DEFAULT NULL COMMENT '등록 일자',
+  `UPDATE_ID` varchar(20) DEFAULT NULL COMMENT '수정자 아이디',
+  `UPDATE_DATE` datetime DEFAULT NULL COMMENT '수정 일자',
+  `SEC_RESIDENT_NO1` varchar(280) DEFAULT NULL COMMENT '암호 주민번호1',
+  `SEC_RESIDENT_NO2` varchar(280) DEFAULT NULL COMMENT '암호 주민번호2',
+  `SEC_RESIDENT_NO` varchar(280) DEFAULT NULL COMMENT '암호 주민번호',
+  `VNUMBER` varchar(13) DEFAULT NULL COMMENT '아이핀 번호',
+  `DUPINFO` varchar(64) DEFAULT NULL COMMENT '중복 가입 정보(DI)',
+  `ESCAPE_DATE` datetime DEFAULT NULL COMMENT '탈퇴 일자',
+  `SEC_EXCHANGE_KEY` varchar(280) DEFAULT NULL COMMENT '암호 대체키',
+  `ESCAPE_CAUSE` varchar(100) DEFAULT NULL COMMENT '강제 탈퇴 사유',
+  `PHARMAI_GROUP_YN` varchar(1) DEFAULT 'N' COMMENT 'PHARMAI 그룹 여부',
+  `COINFO` varchar(88) DEFAULT NULL COMMENT '회원본인인증고유번호(CI)',
+  `PASS_CH_DATE` datetime DEFAULT NULL COMMENT '비밀번호 변경 일자',
+  `PW_CHG_FLG` varchar(1) DEFAULT 'Y' COMMENT '입시비밀번호 여부',
+  `ADMIN_YN` varchar(1) DEFAULT NULL COMMENT 'PHARMAI 관리자 여부',
+  `LOGIN_FAIL_CNT` int(11) DEFAULT 0 COMMENT '로그인 실채 횟수',
+  `CHARGE_ORGAN_CODE` varchar(2) DEFAULT NULL COMMENT '담당 기관 코드',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='통합회원';
+
+
+-- pharmai.tb_manufact_stp_01 definition
+
+CREATE TABLE `tb_manufact_stp_01` (
+  `STP_01_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQUENCE',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `ROUTES_TYPE` varchar(20) NOT NULL COMMENT 'OL/LO/PA',
+  `DOSAGE_FORM_TYPE` varchar(30) NOT NULL COMMENT '제형 선택',
+  `CHECK_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '체크여부',
+  `MANUFACTURING_METHOD` varchar(30) NOT NULL COMMENT '제형 방법',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 No',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 No',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일자',
+  PRIMARY KEY (`STP_01_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8;
+
+
+-- pharmai.tb_manufact_stp_02 definition
+
+CREATE TABLE `tb_manufact_stp_02` (
+  `STP_02_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '프로젝트 아이디',
+  `CHECK_YN` varchar(1) CHARACTER SET utf8 NOT NULL DEFAULT 'Y' COMMENT '체크여부(Y/N)',
+  `PROCESS_NAME` varchar(20) CHARACTER SET utf8 DEFAULT NULL COMMENT '제조과정 이름',
+  `INPUT_MATERIAL` varchar(2000) CHARACTER SET utf8 DEFAULT NULL COMMENT 'INPUT_MATERIAL',
+  `PROCESS_PARAM` varchar(1000) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PROCESSING PARAM',
+  `OUTPUT_MATERIAL` varchar(2000) CHARACTER SET utf8 DEFAULT NULL COMMENT 'OUTPUT_MATERIAL',
+  `USE_YN` varchar(1) CHARACTER SET utf8 NOT NULL DEFAULT 'Y' COMMENT '사용여부',
+  `REGIST_NO` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '입력자NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력일자',
+  `UPDUSR_NO` varchar(10) CHARACTER SET utf8 DEFAULT NULL COMMENT '수정자NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일자',
+  PRIMARY KEY (`STP_02_SEQ`)
+) ENGINE=MyISAM AUTO_INCREMENT=282 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='manufacturing step2';
+
+
+-- pharmai.tb_manufact_stp_03 definition
+
+CREATE TABLE `tb_manufact_stp_03` (
+  `STP_03_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(30) NOT NULL COMMENT '프로젝트 아이디',
+  `TYPE` varchar(1) NOT NULL COMMENT '구분(H/V) -헤더 , VALUE',
+  `FP_CQAS_STATUS` varchar(30) NOT NULL COMMENT 'FP_CQAS',
+  `PHA_COL_1` varchar(30) DEFAULT NULL COMMENT '사과',
+  `PHA_COL_2` varchar(30) DEFAULT NULL COMMENT '혼합',
+  `PHA_COL_3` varchar(30) DEFAULT NULL COMMENT '과립',
+  `PHA_COL_4` varchar(30) DEFAULT NULL COMMENT '건조',
+  `PHA_COL_5` varchar(30) DEFAULT NULL COMMENT '정립',
+  `PHA_COL_6` varchar(30) DEFAULT NULL COMMENT '활택',
+  `PHA_COL_7` varchar(30) DEFAULT NULL COMMENT '타정',
+  `PHA_COL_8` varchar(30) DEFAULT NULL COMMENT '코팅',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 No',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 No',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일자',
+  PRIMARY KEY (`STP_03_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=293 DEFAULT CHARSET=utf8;
+
+
+-- pharmai.tb_manufact_stp_04 definition
+
+CREATE TABLE `tb_manufact_stp_04` (
+  `STP_04_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQUENCE',
+  `PRJCT_ID` varchar(100) NOT NULL,
+  `FMEA_UNIT` varchar(100) NOT NULL COMMENT 'UNIT',
+  `RISK_STATUS` varchar(1) NOT NULL COMMENT 'RISK_STATUS',
+  `FMEA_CPPS` varchar(100) NOT NULL COMMENT 'CPPS',
+  `FMEA_FAILURE_MODE` varchar(100) NOT NULL COMMENT 'FAILURE MODE(CRITICAL EVENT)',
+  `FMEA_CQAS_QTTP` varchar(1000) NOT NULL COMMENT 'EFFECT ON IP & QTTP',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 No',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 No',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일자',
+  PRIMARY KEY (`STP_04_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=832 DEFAULT CHARSET=utf8 COMMENT='FMEA';
+
+
+-- pharmai.tb_manufact_stp_05 definition
+
+CREATE TABLE `tb_manufact_stp_05` (
+  `STP_05_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQUENCE',
+  `PRJCT_ID` varchar(100) NOT NULL,
+  `CHECK_YN` varchar(1) NOT NULL COMMENT '체크여부',
+  `UNIT` varchar(50) NOT NULL COMMENT 'UNIT 이름',
+  `CPP_TYPE` varchar(50) NOT NULL COMMENT 'CPP_TYPE',
+  `RISK` varchar(50) DEFAULT NULL COMMENT 'CPP_TYPE에 따른 위험1',
+  `UNIT_PNG` varchar(200) NOT NULL COMMENT 'PNG 경로',
+  `USE_YN` varchar(50) NOT NULL DEFAULT 'Y' COMMENT '사용여부',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일자',
+  PRIMARY KEY (`STP_05_SEQ`)
+) ENGINE=MyISAM AUTO_INCREMENT=1152 DEFAULT CHARSET=utf8 COMMENT='unit_img 및 risk 저장';
+
+
+-- pharmai.tb_manufact_stp_06 definition
+
+CREATE TABLE `tb_manufact_stp_06` (
+  `STP_06_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `CHECK_YN` varchar(1) DEFAULT NULL COMMENT '체크여부(Y/N)',
+  `PROCESS` varchar(10) DEFAULT NULL COMMENT '공정',
+  `CPP_FACTOR` varchar(50) DEFAULT NULL COMMENT 'CPP FACTOR',
+  `USE_RANGE_S` varchar(10) DEFAULT NULL COMMENT '사용범위 시작',
+  `USE_RANGE_E` varchar(10) DEFAULT NULL COMMENT '사용범위 종료',
+  `IPT_USE_RANGE_S` varchar(10) DEFAULT NULL COMMENT 'INPUT 사용범위 시작',
+  `IPT_USE_RANGE_E` varchar(10) DEFAULT NULL COMMENT 'INPUT 사용범위 종료',
+  `USE_YN` varchar(10) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 USER_NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일자',
+  PRIMARY KEY (`STP_06_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=344 DEFAULT CHARSET=utf8;
+
+
+-- pharmai.tb_manufact_stp_07 definition
+
+CREATE TABLE `tb_manufact_stp_07` (
+  `CQA_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `CHECK_YN` varchar(1) DEFAULT NULL COMMENT 'CHECK_YN(Y/N)',
+  `CQA_NM` varchar(100) DEFAULT NULL COMMENT 'CQA NAME',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`CQA_SEQ`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=504 DEFAULT CHARSET=utf8;
+
+
+-- pharmai.tb_manufact_stp_08 definition
+
+CREATE TABLE `tb_manufact_stp_08` (
+  `STP_08_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'SEQ',
+  `PRJCT_ID` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '프로젝트 ID',
+  `SORT_ORDR` int(11) DEFAULT NULL COMMENT '정렬순서',
+  `TYPE` varchar(1) CHARACTER SET utf8 NOT NULL COMMENT '타입(H/V) HEADER/VALUE',
+  `C1` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CPP 컬럼1',
+  `C2` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CPP 컬럼2',
+  `C3` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CPP 컬럼3',
+  `C4` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼1',
+  `C5` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼2',
+  `C6` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼3',
+  `C7` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼4',
+  `C8` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼5',
+  `C9` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼6',
+  `C10` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼7',
+  `C11` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼8',
+  `C12` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼9',
+  `C13` varchar(50) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CQA 컬럼10',
+  `USE_YN` varchar(1) CHARACTER SET utf8 NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '입력자NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력일자',
+  `UPDUSR_NO` varchar(10) CHARACTER SET utf8 DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일자',
+  PRIMARY KEY (`STP_08_SEQ`)
+) ENGINE=MyISAM AUTO_INCREMENT=271 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='실험치 입력';
+
+
+-- pharmai.tb_manufact_stp_09_graph definition
+
+CREATE TABLE `tb_manufact_stp_09_graph` (
+  `RSLT_GRAPH_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'RESULT GRAPH SEQ',
+  `PRJCT_ID` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PROJECT ID',
+  `PARETO_PATH_1` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_1이미지 경로',
+  `PARETO_PATH_2` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_2 이미지 경로',
+  `PARETO_PATH_3` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_3 이미지 경로',
+  `PARETO_PATH_4` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_4 이미지 경로',
+  `PARETO_PATH_5` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_5 이미지 경로',
+  `PARETO_PATH_6` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_6 이미지 경로',
+  `PARETO_PATH_7` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_7 이미지 경로',
+  `PARETO_PATH_8` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_8 이미지 경로',
+  `PARETO_PATH_9` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_9 이미지 경로',
+  `PARETO_PATH_10` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'PARETO_10 이미지 경로',
+  `CONTOUR_PATH_1` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로 ',
+  `CONTOUR_PATH_2` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_3` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_4` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_5` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_6` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_7` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_8` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_9` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_10` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_11` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_12` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_13` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_14` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `CONTOUR_PATH_15` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'CONTOUR 이미지 경로',
+  `RESPONSE_PATH_1` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_2` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_3` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_4` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_5` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_6` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_7` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_8` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_9` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_10` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_11` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_12` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_13` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_14` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `RESPONSE_PATH_15` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT 'RESPONSE 이미지 경로',
+  `USE_YN` varchar(1) CHARACTER SET utf8 NOT NULL COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) CHARACTER SET utf8 DEFAULT NULL,
+  `UPDT_DT` datetime DEFAULT NULL,
+  PRIMARY KEY (`RSLT_GRAPH_SEQ`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+-- pharmai.tb_manufact_stp_10_design definition
+
+CREATE TABLE `tb_manufact_stp_10_design` (
+  `DESIGN_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'DESIGN SEQ',
+  `PRJCT_ID` varchar(10) DEFAULT NULL COMMENT 'PRJCT_ID',
+  `Y_VARIABLE` varchar(10) DEFAULT NULL COMMENT 'Y_VARIABLE',
+  `EFFECT` varchar(50) DEFAULT NULL COMMENT 'EFFECT',
+  `IPT_START_Y` varchar(10) DEFAULT NULL COMMENT 'INPUT 목표치 값 시작',
+  `IPT_END_Y` varchar(10) DEFAULT NULL COMMENT 'INPUT 목표치 값 종료',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL,
+  `UPDT_DT` datetime DEFAULT NULL,
+  PRIMARY KEY (`DESIGN_SEQ`)
+) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
+
+
+-- pharmai.tb_manufact_stp_10_design_img definition
+
+CREATE TABLE `tb_manufact_stp_10_design_img` (
+  `DESIGN_IMG_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'DESIGN_IMG_SEQ',
+  `PRJCT_ID` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT 'PRJCT_ID',
+  `DESIGN_IMG_PATH_1` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT '디자인 이미지 경로 1',
+  `DESIGN_IMG_PATH_2` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT '디자인 이미지 경로 2',
+  `DESIGN_IMG_PATH_3` varchar(200) CHARACTER SET utf8 DEFAULT NULL COMMENT '디자인 이미지 경로 3',
+  `USE_YN` varchar(1) CHARACTER SET utf8 NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) CHARACTER SET utf8 DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일시',
+  PRIMARY KEY (`DESIGN_IMG_SEQ`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+-- pharmai.tb_manufact_stp_10_result definition
+
+CREATE TABLE `tb_manufact_stp_10_result` (
+  `RESULT_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'RESULT SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT 'PROJECT ID',
+  `EXCIPENT_NM` varchar(50) DEFAULT NULL COMMENT 'EXCIPENT_NM',
+  `EXCIPENT_MIN` varchar(10) DEFAULT NULL COMMENT '실험치 최솟값',
+  `EXCIPENT_MAX` varchar(10) DEFAULT NULL COMMENT '실험치 최댓값',
+  `CONTROL_SPACE_MIN` varchar(10) DEFAULT NULL COMMENT 'CONTROL_최솟값',
+  `CONTROL_SPACE_MAX` varchar(10) DEFAULT NULL COMMENT 'CONTROL_최댓값',
+  `DESIGN_SPACE_MIN` varchar(10) DEFAULT NULL COMMENT 'DESIGN_최댓값',
+  `DESIGN_SPACE_MAX` varchar(10) DEFAULT NULL COMMENT 'DESIGN_최솟값',
+  `KNOWLEDGE_SPACE_MIN` varchar(10) DEFAULT NULL COMMENT 'KNOWLEDGE_최솟값',
+  `KNOWLEDGE_SPACE_MAX` varchar(10) DEFAULT NULL COMMENT 'KNOWLEDGE_최댓값',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL,
+  `UPDT_DT` datetime DEFAULT NULL,
+  PRIMARY KEY (`RESULT_SEQ`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='result 변수 저장';
+
+
+-- pharmai.tb_manufact_stp_10_result_img definition
+
+CREATE TABLE `tb_manufact_stp_10_result_img` (
+  `RESULT_IMG_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'RESULT_IMG_SEQ',
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT 'PROJECT ID',
+  `DESIGN_IMG_PATH_1` varchar(200) DEFAULT NULL COMMENT 'FINAL 디자인 이미지 경로1',
+  `DESIGN_IMG_PATH_2` varchar(200) DEFAULT NULL COMMENT 'FINAL 디자인 이미지 경로2',
+  `DESIGN_IMG_PATH_3` varchar(200) DEFAULT NULL COMMENT 'FINAL 디자인 이미지 경로3',
+  `CONTOUR_IMG_PATH_1` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로1',
+  `CONTOUR_IMG_PATH_2` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로2',
+  `CONTOUR_IMG_PATH_3` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로3',
+  `CONTOUR_IMG_PATH_4` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로4',
+  `CONTOUR_IMG_PATH_5` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로5',
+  `CONTOUR_IMG_PATH_6` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로6',
+  `CONTOUR_IMG_PATH_7` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로7',
+  `CONTOUR_IMG_PATH_8` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로8',
+  `CONTOUR_IMG_PATH_9` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로9',
+  `CONTOUR_IMG_PATH_10` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로10',
+  `CONTOUR_IMG_PATH_11` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로11',
+  `CONTOUR_IMG_PATH_12` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로12',
+  `CONTOUR_IMG_PATH_13` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로13',
+  `CONTOUR_IMG_PATH_14` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로14',
+  `CONTOUR_IMG_PATH_15` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로15',
+  `CONTOUR_IMG_PATH_16` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로16',
+  `CONTOUR_IMG_PATH_17` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로17',
+  `CONTOUR_IMG_PATH_18` varchar(200) DEFAULT NULL COMMENT 'FINAL 윤곽 이미지 경로18',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '생성자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '생성일',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정일시',
+  PRIMARY KEY (`RESULT_IMG_SEQ`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+
+
+-- pharmai.tb_mber definition
+
+CREATE TABLE `tb_mber` (
+  `USER_NO` varchar(10) NOT NULL COMMENT '사용자 번호',
+  `ID` varchar(100) DEFAULT NULL COMMENT '아이디',
+  `PASSWORD` varchar(100) DEFAULT NULL COMMENT '비밀번호',
+  `NM` varchar(100) DEFAULT NULL COMMENT '이름',
+  `IHIDNUM` varchar(100) DEFAULT NULL COMMENT '주민등록번호',
+  `MOBLPHON_NO` varchar(100) DEFAULT NULL COMMENT '핸드폰 번호',
+  `USER_STTUS_CODE` varchar(10) DEFAULT NULL COMMENT '사용자 상태 코드',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='사용자';
+
+
+-- pharmai.tb_menu definition
+
+CREATE TABLE `tb_menu` (
+  `MENU_PK` varchar(8) NOT NULL COMMENT '메뉴 기본키',
+  `MENU_ID` varchar(24) NOT NULL COMMENT '메뉴 아이디',
+  `MENU_TY_CODE` varchar(10) DEFAULT NULL COMMENT '메뉴 타입 코드',
+  `MENU_LEVEL` int(11) DEFAULT NULL COMMENT '메뉴 레벨',
+  `MENU_NM` varchar(200) DEFAULT NULL COMMENT '메뉴 명',
+  `FNCT_NM` varchar(200) DEFAULT NULL COMMENT '기능 명',
+  `ICON_NM` varchar(200) DEFAULT NULL COMMENT 'ICON 명',
+  `MENU_SE_CODE` varchar(10) DEFAULT NULL COMMENT '메뉴 구분 코드',
+  `BBS_CODE` varchar(5) DEFAULT NULL COMMENT '게시판 코드',
+  `CNTNTS_ID` varchar(8) DEFAULT NULL COMMENT '컨텐츠 아이디',
+  `USE_YN` varchar(1) DEFAULT NULL COMMENT '사용 가부',
+  `DISP_YN` varchar(1) DEFAULT NULL COMMENT '전시 가부',
+  `URL` varchar(1000) DEFAULT NULL COMMENT 'URL',
+  `URL_TY_CODE` varchar(4) DEFAULT NULL COMMENT 'URL 유형 코드',
+  `RM` varchar(1000) DEFAULT NULL COMMENT '비고',
+  `SORT_ORDR` int(11) DEFAULT NULL COMMENT '정렬 순서',
+  `SORT_ORDR_1` int(11) DEFAULT NULL COMMENT '정렬 순서 1',
+  `SORT_ORDR_2` int(11) DEFAULT NULL COMMENT '정렬 순서 2',
+  `SORT_ORDR_3` int(11) DEFAULT NULL COMMENT '정렬 순서 3',
+  `SORT_ORDR_4` int(11) DEFAULT NULL COMMENT '정렬 순서 4',
+  `SORT_ORDR_5` int(11) DEFAULT NULL COMMENT '정렬 순서 5',
+  `SORT_ORDR_6` int(11) DEFAULT NULL COMMENT '정렬 순서 6',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`MENU_PK`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='메뉴';
+
+
+-- pharmai.tb_page_view definition
+
+CREATE TABLE `tb_page_view` (
+  `SYS_CODE` varchar(10) NOT NULL COMMENT '시스템 코드',
+  `ACCES_DE` varchar(8) NOT NULL COMMENT '접근 일자',
+  `MENU_PK` varchar(8) NOT NULL COMMENT '메뉴 기본키',
+  `ACCES_CNT` int(11) DEFAULT NULL COMMENT '접근 카운트',
+  PRIMARY KEY (`SYS_CODE`,`ACCES_DE`,`MENU_PK`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='페이지 뷰';
+
+
+-- pharmai.tb_photo_group definition
+
+CREATE TABLE `tb_photo_group` (
+  `PHOTO_SEQ` int(11) NOT NULL COMMENT '사진 일련',
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '시스템 코드',
+  `SJ` varchar(200) DEFAULT NULL COMMENT '제목',
+  `IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '이미지 문서 아이디',
+  `PHOTO_POTOGRF_DE` varchar(8) DEFAULT NULL COMMENT '사진 촬영 일자',
+  `RM` longtext DEFAULT NULL COMMENT '비고',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`PHOTO_SEQ`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='사진 그룹';
+
+
+-- pharmai.tb_photo_meta definition
+
+CREATE TABLE `tb_photo_meta` (
+  `FILE_ID` varchar(45) NOT NULL COMMENT '파일 아이디',
+  `IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '이미지 문서 아이디',
+  `PHOTO_SEQ` int(11) DEFAULT NULL COMMENT '사진 일련',
+  `CAPTION` varchar(200) DEFAULT NULL COMMENT '캡션',
+  `META_INFO` longtext DEFAULT NULL COMMENT '메타 정보',
+  `KWRD` varchar(1000) DEFAULT NULL COMMENT '키워드',
+  `WIDTH` int(11) DEFAULT NULL COMMENT '가로',
+  `HEIGHT` int(11) DEFAULT NULL COMMENT '세로',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`FILE_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='사진 메타';
+
+
+-- pharmai.tb_popup definition
+
+CREATE TABLE `tb_popup` (
+  `POPUP_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '팝업 일련',
+  `SYS_CODE` varchar(10) NOT NULL COMMENT '시스템 코드',
+  `POPUP_SE_CODE` varchar(10) DEFAULT NULL COMMENT '팝업 구분 코드',
+  `SJ` varchar(200) DEFAULT NULL COMMENT '제목',
+  `CN` longtext DEFAULT NULL COMMENT '내용 ',
+  `LINK_URL` varchar(1000) DEFAULT NULL COMMENT '링크URL',
+  `WIDTH_SIZE` int(11) DEFAULT NULL COMMENT '가로 사이즈',
+  `VRTICL_SIZE` int(11) DEFAULT NULL COMMENT '세로 사이즈',
+  `IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '이미지 문서 아이디',
+  `CRDNT_X` int(11) DEFAULT NULL COMMENT '좌표 X',
+  `CRDNT_Y` int(11) DEFAULT NULL COMMENT '좌표 Y',
+  `USE_YN` varchar(1) DEFAULT NULL COMMENT '사용 가부',
+  `MOBILE_USE_YN` varchar(1) DEFAULT NULL COMMENT '모바일 사용 가부',
+  `DISP_BEGIN_DE` varchar(12) DEFAULT NULL COMMENT '전시 시작 일자',
+  `DISP_END_DE` varchar(12) DEFAULT NULL COMMENT '전시 종료 일자',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시 ',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시 ',
+  PRIMARY KEY (`POPUP_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='팝업';
+
+
+-- pharmai.tb_prj_mst definition
+
+CREATE TABLE `tb_prj_mst` (
+  `PRJCT_ID` varchar(10) NOT NULL COMMENT '프로젝트 ID',
+  `PRJCT_NM` varchar(100) NOT NULL COMMENT '프로젝트 명',
+  `PRJCT_TYPE` varchar(1) NOT NULL COMMENT '프로젝트 구분(F/M)',
+  `STEP_CD` varchar(2) NOT NULL DEFAULT '01' COMMENT '진행코드 (01,02,...)',
+  `USE_YN` varchar(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부(Y/N)',
+  `REGIST_NO` varchar(10) NOT NULL COMMENT '입력자 NO',
+  `REGIST_DT` datetime NOT NULL COMMENT '입력 일자',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 NO',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일자',
+  PRIMARY KEY (`PRJCT_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='프로젝트마스터';
+
+
+-- pharmai.tb_qr_code definition
+
+CREATE TABLE `tb_qr_code` (
+  `QR_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT 'QR 일련',
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '시스템 코드',
+  `SJ` varchar(200) DEFAULT NULL COMMENT '제목',
+  `CODE_CN` longtext DEFAULT NULL COMMENT '코드 내용',
+  `QR_IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT 'QR 이미지 문서 아이디',
+  `IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '이미지 문서 아이디',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`QR_SEQ`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='QR 코드';
+
+
+-- pharmai.tb_quick_menu definition
+
+CREATE TABLE `tb_quick_menu` (
+  `QUICK_MENU_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '퀵 메뉴 일련',
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '시스템 코드',
+  `ZONE_CODE` varchar(4) DEFAULT NULL COMMENT '구역 코드',
+  `QUICK_MENU_NM` varchar(100) DEFAULT NULL COMMENT '퀵 메뉴 명',
+  `WEB_IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '웹 이미지 문서 아이디',
+  `MOBILE_IMAGE_DOC_ID` varchar(45) DEFAULT NULL COMMENT '모바일 이미지 문서 아이디',
+  `DISP_YN` varchar(1) DEFAULT NULL COMMENT '전시 가부',
+  `ATTRB_1` varchar(1000) DEFAULT NULL COMMENT '속성1',
+  `ATTRB_2` varchar(1000) DEFAULT NULL COMMENT '속성2',
+  `ATTRB_3` varchar(1000) DEFAULT NULL COMMENT '속성3',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`QUICK_MENU_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='퀵 메뉴';
+
+
+-- pharmai.tb_quick_menu_image definition
+
+CREATE TABLE `tb_quick_menu_image` (
+  `QUICK_MENU_IMAGE_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '퀵 메뉴 이미지 일련',
+  `DOC_ID` varchar(100) DEFAULT NULL COMMENT '문서 아이디',
+  `FILE_ID` varchar(60) DEFAULT NULL COMMENT '파일 아이디',
+  `FILE_NM` varchar(200) DEFAULT NULL COMMENT '파일 명',
+  `FILE_EXTSN_NM` varchar(100) DEFAULT NULL COMMENT '파일 확장자 명',
+  `FILE_SIZE` varchar(100) DEFAULT NULL COMMENT '파일 사이즈',
+  `FILE_PARTN_COURS` varchar(200) DEFAULT NULL COMMENT '파일 상대 경로',
+  `FILE_ABSLT_COURS` varchar(200) DEFAULT NULL COMMENT '파일 절대 경로',
+  `CNTNTS_TY` varchar(100) DEFAULT NULL COMMENT '콘텐츠 유형',
+  `LINK_URL` varchar(1000) DEFAULT NULL COMMENT '링크URL',
+  `SORT_ORDR` int(11) DEFAULT NULL COMMENT '정렬 순서',
+  `DISP_YN` varchar(1) DEFAULT 'Y' COMMENT '전시 가부',
+  `ATTRB_1` varchar(1000) DEFAULT NULL COMMENT '속성 1',
+  `ATTRB_2` varchar(1000) DEFAULT NULL COMMENT '속성 2',
+  `ATTRB_3` varchar(1000) DEFAULT NULL COMMENT '속성 3',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  PRIMARY KEY (`QUICK_MENU_IMAGE_SEQ`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='퀵 메뉴 이미지';
+
+
+-- pharmai.tb_seq definition
+
+CREATE TABLE `tb_seq` (
+  `SEQ_NM` varchar(100) NOT NULL COMMENT '일련 명',
+  `SEQ_INCRS` int(11) DEFAULT NULL COMMENT '일련 증가',
+  `SEQ_MUMM_VALUE` int(11) DEFAULT NULL COMMENT '일련 최소 값',
+  `SEQ_MXMM_VALUE` int(11) DEFAULT NULL COMMENT '일련 최대 값',
+  `SEQ_NOW_VALUE` int(11) DEFAULT NULL COMMENT '일련 현재 값',
+  `SEQ_INITL_YN` varchar(1) DEFAULT NULL COMMENT '일련 초기화 가부',
+  PRIMARY KEY (`SEQ_NM`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='일련';
+
+
+-- pharmai.tb_stsfdg definition
+
+CREATE TABLE `tb_stsfdg` (
+  `SYS_CODE` varchar(10) DEFAULT NULL COMMENT '시스템 코드',
+  `MENU_PK` varchar(8) DEFAULT NULL COMMENT '메뉴 기본키',
+  `URL` varchar(1000) DEFAULT NULL COMMENT 'URL',
+  `URI` varchar(1000) DEFAULT NULL COMMENT 'URI',
+  `QUERY` varchar(1000) DEFAULT NULL COMMENT '쿼리',
+  `STSFDG_SCORE` int(11) DEFAULT NULL COMMENT '만족도 점수',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='만족도';
+
+
+-- pharmai.tb_unique_visitr definition
+
+CREATE TABLE `tb_unique_visitr` (
+  `SYS_CODE` varchar(10) NOT NULL COMMENT '시스템 코드',
+  `ACCES_DE` varchar(8) NOT NULL COMMENT '접근 일자',
+  `MENU_PK` varchar(8) NOT NULL COMMENT '메뉴 기본키',
+  `ACCES_CNT` int(11) DEFAULT NULL COMMENT '접근 카운트',
+  PRIMARY KEY (`SYS_CODE`,`ACCES_DE`,`MENU_PK`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='유일 방문자';
+
+
+-- pharmai.tb_user definition
+
+CREATE TABLE `tb_user` (
+  `USER_NO` varchar(10) NOT NULL COMMENT '사용자 번호',
+  `USER_SE_CODE` varchar(10) DEFAULT NULL COMMENT '사용자 구분 코드',
+  `USER_ID` varchar(200) DEFAULT NULL COMMENT '사용자 아이디',
+  `PASSWORD` varchar(200) DEFAULT NULL COMMENT '비밀번호',
+  `USER_NM` varchar(200) DEFAULT NULL COMMENT '사용자 이름',
+  `USER_STTUS_CODE` varchar(10) DEFAULT NULL COMMENT '사용자 상태 코드',
+  `THEMA_OPTION` varchar(1000) DEFAULT NULL,
+  `PASSWORD_INITL_YN` varchar(1) DEFAULT 'N' COMMENT '비밀번호 초기화 여부',
+  `LOGIN_FAILR_CNT` int(11) DEFAULT 0 COMMENT '로그인 실패 수',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  `CUR_PRJCT_ID` varchar(10) DEFAULT NULL,
+  `CUR_STEP_CD` varchar(2) DEFAULT NULL,
+  `CUR_PRJCT_TYPE` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`USER_NO`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='사용자';
+
+
+-- pharmai.tb_user_adi definition
+
+CREATE TABLE `tb_user_adi` (
+  `USER_NO` varchar(10) NOT NULL COMMENT '사용자 번호',
+  `CTTPC_SE_CODE` varchar(4) DEFAULT NULL COMMENT '연락처 구분 코드',
+  `CTTPC` varchar(200) DEFAULT NULL COMMENT '연락처',
+  `EMAIL` varchar(200) DEFAULT NULL COMMENT '이메일',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  PRIMARY KEY (`USER_NO`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='사용자 부가';
+
+
+-- pharmai.tb_user_author definition
+
+CREATE TABLE `tb_user_author` (
+  `USER_AUTHOR_SEQ` int(11) NOT NULL AUTO_INCREMENT COMMENT '사용자 권한 일련',
+  `USER_NO` varchar(10) NOT NULL COMMENT '사용자 번호',
+  `AUTHOR_ID` varchar(20) NOT NULL COMMENT '권한 아이디',
+  `REGISTER_NO` varchar(10) DEFAULT NULL COMMENT '등록자 번호',
+  `REGIST_DT` datetime DEFAULT NULL COMMENT '등록 일시',
+  `UPDUSR_NO` varchar(10) DEFAULT NULL COMMENT '수정자 번호',
+  `UPDT_DT` datetime DEFAULT NULL COMMENT '수정 일시',
+  PRIMARY KEY (`USER_AUTHOR_SEQ`,`USER_NO`,`AUTHOR_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8 COMMENT='사용자 권한';
+
+-------------------------------------------------------------
+-- 2022-05-25. 
+-------------------------------------------------------------
+--- STEP1 결과값에 대한 테이블 (API1 OUTPUT) ---
+-- pharmai.tb_formula_prop_dtl 필요없는 컬럼명 변경 및 컬럼 추가 (melting, water 추가)
+alter table tb_formula_prop_dtl add MELTING varchar(100);
+alter table tb_formula_prop_dtl add WATER varchar(100);
+
+
+
+-- Create Function 
+CREATE DEFINER=`pharmai`@`112.220.89.98` FUNCTION `pharmai`.`FN_CREAT_PJT_ID`() RETURNS varchar(20) CHARSET utf8
+BEGIN
+    DECLARE esntl_id varchar(20);
+    SELECT CONCAT('PJT_', LPAD(FN_NEXTVAL('SQ_PRJCT_NO'), 6, '0')) INTO esntl_id
+    ;    
+    RETURN esntl_id;
+END;
+
+CREATE DEFINER=`pharmai`@`112.220.89.98` FUNCTION `pharmai`.`FN_NEXTVAL`(
+	`seq_name` varchar(100)
+) RETURNS int(11)
+BEGIN
+    DECLARE cur_val INT(11);
+    SELECT
+        SEQ_NOW_VALUE INTO cur_val
+    FROM
+        TB_SEQ
+    WHERE
+        SEQ_NM = seq_name;
+    IF cur_val IS NOT NULL THEN
+        UPDATE
+            TB_SEQ
+        SET
+            SEQ_NOW_VALUE = IF (
+                (SEQ_NOW_VALUE + SEQ_INCRS) > SEQ_MXMM_VALUE,
+                IF (
+                    SEQ_INITL_YN = 'Y',
+                    SEQ_MUMM_VALUE,
+                    NULL
+                ),
+                SEQ_NOW_VALUE + SEQ_INCRS
+            )
+        WHERE
+            SEQ_NM = seq_name;
+    END IF;
+    RETURN cur_val;
+END;
+
+CREATE DEFINER=`pharmai`@`112.220.89.98` FUNCTION `pharmai`.`FN_RESET_MANU_STEP`(
+	`P_PRJCT_ID` VARCHAR(10),
+	`P_STEP_CD` VARCHAR(2),
+	`P_USER_NO` VARCHAR(10)
+) RETURNS varchar(2) CHARSET utf8
+BEGIN
+		
+	DECLARE L_STEP_CD VARCHAR(2); 
+	DECLARE L_EXISTS INTEGER;
+	DECLARE RSLT VARCHAR(2); 
+
+	SET RSLT = '01';
+	
+	SELECT EXISTS (SELECT STEP_CD FROM TB_PRJ_MST WHERE PRJCT_ID = P_PRJCT_ID) INTO L_EXISTS;
+
+	-- 삭제할 프로젝트 존재 여부
+	IF(L_EXISTS > 0) THEN	
+	
+		-- STEP 초기화
+		IF(P_STEP_CD = '01') THEN	
+		 	UPDATE tb_manufact_stp_01 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+		 	UPDATE tb_manufact_stp_02 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_03 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_04 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_06 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_07 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_08 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_09_graph SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '02') then
+		
+			UPDATE tb_manufact_stp_02 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+		 	UPDATE tb_manufact_stp_03 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_04 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_06 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_07 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_08 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_09_graph SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '03') then
+		 	UPDATE tb_manufact_stp_03 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_04 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_06 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_07 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_08 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_09_graph SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '04') then
+			UPDATE tb_manufact_stp_04 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_06 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_07 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_08 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_09_graph SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '05') then
+			UPDATE tb_manufact_stp_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+		 	UPDATE tb_manufact_stp_06 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_07 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_08 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_09_graph SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '06') THEN
+			UPDATE tb_manufact_stp_06 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+      	UPDATE tb_manufact_stp_07 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_08 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_09_graph SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;	
+		
+			SET RSLT = '00';
+		
+		 ELSEIF (P_STEP_CD = '07') then
+      
+         UPDATE tb_manufact_stp_07 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_08 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_09_graph SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_10_design SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+      
+         SET RSLT = '00';
+         
+      ELSEIF (P_STEP_CD = '08') then
+      
+         UPDATE tb_manufact_stp_08 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_09_graph SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+         UPDATE tb_manufact_stp_10_design SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_design_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE tb_manufact_stp_10_result_img SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+      
+         SET RSLT = '00';
+         
+      ELSEIF (P_STEP_CD = '09') then
+      
+         UPDATE tb_manufact_stp_09_graph SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+      
+         SET RSLT = '00';
+			
+			
+		ELSE
+			SET RSLT = '01';
+		END if;
+		
+	END if;
+
+	RETURN RSLT;
+
+end;
+
+CREATE DEFINER=`pharmai`@`112.220.89.98` FUNCTION `pharmai`.`FN_RESET_STEP`(
+	`P_PRJCT_ID` VARCHAR(10),
+	`P_STEP_CD` VARCHAR(2),
+	`P_USER_NO` VARCHAR(10)
+) RETURNS varchar(2) CHARSET utf8
+BEGIN
+		
+	DECLARE L_STEP_CD VARCHAR(2); 
+	DECLARE L_EXISTS INTEGER;
+	DECLARE RSLT VARCHAR(2); 
+
+	SET RSLT = '01';
+	
+	SELECT EXISTS (SELECT STEP_CD FROM TB_PRJ_MST WHERE PRJCT_ID = P_PRJCT_ID) INTO L_EXISTS;
+
+	-- 삭제할 프로젝트 존재 여부
+	IF(L_EXISTS > 0) THEN	
+	
+		-- STEP 초기화
+		IF(P_STEP_CD = '01') THEN	
+			UPDATE TB_FORMULA_STP_01 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_PROP SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_PROP_DTL SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_DOSAGE SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_02 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_EXCIPIENT SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_03 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_04 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_06_GRAPH SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_RESULT SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '02') then
+			UPDATE TB_FORMULA_STP_02 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_EXCIPIENT SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_03 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_04 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_06_GRAPH SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_RESULT SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_RESULT_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+		
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '03') then
+			UPDATE TB_FORMULA_STP_03 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_04 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_06_GRAPH SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_RESULT SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_RESULT_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+		
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '04') then
+			UPDATE TB_FORMULA_STP_04 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_06_GRAPH SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_RESULT SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_RESULT_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+		
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '05') then
+			UPDATE TB_FORMULA_STP_05 SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;			
+			UPDATE TB_FORMULA_STP_06_GRAPH SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_DESIGN_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_RESULT SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			UPDATE TB_FORMULA_STP_07_RESULT_IMG SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+		
+			SET RSLT = '00';
+		
+		ELSEIF (P_STEP_CD = '06') THEN
+			UPDATE TB_FORMULA_STP_06_GRAPH SET USE_YN = 'N', UPDUSR_NO = P_USER_NO, UPDT_DT = NOW() WHERE PRJCT_ID = P_PRJCT_ID;
+			
+			SET RSLT = '00';
+		ELSE
+			SET RSLT = '01';
+		END if;
+		
+	END if;
+
+	RETURN RSLT;
+
+end;

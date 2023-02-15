@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.access">
+
+	<select id="selectTotCntAccess" parameterType="dataMap" resultType="int">
+	/* admin.access.selectTotCntAccess */
+	SELECT COUNT(1) TOT_CNT
+	FROM TBW_ACCES_IP A1
+	</select>
+
+	<select id="selectPageListAccess" parameterType="dataMap" resultType="dataMap">
+	/* admin.access.selectPageListAccess */
+	SELECT *
+	FROM (
+		SELECT ROWNUM AS RNUM, AA.*
+		FROM (
+			SELECT A1.IP
+				, A1.REGISTER_NO
+				, A2.USER_NM AS REGISTER_NM
+				, A1.REGIST_DT
+				, TO_CHAR(A1.REGIST_DT, 'YYYY.MM.DD') AS REGIST_YMD
+				FROM TBW_ACCES_IP A1
+				LEFT OUTER JOIN TBW_USER A2
+				ON A1.REGISTER_NO = A2.USER_NO
+			ORDER BY A1.REGIST_DT DESC
+		) AA
+	) AAA
+	WHERE RNUM <![CDATA[ > ]]> #{limitStart, jdbcType=INTEGER} AND ROWNUM <![CDATA[ <= ]]> #{limitCount, jdbcType=INTEGER}
+	</select>
+
+	<insert id="insertAccess" parameterType="dataMap">
+	/* admin.access.insertAccess */
+	INSERT INTO TBW_ACCES_IP (
+		IP
+		, REGISTER_NO
+		, REGIST_DT
+	) VALUES (
+		#{ip, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=VARCHAR}
+		, SYSDATE
+	)
+	</insert>
+
+	<select id="selectAccess" parameterType="dataMap" resultType="dataMap">
+	/* admin.access.selectAccess */
+	SELECT A1.IP
+	, A1.REGISTER_NO
+	, A2.USER_NM AS REGISTER_NM
+	, A1.REGIST_DT
+	, TO_CHAR(A1.REGIST_DT, 'YYYY.MM.DD') AS REGIST_YMD
+	FROM TBW_ACCES_IP A1
+	LEFT OUTER JOIN TBW_USER A2
+	ON A1.REGISTER_NO = A2.USER_NO
+	WHERE A1.IP = #{ip, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateAccess" parameterType="dataMap">
+	/* admin.access.updateAccess */
+	UPDATE TBW_ACCES_IP
+		SET IP = #{up_ip, jdbcType=VARCHAR}
+			, UPDUSR_NO = #{ss_user_no, jdbcType=INTEGER}
+			, UPDT_DT = SYSDATE
+		WHERE IP = #{ip, jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteAccess" parameterType="dataMap">
+	/* admin.access.deleteAccess */
+	DELETE FROM TBW_ACCES_IP
+	WHERE IP = #{ip, jdbcType=VARCHAR}
+	</delete>
+</mapper>

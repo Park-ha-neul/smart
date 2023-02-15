@@ -1,0 +1,60 @@
+# ai_dockerfile
+FROM pytorch/pytorch:1.9.1-cuda11.1-cudnn8-devel
+ARG DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+ENV PATH /opt/conda/bin:$PATH
+ENV PATH "$PATH:/root/anaconda/bin"
+ENV PYTHONDONTWRITEBYTECODE 1
+#플랫폼 사용 필요
+RUN apt-get update
+RUN apt-get update && apt-get install -y wget\
+    python3-pip \
+    python3-dev \
+        postgresql-10 \
+        libpq-dev \
+        bzip2 \
+        git \
+        sox \
+        ffmpeg \
+        libcairo2 \
+        libcairo2-dev \
+        texlive-full \
+        libxrender1
+
+RUN conda create -n chemprop python=3.8
+
+RUN /bin/bash -c "source activate chemprop"
+RUN conda install -c conda-forge rdkit
+RUN conda install -y torchaudio cudatoolkit=11.3 -c pytorch
+RUN exit
+
+RUN pip3 install git+https://github.com/bp-kelley/descriptastorus
+RUN pip3 install chemprop
+RUN pip install seaborn
+
+#플랫폼 사용 필요
+ADD ./requirements.txt /work/requirements.txt
+RUN pip3 install --upgrade pip
+RUN pip3 install -r /work/requirements.txt
+WORKDIR /work
+
+# 참고 : https://medium.com/@amilind29/install-latest-chrome-and-driver-in-linux-docker-image-7120cf6e13d4
+# chrome driver와 browser 설치파일 같이 알고리즘에 같이 업로드, 설치는 이 안에서 하기 0420
+RUN apt install -y wget unzip
+RUN apt-get install -y tzdata
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN dpkg -i google-chrome-stable_current_amd64.deb
+RUN apt -f install -y
+
+COPY install_chrome_driver.sh /
+CMD '/install_chrome_driver.sh'
+#
+## chrome browser, chromedriver
+### chrome browser
+#RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+#RUN sudo apt install ./google-chrome-stable_current_amd64.deb  # 여기서 막힘.
+#
+### chrome driver
+#RUN wget https://chromedriver.storage.googleapis.com/100.0.4896.20/chromedriver_linux64.zip
+#RUN unzip chromedriver_linux64.zip -d /work/api_predict
+##FROM browserless/chrome:latest

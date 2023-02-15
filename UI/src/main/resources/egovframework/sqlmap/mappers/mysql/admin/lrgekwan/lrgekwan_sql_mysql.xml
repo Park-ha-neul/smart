@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.lrgekwan">
+
+	<select id="selectTotCntLrgekwan" parameterType="dataMap" resultType="int">
+	/* admin.lrgekwan.selectTotCntLrgekwan */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_LRGEKWAN_REQST A1
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'nm'">
+		AND (A1.NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%') OR A1.APPLCNT LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%'))
+			</when>
+			<when test="sch_type == 'hp'">
+		AND A1.CTTPC LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'email'">
+		AND A1.EMAIL LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	</select>
+
+	<select id="selectPageListLrgekwan" parameterType="dataMap" resultType="dataMap">
+	/* admin.lrgekwan.selectPageListLrgekwan */
+	SELECT A1.REQST_SEQ
+		, A1.REQST_SEQ
+		, A1.NM
+		, A1.APPLCNT
+		, A1.RSPOFC
+		, A1.HOPE_BEGIN_DT
+		, DATE_FORMAT(A1.HOPE_BEGIN_DT, '%Y.%m.%d %H:%i') AS HOPE_BEGIN_DT_STR
+		, A1.HOPE_END_DT
+		, DATE_FORMAT(A1.HOPE_END_DT, '%Y.%m.%d %H:%i') AS HOPE_END_DT_STR
+		, A1.NMPR
+		, A1.CTTPC
+		, A1.PLACE
+		, A1.EMAIL
+		, A1.PURPS
+		, REPLACE(A1.PURPS, '\r', '') AS PURPS_EXCEL
+		, A1.REQUST_MATTER
+		, REPLACE(A1.REQUST_MATTER, '\r', '') AS REQUST_MATTER_EXCEL
+		, A1.MEMO
+		, REPLACE(A1.MEMO, '\r', '') AS MEMO_EXCEL
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	FROM TB_LRGEKWAN_REQST A1
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'nm'">
+		AND (A1.NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%') OR A1.APPLCNT LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%'))
+			</when>
+			<when test="sch_type == 'hp'">
+		AND A1.CTTPC LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'email'">
+		AND A1.EMAIL LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	ORDER BY A1.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectLrgekwan" parameterType="dataMap" resultType="dataMap">
+	/* admin.lrgekwan.selectLrgekwan */
+	SELECT A1.REQST_SEQ
+		, A1.REQST_SEQ
+		, A1.NM
+		, A1.APPLCNT
+		, A1.RSPOFC
+		, A1.HOPE_BEGIN_DT
+		, DATE_FORMAT(A1.HOPE_BEGIN_DT, '%Y.%m.%d %H:%i') AS HOPE_BEGIN_DT_STR
+		, A1.HOPE_END_DT
+		, DATE_FORMAT(A1.HOPE_END_DT, '%Y.%m.%d %H:%i') AS HOPE_END_DT_STR
+		, A1.NMPR
+		, A1.CTTPC
+		, A1.PLACE
+		, A1.EMAIL
+		, A1.PURPS
+		, REPLACE(A1.PURPS, '\r', '') AS PURPS_EXCEL
+		, A1.REQUST_MATTER
+		, REPLACE(A1.REQUST_MATTER, '\r', '') AS REQUST_MATTER_EXCEL
+		, A1.MEMO
+		, REPLACE(A1.MEMO, '\r', '') AS MEMO_EXCEL
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	FROM TB_LRGEKWAN_REQST A1
+	WHERE A1.REQST_SEQ = #{reqst_seq, jdbcType=INTEGER}
+	</select>
+	
+	<update id="updateLrgekwan" parameterType="dataMap">
+	/* admin.lrgekwan.updateLrgekwan */
+	UPDATE TB_LRGEKWAN_REQST
+	SET MEMO = #{memo, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE REQST_SEQ = #{reqst_seq, jdbcType=INTEGER}
+	</update>
+	
+	<delete id="deleteLrgekwan" parameterType="dataMap">
+	/* admin.lrgekwan.deleteLrgekwan */
+	DELETE FROM TB_LRGEKWAN_REQST
+	WHERE REQST_SEQ = #{reqst_seq, jdbcType=INTEGER}
+	</delete>
+</mapper>

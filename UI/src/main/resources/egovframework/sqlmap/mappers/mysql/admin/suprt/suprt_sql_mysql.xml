@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.suprt">
+
+	<select id="selectTotCntSuprt" parameterType="dataMap" resultType="int">
+	/* admin.suprt.selectTotCntSuprt */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_SUPRT_REQST A1
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'nm'">
+		AND A1.NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'hp'">
+		AND A1.MOBLPHON_NO LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'email'">
+		AND A1.EMAIL LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_spnser_se_code != null and sch_spnser_se_code != ''">
+		AND A1.SPNSER_SE_CODE = #{sch_spnser_se_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_suprt_realm_code != null and sch_suprt_realm_code != ''">
+		AND A1.SUPRT_REALM_CODE = #{sch_suprt_realm_code, jdbcType=VARCHAR}
+	</if>
+	</select>
+
+	<select id="selectPageListSuprt" parameterType="dataMap" resultType="dataMap">
+	/* admin.suprt.selectPageListSuprt */
+	SELECT A1.SUPRT_SEQ
+	, A1.NM
+	, A1.SEXDSTN_CODE
+	, A4.CODE_NM AS SEXDSTN_NM
+	, A1.IHIDNUM
+	, A1.MOBLPHON_NO
+	, A1.POST_NO
+	, A1.ADRES_ONE
+	, A1.ADRES_TWO
+	, A1.ADRES_THREE
+	, A1.EMAIL
+	, A1.SPNSER_SE_CODE
+	, A2.CODE_NM AS SPNSER_SE_NM
+	, A1.SPNSER_SE_ETC_NM
+	, A1.SUPRT_REALM_CODE
+	, A3.CODE_NM AS SUPRT_REALM_NM
+	, A1.SUPRT_MTH_CODE
+	, A5.CODE_NM AS SUPRT_MTH_NM
+	, A1.DPSTR
+	, A1.BANK_NM
+	, A1.ACNUT_NO
+	, A1.SMALLFRMLAPAPR_YN
+	, A1.RM
+	, REPLACE(A1.RM, '\r', '') AS RM_EXCEL
+	, A1.REGIST_DT
+	, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	, A1.MEMO
+	, REPLACE(A1.MEMO, '\r', '') AS MEMO_EXCEL
+	FROM TB_SUPRT_REQST A1
+	LEFT OUTER JOIN TB_CODE A2
+	ON A2.GROUP_ID = 'R010430'
+		AND A1.SPNSER_SE_CODE = A2.CODE
+	LEFT OUTER JOIN TB_CODE A3
+	ON A3.GROUP_ID = 'R010440'
+		AND A1.SUPRT_REALM_CODE = A3.CODE
+	LEFT OUTER JOIN TB_CODE A4
+	ON A4.GROUP_ID = 'R010030'
+		AND A1.SEXDSTN_CODE = A4.CODE
+	LEFT OUTER JOIN TB_CODE A5
+	ON A5.GROUP_ID = 'R010450'
+		AND A1.SUPRT_MTH_CODE = A5.CODE
+	WHERE 1 = 1
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'nm'">
+		AND A1.NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'hp'">
+		AND A1.MOBLPHON_NO LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'email'">
+		AND A1.EMAIL LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_spnser_se_code != null and sch_spnser_se_code != ''">
+		AND A1.SPNSER_SE_CODE = #{sch_spnser_se_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_suprt_realm_code != null and sch_suprt_realm_code != ''">
+		AND A1.SUPRT_REALM_CODE = #{sch_suprt_realm_code, jdbcType=VARCHAR}
+	</if>
+	ORDER BY A1.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectSuprt" parameterType="dataMap" resultType="dataMap">
+	/* admin.suprt.selectSuprt */
+	SELECT A1.SUPRT_SEQ
+	, A1.NM
+	, A1.SEXDSTN_CODE
+	, A4.CODE_NM AS SEXDSTN_NM
+	, A1.IHIDNUM
+	, A1.MOBLPHON_NO
+	, A1.POST_NO
+	, A1.ADRES_ONE
+	, A1.ADRES_TWO
+	, A1.ADRES_THREE
+	, A1.EMAIL
+	, A1.SPNSER_SE_CODE
+	, A2.CODE_NM AS SPNSER_SE_NM
+	, A1.SPNSER_SE_ETC_NM
+	, A1.SUPRT_REALM_CODE
+	, A3.CODE_NM AS SUPRT_REALM_NM
+	, A1.SUPRT_MTH_CODE
+	, A5.CODE_NM AS SUPRT_MTH_NM
+	, A1.DPSTR
+	, A1.BANK_NM
+	, A1.ACNUT_NO
+	, A1.SMALLFRMLAPAPR_YN
+	, A1.RM
+	, REPLACE(A1.RM, '\r', '') AS RM_EXCEL
+	, A1.REGIST_DT
+	, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+	, A1.MEMO
+	, REPLACE(A1.MEMO, '\r', '') AS MEMO_EXCEL
+	FROM TB_SUPRT_REQST A1
+	LEFT OUTER JOIN TB_CODE A2
+	ON A2.GROUP_ID = 'R010430'
+		AND A1.SPNSER_SE_CODE = A2.CODE
+	LEFT OUTER JOIN TB_CODE A3
+	ON A3.GROUP_ID = 'R010440'
+		AND A1.SUPRT_REALM_CODE = A3.CODE
+	LEFT OUTER JOIN TB_CODE A4
+	ON A4.GROUP_ID = 'R010030'
+		AND A1.SEXDSTN_CODE = A4.CODE
+	LEFT OUTER JOIN TB_CODE A5
+	ON A5.GROUP_ID = 'R010450'
+		AND A1.SUPRT_MTH_CODE = A5.CODE
+	WHERE A1.SUPRT_SEQ = #{suprt_seq, jdbcType=INTEGER}
+	</select>
+	
+	<update id="updateSuprt" parameterType="dataMap">
+	/* admin.suprt.updateSuprt */
+	UPDATE TB_SUPRT_REQST
+	SET MEMO = #{memo, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE SUPRT_SEQ = #{suprt_seq, jdbcType=INTEGER}
+	</update>
+	
+	<delete id="deleteSuprt" parameterType="dataMap">
+	/* admin.suprt.deleteSuprt */
+	DELETE FROM TB_SUPRT_REQST
+	WHERE SUPRT_SEQ = #{suprt_seq, jdbcType=INTEGER}
+	</delete>
+</mapper>

@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.cnts">
+
+<resultMap type="egovframework.framework.common.object.DataMap" id="rstMap">
+	<result property="CNTNTS_SEQ" column="CNTNTS_SEQ" />
+	<result property="SYS_CODE" column="SYS_CODE" />
+	<result property="MENU_NM" column="MENU_NM" />
+	<result property="CNTNTS_ID" column="CNTNTS_ID" />
+	<result property="SJ" column="SJ" />
+	<result property="CN" column="CN" />
+	<result property="TEXT_CN" column="TEXT_CN" />
+	<result property="IMAGE_DOC_ID" column="IMAGE_DOC_ID" />
+	<result property="DOC_ID" column="DOC_ID" />
+	<result property="HIT_CNT" column="HIT_CNT" />
+	<result property="KWRD" column="KWRD" />
+	<result property="DISP_YN" column="DISP_YN" />
+	<result property="LAST_VER" column="LAST_VER" />
+	<result property="DELETE_YN" column="DELETE_YN" />
+	<result property="REGISTER_NO" column="REGISTER_NO" />
+	<result property="REGIST_DT" column="REGIST_DT" />
+	<result property="UPDUSR_NO" column="UPDUSR_NO" />
+	<result property="UPDT_DT" column="UPDT_DT" />
+</resultMap>
+
+
+<resultMap type="egovframework.framework.common.object.DataMap" id="photoMap">
+	<result property="FILE_ID" column="FILE_ID" />
+	<result property="DOC_ID" column="DOC_ID" />
+	<result property="FILE_NM" column="FILE_NM" />
+	<result property="FILE_EXTSN_NM" column="FILE_EXTSN_NM" />
+	<result property="FILE_SIZE" column="FILE_SIZE" />
+	<result property="FILE_PARTN_COURS" column="FILE_PARTN_COURS" />
+	<result property="FILE_ABSLT_COURS" column="FILE_ABSLT_COURS" />
+	<result property="CNTNTS_TY" column="CNTNTS_TY" />
+	<result property="SORT_ORDR" column="SORT_ORDR" />
+	<result property="REGISTER_NO" column="REGISTER_NO" />
+	<result property="REGIST_DT" column="REGIST_DT" />
+	<result property="PHOTO_SEQ" column="PHOTO_SEQ" />
+	<result property="CAPTION" column="CAPTION" />
+	<result property="META_INFO" column="META_INFO" />
+	<result property="KWRD" column="KWRD" />
+	<result property="UPDUSR_NO" column="UPDUSR_NO" />
+	<result property="UPDT_DT" column="UPDT_DT" />
+	<result property="SJ" column="SJ" />
+	<result property="PHOTO_POTOGRF_DE" column="PHOTO_POTOGRF_DE" />
+	<result property="RM" column="RM" />
+</resultMap>
+
+	<select id="selectTotCntMgt" parameterType="dataMap" resultType="int">
+	/* admin.cnts.selectTotCntMgt */
+	<![CDATA[
+	SELECT COUNT(1) AS TOT_CNT
+	FROM TB_CNTNTS A
+	WHERE 1=1
+	]]>
+	<if test="sch_sys_code != null and sch_sys_code != ''" >
+		AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_menu_yn != null and sch_menu_yn != ''" >
+		<choose>
+			<when test='sch_menu_yn == "Y"'>
+				AND (SELECT COUNT(1) FROM TB_MENU M2 WHERE M2.CNTNTS_ID = A.CNTNTS_ID) > 0
+			</when>
+			<when test='sch_menu_yn == "N"'>
+				AND (SELECT COUNT(1) FROM TB_MENU M2 WHERE M2.CNTNTS_ID = A.CNTNTS_ID) = 0
+			</when>
+		</choose>
+	</if>
+	<if test="sch_sys_code != null and sch_sys_code != ''">
+	AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_text != null and sch_type != ''" >
+		<choose>
+			<when test="sch_type == 'sch_sj'">
+		AND A.SJ LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+			</when>
+			<when test="sch_type == 'sch_cn'">
+		AND A.CN LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+			</when>
+			<when test="sch_type == 'sch_kwrd'">
+		AND A.KWRD LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+			</when>
+			<when test="sch_type == 'sch_cntnts_id'">
+		AND A.CNTNTS_ID LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+			</when>
+		</choose>
+	</if>
+	</select>
+
+	<select id="selectPageListCntsMgt" parameterType="dataMap" resultMap="rstMap">
+	/* admin.cnts.selectPageListCntsMgt */
+	<![CDATA[
+	SELECT A.CNTNTS_SEQ
+		, A.SYS_CODE
+		, B.CODE_NM AS SYS_NM
+		, D.MENU_NM
+		, A.CNTNTS_ID
+		, A.SJ
+		, A.CN
+		, A.TEXT_CN
+		, A.IMAGE_DOC_ID
+		, A.DOC_ID
+		, A.HIT_CNT
+		, A.KWRD
+		, A.DISP_YN
+		, CASE A.DISP_YN WHEN 'Y' THEN '예' ELSE '아니오' END DISP_YN_NM
+		, A.LAST_VER
+		, DELETE_YN
+		, CASE A.DELETE_YN WHEN 'Y' THEN '예' ELSE '아니오' END DELETE_YN_NM
+		, C.USER_NM AS REGISTER_NM
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT
+		, DATE_FORMAT(A.UPDT_DT, '%Y.%m.%d') AS UPDT_DT
+		, (SELECT COUNT(1) FROM TB_MENU M2 WHERE M2.CNTNTS_ID = A.CNTNTS_ID) AS MENU_USE_CNT
+		, B.ATTRB_1
+	FROM TB_CNTNTS A
+		LEFT OUTER JOIN TB_CODE B ON A.SYS_CODE = B.CODE AND B.GROUP_ID = #{sys_group_id, jdbcType=VARCHAR}
+		LEFT OUTER JOIN TB_USER C ON A.REGISTER_NO = C.USER_NO
+		LEFT OUTER JOIN (SELECT MENU_NM, CNTNTS_ID FROM TB_MENU WHERE MENU_PK IN (SELECT MAX(MENU_PK) FROM TB_MENU GROUP BY CNTNTS_ID HAVING CNTNTS_ID IS NOT NULL)) D ON A.CNTNTS_ID = D.CNTNTS_ID
+	WHERE 1=1
+	]]>
+	<if test="sch_menu_yn != null and sch_menu_yn != ''" >
+		<choose>
+			<when test='sch_menu_yn == "Y"'>
+				AND (SELECT COUNT(1) FROM TB_MENU M2 WHERE M2.CNTNTS_ID = A.CNTNTS_ID) > 0
+			</when>
+			<when test='sch_menu_yn == "N"'>
+				AND (SELECT COUNT(1) FROM TB_MENU M2 WHERE M2.CNTNTS_ID = A.CNTNTS_ID) = 0
+			</when>
+		</choose>
+	</if>
+	<if test="sch_disp_yn != null and sch_disp_yn !='' ">
+		AND A.DISP_YN = #{sch_disp_yn, jdbcType=VARCHAR }
+	</if>
+	<if test="sch_sys_code != null and sch_sys_code != ''">
+		AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_text != null and sch_type != ''" >
+		<choose>
+			<when test="sch_type == 'sch_sj'">
+		AND A.SJ LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+			</when>
+			<when test="sch_type == 'sch_cn'">
+		AND A.CN LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+			</when>
+			<when test="sch_type == 'sch_kwrd'">
+		AND A.KWRD LIKE CONCAT('%',#{sch_text, jdbcType=VARCHAR},'%')
+			</when>
+			<when test="sch_type == 'sch_cntnts_id'">
+		AND A.CNTNTS_ID LIKE CONCAT ('%' ,#{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<![CDATA[
+	ORDER BY CNTNTS_SEQ DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	]]>
+	</select>
+
+	<select id="selectCntsMgt" parameterType="dataMap" resultMap="rstMap">
+	/* admin.cnts.selectCntsMgt */
+	SELECT A.CNTNTS_SEQ
+	,A.CNTNTS_ID
+	,A.SYS_CODE
+	,B.CODE_NM AS SYS_NM
+	,A.SJ
+	,A.CN
+	,A.TEXT_CN
+	,A.IMAGE_DOC_ID
+	,A.DOC_ID
+	,A.HIT_CNT
+	,A.KWRD
+	,A.DISP_YN
+	,CASE A.DISP_YN WHEN 'Y' THEN '예' ELSE '아니오' END DISP_YN_NM
+	,A.LAST_VER
+	,A.DELETE_YN
+	,CASE A.DELETE_YN WHEN 'Y' THEN '예' ELSE '아니오' END DELETE_YN_NM
+	,A.REGISTER_NO
+	,C.USER_NM AS REGISTER_NM
+	,DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d %H:%i:%s') AS REGIST_DT
+	,A.UPDUSR_NO
+	,DATE_FORMAT(A.UPDT_DT, '%Y.%m.%d %H:%i:%s') AS UPDT_DT
+
+	<!-- 메뉴(컨텐츠 타입)가 걸려있는경우만 메뉴명이 노출이 된다. -->
+	, (SELECT MENU_NM FROM TB_MENU WHERE CNTNTS_ID = A.CNTNTS_ID ORDER BY REGIST_DT DESC LIMIT 1) AS MENU_LIST
+<!-- 	,(SELECT SUBSTR(XMLAGG( XMLELEMENT(COL ,',  ', '[' || (SELECT FF.MENU_NM FROM TB_MENU FF WHERE FF.MENU_ID = SUBSTR(F.MENU_ID , 1, 8)) || ']' || F.MENU_NM)  -->
+<!--     	ORDER BY F.REGIST_DT).EXTRACT('//text()').GETSTRINGVAL() -->
+<!--      	, 2)  -->
+<!--      FROM TB_MENU F  -->
+<!--      WHERE F.CNTNTS_ID = A.CNTNTS_ID   -->
+<!--      ) AS MENU_LIST  -->
+  , B.ATTRB_1
+	, A.SCRIPT
+	FROM TB_CNTNTS A
+		LEFT OUTER JOIN TB_CODE B ON A.SYS_CODE = B.CODE AND B.GROUP_ID = #{sys_group_id, jdbcType=VARCHAR}
+		LEFT OUTER JOIN TB_USER C ON A.REGISTER_NO = C.USER_NO
+	WHERE
+		A.CNTNTS_SEQ = #{cntnts_seq, jdbcType=INTEGER}
+	</select>
+
+	<select id="selectCntsMenuMgt" parameterType="dataMap" resultMap="rstMap">
+	/* admin.cnts.selectCntsMenuMgt */
+	<![CDATA[
+	SELECT A.CNTNTS_SEQ
+	,D.MENU_ID
+	,D.MENU_NM
+	FROM TB_CNTNTS A
+		LEFT OUTER JOIN TB_MENU D ON A.CNTNTS_ID = D.CNTNTS_ID
+	WHERE
+		A.CNTNTS_SEQ = #{cntnts_seq, jdbcType=INTEGER}
+	]]>
+
+	</select>
+
+
+	<select id="selectPageListCntsVerMgt" parameterType="dataMap" resultType="dataMap">
+	/* admin.cnts.selectCntsVerMgt */
+	<![CDATA[
+	SELECT * FROM TB_CNTNTS_VER WHERE CNTNTS_SEQ = #{cntnts_seq, jdbcType=VARCHAR}
+
+	ORDER BY VER DESC
+	]]>
+	</select>
+
+	<select id="selectOldVerMgt" parameterType="dataMap" resultMap="rstMap">
+	<![CDATA[
+
+SELECT
+	B.CNTNTS_SEQ
+	,B.CNTNTS_ID
+	,B.LAST_VER
+	,C.CODE_NM AS SYS_NM
+	,A.SYS_CODE
+	,A.VER
+	,A.SJ
+	,A.CN
+	,A.TEXT_CN
+	,A.KWRD
+	,A.REGIST_DT
+	,A.REGISTER_NO
+	,CASE B.DISP_YN WHEN 'Y' THEN '예' ELSE '아니오' END DISP_YN_NM
+	,CASE B.DELETE_YN WHEN 'Y' THEN '예' ELSE '아니오' END DELETE_YN_NM
+	,A.DOC_ID
+	,A.IMAGE_DOC_ID
+	,B.HIT_CNT
+	,B.DISP_YN
+	,B.DELETE_YN
+	,B.UPDUSR_NO
+	,DATE_FORMAT(B.UPDT_DT, '%Y.%m.%d %H:%i:%s') AS UPDT_DT
+	,A.SCRIPT
+	FROM TB_CNTNTS_VER A
+		INNER JOIN TB_CNTNTS B ON A.CNTNTS_SEQ = B.CNTNTS_SEQ AND A.CNTNTS_SEQ = #{cntnts_seq, jdbcType=VARCHAR}
+			AND A.VER= #{select_ver, jdbcType=VARCHAR}
+		LEFT OUTER JOIN TB_CODE C ON B.SYS_CODE = C.CODE AND C.GROUP_ID = #{sys_group_id, jdbcType=VARCHAR}
+	]]>
+
+
+	</select>
+
+	<delete id="deleteCntsMgt" parameterType="dataMap">
+	/* admin.cnts.deleteCntsMgt */
+	<![CDATA[
+	DELETE FROM TB_CNTNTS WHERE CNTNTS_SEQ = #{cntnts_seq}
+	]]>
+	</delete>
+
+
+	<delete id="deleteCntsVerMgt" parameterType="dataMap">
+	/* admin.cnts.deleteCntsVerMgt */
+	<![CDATA[
+	DELETE FROM TB_CNTNTS_VER WHERE CNTNTS_SEQ = #{cntnts_seq}
+	]]>
+	</delete>
+
+	 <!--
+
+	<update id="deleteCntsMgt" parameterType="dataMap">
+	/* admin.cnts.deleteCntsMgt */
+	<![CDATA[
+	UPDATE TB_CNTNTS SET
+	DELETE_YN = 'Y'
+	,DISP_YN = 'N'
+	WHERE CNTNTS_SEQ = #{cntnts_seq}
+	]]>
+	</update>
+	 -->
+
+	<select id="selectCntntsSeq" resultType="string">
+	/* admin.cnts.selectCntntsSeq */
+	SELECT IFNULL(MAX(CNTNTS_SEQ), 0)+1
+	FROM TB_CNTNTS
+	</select>
+
+	<insert id="insertCntsMgt" parameterType="dataMap">
+	/* admin.cnts.insertCntsMgt */
+	<![CDATA[
+	INSERT INTO TB_CNTNTS
+	(CNTNTS_SEQ
+	,CNTNTS_ID
+	,SYS_CODE
+	,SJ
+	,CN
+	,TEXT_CN
+	,IMAGE_DOC_ID
+	,DOC_ID
+	,HIT_CNT
+	,KWRD
+	,DISP_YN
+	,LAST_VER
+	,DELETE_YN
+	,REGISTER_NO
+	,REGIST_DT
+	,SCRIPT)
+	VALUES
+	(#{cntnts_seq, jdbcType=VARCHAR}
+	,#{cntnts_id, jdbcType=VARCHAR}
+	,#{sys_code, jdbcType=VARCHAR}
+	,#{sj, jdbcType=VARCHAR}
+	,#{cn, jdbcType=VARCHAR}
+	,#{text_cn, jdbcType=VARCHAR}
+	,#{image_doc_id, jdbcType=VARCHAR}
+	,#{doc_id, jdbcType=VARCHAR}
+	,0
+	,#{kwrd, jdbcType=VARCHAR}
+	,#{disp_yn, jdbcType=VARCHAR}
+	,#{last_ver, jdbcType=VARCHAR}
+	,'N'
+	,#{ss_user_no}
+	,NOW()
+	,#{script, jdbcType=VARCHAR})
+	]]>
+	</insert>
+
+		<insert id="insertCntsVerMgt" parameterType="dataMap">
+	/* admin.cnts.insertCntsVerMgt */
+	<![CDATA[
+	INSERT INTO TB_CNTNTS_VER
+	(CNTNTS_SEQ
+	,VER
+	,SYS_CODE
+	,SJ
+	,CN
+	,TEXT_CN
+	,KWRD
+	,DOC_ID
+	,IMAGE_DOC_ID
+	,REGIST_DT
+	,REGISTER_NO
+	,SCRIPT)
+	VALUES
+	(
+	]]>
+	 #{cntnts_seq, jdbcType=VARCHAR}
+	,#{last_ver, jdbcType=VARCHAR}
+	,#{sys_code, jdbcType=VARCHAR}
+	,#{sj, jdbcType=VARCHAR}
+	,#{cn, jdbcType=VARCHAR}
+	,#{text_cn, jdbcType=VARCHAR}
+	,#{kwrd, jdbcType=VARCHAR}
+	,#{doc_id, jdbcType=VARCHAR}
+	,#{image_doc_id, jdbcType=VARCHAR}
+	,NOW()
+	,#{ss_user_no}
+	,#{script, jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateCntsMgt" parameterType="dataMap">
+	/* admin.cnts.updateCntsMgt */
+	<![CDATA[
+	UPDATE TB_CNTNTS SET
+			SYS_CODE = #{sys_code, jdbcType=VARCHAR}
+			,CNTNTS_ID = #{cntnts_id, jdbcType=VARCHAR}
+			,SJ = #{sj, jdbcType=VARCHAR}
+			,CN = #{cn, jdbcType=VARCHAR}
+			,TEXT_CN = #{text_cn, jdbcType=VARCHAR}
+			,IMAGE_DOC_ID = #{image_doc_id, jdbcType=VARCHAR}
+			,DOC_ID = #{doc_id, jdbcType=VARCHAR}
+			,LAST_VER = #{last_ver, jdbcType=VARCHAR}
+			,DISP_YN = #{disp_yn, jdbcType=VARCHAR}
+			,DELETE_YN=#{delete_yn, jdbcType=VARCHAR}
+			,KWRD = #{kwrd, jdbcType=VARCHAR}
+			,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+			,UPDT_DT = NOW()
+			,SCRIPT = #{script, jdbcType=VARCHAR}
+	WHERE CNTNTS_SEQ = #{cntnts_seq, jdbcType=VARCHAR}
+	]]>
+	</update>
+
+	<update id="updateHitCnt" parameterType="dataMap">
+	/* admin.cnts.updateHitCnt */
+	<![CDATA[
+	UPDATE TB_CNTNTS
+	SET  HIT_CNT = HIT_CNT + 1
+	WHERE CNTNTS_SEQ = #{cntnts_seq, jdbcType=INTEGER}
+	]]>
+	</update>
+
+
+	<select id="selectTotCntPhotoMng" parameterType="dataMap" resultType="int">
+	/* admin.cnts.selectTotCntMgt */
+	SELECT COUNT(*) AS TOT_CNT
+	FROM TB_PHOTO_GROUP PG
+		,TB_PHOTO_META PM
+		,TB_FILE F
+	WHERE PG.IMAGE_DOC_ID = PM.IMAGE_DOC_ID
+		AND PM.FILE_ID = F.FILE_ID
+	<if test="sch_text != null and sch_text != ''" >
+		<choose>
+			<when test="sch_type == 'sch_all'">
+		AND (PM.KWRD LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			OR	PG.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			OR	PM.CAPTION LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			)
+			</when>
+			<when test="sch_type == 'sch_kwrd'">
+		AND PM.KWRD LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'sch_sj'">
+		AND PG.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'sch_caption'">
+		AND PM.CAPTION LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	</select>
+
+	<select id="selectPageListPhotoMng" parameterType="dataMap" resultMap="photoMap">
+	/* admin.cnts.selectPageListPhotoMng */
+		SELECT	PG.PHOTO_SEQ
+			,PG.SYS_CODE
+			,PG.SJ
+			,PG.IMAGE_DOC_ID
+			,PG.PHOTO_POTOGRF_DE
+			,PG.RM
+			,PM.FILE_ID
+			,PM.CAPTION
+			,PM.META_INFO
+			,PM.KWRD
+			,PM.WIDTH
+			,PM.HEIGHT
+			,DATE_FORMAT(PM.REGIST_DT, '%Y.%m.%d %H:%i:%s') AS REGIST_DT
+			,F.FILE_NM
+			,F.FILE_EXTSN_NM
+			,F.FILE_SIZE
+			,F.FILE_PARTN_COURS
+			,F.FILE_ABSLT_COURS
+			,F.CNTNTS_TY
+			,F.SORT_ORDR
+		FROM TB_PHOTO_GROUP PG
+			,TB_PHOTO_META PM
+			,TB_FILE F
+		WHERE PG.IMAGE_DOC_ID = PM.IMAGE_DOC_ID
+		AND PM.FILE_ID = F.FILE_ID
+	<if test="sch_sys_code != null and sch_sys_code != ''" >
+		AND PG.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_text != null and sch_text != ''" >
+		<choose>
+			<when test="sch_type == 'sch_all'">
+		AND (PM.KWRD LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			OR	PG.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			OR	PM.CAPTION LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			)
+			</when>
+			<when test="sch_type == 'sch_kwrd'">
+		AND PM.KWRD LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'sch_sj'">
+		AND PG.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'sch_caption'">
+		AND PM.CAPTION LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	ORDER BY PM.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+
+	<select id="selectCntntIdSeq" parameterType="dataMap" resultType="dataMap">
+	/* admin.cnts.selectCntntIdSeq */
+	SELECT	IFNULL(SUBSTR(MAX(CNTNTS_ID),5,4),0)+1 AS CNTNT_ID_SEQ
+	FROM	TB_CNTNTS
+	WHERE 	SYS_CODE = #{sys_code, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectOrganChk" parameterType="dataMap" resultType="int">
+	/* admin.cnts.selectOrganChk */
+			<![CDATA[
+			SELECT COUNT(1) AS TOT_CNT FROM TB_CNTNTS A
+				WHERE CNTNTS_ID = #{cntnts_id, jdbcType=VARCHAR}
+		]]>
+	</select>
+
+	<select id="selectTotCntMenu" parameterType="dataMap" resultType="int">
+	/* admin.cnts.selectTotCntMenu */
+	<![CDATA[
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_MENU
+		WHERE USE_YN = 'Y'
+					AND(URL_TY_CODE IS NULL OR ( URL_TY_CODE IS NOT NULL AND CNTNTS_ID IS NOT NULL))
+					AND (MENU_TY_CODE = '10' OR MENU_TY_CODE = '20')
+	]]>
+	</select>
+
+
+	<update id="updateMenuCntsEmpty" parameterType="dataMap">
+	/* admin.cnts.updateMenuCntsEmpty */
+	UPDATE TB_MENU
+	SET BBS_CODE = ''
+			,URL_TY_CODE = ''
+			,CNTNTS_ID = ''
+			,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+			,UPDT_DT = NOW()
+	WHERE CNTNTS_ID = #{cntnts_id, jdbcType=VARCHAR}
+
+	</update>
+	<update id="updateMenuCntsCode" parameterType="dataMap">
+	/* admin.cnts.updateMenuCntsCode */
+	UPDATE TB_MENU
+	SET BBS_CODE = ''
+			,URL_TY_CODE = #{url_ty_code, jdbcType=VARCHAR}
+			,CNTNTS_ID = #{cntnts_id, jdbcType=VARCHAR}
+			,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+			,UPDT_DT = NOW()
+	WHERE MENU_ID = #{menu_id, jdbcType=VARCHAR}
+	</update>
+
+</mapper>

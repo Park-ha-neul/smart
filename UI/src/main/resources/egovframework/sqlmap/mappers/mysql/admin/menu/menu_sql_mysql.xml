@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.menu">
+
+
+	<select id="selectListParentMenuId" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectListParentMenuId */
+	<![CDATA[
+	SELECT	A.MENU_ID
+			,A.MENU_PK
+			,A.MENU_NM
+	FROM TB_MENU A
+	WHERE A.MENU_LEVEL <= 2
+	ORDER BY A.SORT_ORDR_1
+			,A.SORT_ORDR_2
+			,A.SORT_ORDR_3
+			,A.SORT_ORDR_4
+			,A.SORT_ORDR_5
+			,A.SORT_ORDR_6
+	]]>
+	</select>
+
+	<select id="selectTotCntMenu" parameterType="dataMap" resultType="int">
+	/* admin.menu.selectTotCntMenu */
+	<![CDATA[
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_MENU
+	]]>
+	</select>
+
+	<select id="selectListMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectListMenu */
+		SELECT MENU_PK,
+		  MENU_ID,
+		  MENU_TY_CODE,
+		  MENU_LEVEL,
+		  CASE WHEN FNCT_NM IS NULL OR FNCT_NM = '' THEN MENU_NM
+		  	ELSE CONCAT(MENU_NM, '(', FNCT_NM, ')')
+		  END AS MENU_NM,
+		  ICON_NM,
+		  URL,
+		  SORT_ORDR,
+		  USE_YN,
+		  DISP_YN,
+		  SORT_ORDR_1,
+		  SORT_ORDR_2,
+		  SORT_ORDR_3,
+		  SORT_ORDR_4,
+		  SORT_ORDR_5,
+		  SORT_ORDR_6,
+		  REGISTER_NO,
+		  REGIST_DT,
+		  UPDUSR_NO,
+		  UPDT_DT,
+		  MENU_SE_CODE,
+			BBS_CODE,
+			CNTNTS_ID
+		FROM TB_MENU
+		<if test = 'sch_parent_menu_id != null and sch_parent_menu_id != ""'>
+		WHERE MENU_ID LIKE CONCAT(#{sch_parent_menu_id, jdbcType=VARCHAR}, '%')
+		</if>
+		ORDER BY SORT_ORDR_1 ASC ,SORT_ORDR_2 ASC ,SORT_ORDR_3 ASC ,SORT_ORDR_4 ASC ,SORT_ORDR_5 ASC,SORT_ORDR_6 ASC
+	</select>
+
+	<select id="selectMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectMenu */
+	<![CDATA[
+	SELECT A.MENU_PK
+		,A.MENU_ID
+		,A.MENU_TY_CODE
+		,A.MENU_LEVEL
+		,A.MENU_NM
+		,A.FNCT_NM
+		,A.ICON_NM
+		,A.URL
+		,A.SORT_ORDR
+		,A.USE_YN
+		,A.DISP_YN
+		,A.SORT_ORDR_1
+		,A.SORT_ORDR_2
+		,A.SORT_ORDR_3
+		,A.SORT_ORDR_4
+		,A.SORT_ORDR_5
+		,A.SORT_ORDR_6
+		,A.REGISTER_NO
+		,A.REGIST_DT
+		,A.UPDUSR_NO
+		,A.UPDT_DT
+		,A.MENU_SE_CODE
+		,A.BBS_CODE
+		,A.CNTNTS_ID
+		,(SELECT MENU_NM FROM TB_MENU WHERE MENU_ID = SUBSTR( A.MENU_ID,  1,LENGTH(A.MENU_ID) - 4 )  ) AS UP_MENU_NM
+		,(SELECT MENU_ID FROM TB_MENU WHERE MENU_ID = SUBSTR( A.MENU_ID,  1,LENGTH(A.MENU_ID) - 4 )  ) AS UP_MENU_ID
+		,(SELECT SUBSTRING( MAX(MENU_ID), LENGTH(MENU_ID) - 3, 4 ) FROM TB_MENU WHERE MENU_ID LIKE CONCAT(#{menu_id, jdbcType=VARCHAR},'%') AND MENU_LEVEL = #{menu_lv, jdbcType=INTEGER}+'1') AS LOW_MENU_ID
+		,(SELECT MAX(SORT_ORDR) FROM TB_MENU WHERE MENU_ID LIKE CONCAT(#{menu_id, jdbcType=VARCHAR},'%') AND MENU_LEVEL = #{menu_lv, jdbcType=INTEGER}+'1') AS MAX_SORT_ORDR
+		,A.RM
+	]]>
+	FROM TB_MENU A
+	WHERE A.MENU_ID = #{menu_id, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectExistYnMenuId" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu."selectExistYnMenuId" */
+	<![CDATA[
+	SELECT	CASE WHEN COUNT(1) = 0 THEN 'N' ELSE 'Y' END AS EXIST_YN
+	FROM 	TB_MENU A
+	WHERE 	A.MENU_ID = #{new_menu_id, jdbcType=VARCHAR}
+	]]>
+	</select>
+
+	<select id="selectExistYnMenuUrl" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectExistYnMenuUrl */
+	<![CDATA[
+	SELECT	CASE WHEN COUNT(1) = 0 THEN 'N' ELSE 'Y' END AS EXIST_YN
+	FROM 	TB_MENU
+	WHERE 	URL = #{new_url, jdbcType=VARCHAR}
+	]]>
+	</select>
+
+	<select id="selectExistYnSubMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectExistYnSubMenu */
+	<![CDATA[
+	SELECT CASE WHEN COUNT(1) = 0 THEN 'N' ELSE 'Y' END AS EXIST_SUB_YN
+	FROM TB_MENU A
+	WHERE A.UP_MENU_ID = #{menu_id, jdbcType=VARCHAR}
+	]]>
+	</select>
+
+	<select id="selectNumberMenuPk" resultType="int">
+	/* admin.menu.selectNumberMenuPk */
+	SELECT FN_NEXTVAL('SQ_MENU_PK')
+	</select>
+
+	<insert id="insertMenu" parameterType="dataMap">
+	/* admin.menu.insertMenu */
+	<![CDATA[
+	INSERT INTO TB_MENU	(
+			MENU_PK
+			,MENU_ID
+			,MENU_TY_CODE
+			,MENU_LEVEL
+			,MENU_NM
+			,FNCT_NM
+			,ICON_NM
+			,URL
+			,SORT_ORDR
+			,USE_YN
+			,DISP_YN
+			,SORT_ORDR_1
+			,SORT_ORDR_2
+			,SORT_ORDR_3
+			,SORT_ORDR_4
+			,SORT_ORDR_5
+			,SORT_ORDR_6
+			,REGISTER_NO
+			,REGIST_DT
+			,MENU_SE_CODE
+			,BBS_CODE
+			,CNTNTS_ID
+			,RM
+	)
+	VALUES	(
+			#{new_menu_pk, jdbcType=VARCHAR}
+			,#{new_menu_id, jdbcType=VARCHAR}
+			,#{new_menu_type_code, jdbcType=VARCHAR}
+			,#{new_menu_lv, jdbcType=INTEGER}
+			,#{new_menu_nm, jdbcType=VARCHAR}
+			,#{new_fnct_nm, jdbcType=VARCHAR}
+			,#{new_icon_nm, jdbcType=VARCHAR}
+			,#{new_url, jdbcType=VARCHAR}
+			,#{new_srt_ord, jdbcType=INTEGER}
+			,#{new_use_yn, jdbcType=VARCHAR}
+			,#{new_disp_yn, jdbcType=VARCHAR}
+			,#{sort_ordr_1, jdbcType=INTEGER}
+			,#{sort_ordr_2, jdbcType=INTEGER}
+			,#{sort_ordr_3, jdbcType=INTEGER}
+			,#{sort_ordr_4, jdbcType=INTEGER}
+			,#{sort_ordr_5, jdbcType=INTEGER}
+			,#{sort_ordr_6, jdbcType=INTEGER}
+			,#{ss_user_id, jdbcType=INTEGER}
+			,SYSDATE()
+			,#{new_url_ty_code, jdbcType=VARCHAR}
+			,#{new_bbs_code, jdbcType=VARCHAR}
+			,#{new_cntnts_id, jdbcType=VARCHAR}
+			,#{new_rm, jdbcType=VARCHAR}
+	)
+	]]>
+	</insert>
+
+	<update id="updateMenu" parameterType="dataMap">
+	/* admin.menu.updateMenu */
+	UPDATE TB_MENU
+	SET MENU_TY_CODE = #{menu_type_code, jdbcType=VARCHAR}
+		, MENU_NM = #{menu_nm, jdbcType=VARCHAR}
+		, FNCT_NM = #{fnct_nm, jdbcType=VARCHAR}
+		, ICON_NM = #{icon_nm, jdbcType=VARCHAR}
+		, URL = #{url, jdbcType=VARCHAR}
+		, SORT_ORDR = #{srt_ord, jdbcType=INTEGER}
+		, SORT_ORDR_1=#{sort_ordr_1, jdbcType=INTEGER}
+		, SORT_ORDR_2=#{sort_ordr_2, jdbcType=INTEGER}
+		, SORT_ORDR_3=#{sort_ordr_3, jdbcType=INTEGER}
+		, SORT_ORDR_4=#{sort_ordr_4, jdbcType=INTEGER}
+		, SORT_ORDR_5=#{sort_ordr_5, jdbcType=INTEGER}
+		, SORT_ORDR_6=#{sort_ordr_6, jdbcType=INTEGER}
+		, USE_YN = #{use_yn, jdbcType=VARCHAR}
+		, DISP_YN = #{disp_yn, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=INTEGER}
+		, UPDT_DT = SYSDATE()
+		, MENU_SE_CODE = #{url_ty_code, jdbcType=VARCHAR}
+		, BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+		, CNTNTS_ID = #{cntnts_id, jdbcType=VARCHAR}
+		, RM = #{rm, jdbcType=VARCHAR}
+	WHERE MENU_ID = #{menu_id, jdbcType=VARCHAR}
+	</update>
+
+	<update id="deleteUrlTyValue" parameterType="dataMap">
+	/* admin.menu.deleteUrlTyValue */
+	UPDATE TB_MENU
+	SET
+		<choose>
+				<when test="url_ty_code == '10'">
+			CNTNTS_ID = null
+				</when>
+				<when test="url_ty_code == '20'">
+			BBS_CODE = null
+				</when>
+				<when test="url_ty_code == '30'">
+			BBS_CODE = null, CNTNTS_ID = null
+				</when>
+		</choose>
+	WHERE MENU_ID = #{menu_id, jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateMenuSub" parameterType="dataMap">
+	/* admin.menu.updateMenuSub */
+	UPDATE TB_MENU
+	SET
+		UPDUSR_NO = #{ss_user_id, jdbcType=INTEGER}
+		, UPDT_DT = SYSDATE()
+	<choose>
+		<when test="sortDepth == 1">
+			,SORT_ORDR_1=#{srt_ord, jdbcType=INTEGER}
+		</when>
+		<when test="sortDepth == 2">
+			,SORT_ORDR_2=#{srt_ord, jdbcType=INTEGER}
+		</when>
+		<when test="sortDepth == 3">
+			,SORT_ORDR_3=#{srt_ord, jdbcType=INTEGER}
+		</when>
+		<when test="sortDepth == 4">
+			,SORT_ORDR_4=#{srt_ord, jdbcType=INTEGER}
+		</when>
+		<when test="sortDepth == 5">
+			,SORT_ORDR_5=#{srt_ord, jdbcType=INTEGER}
+		</when>
+		<when test="sortDepth == 6">
+			,SORT_ORDR_6=#{srt_ord, jdbcType=INTEGER}
+		</when>
+	</choose>
+	WHERE MENU_ID LIKE CONCAT(#{menu_id, jdbcType=VARCHAR}, '%')
+	</update>
+
+
+	<delete id="deleteAuthMenu" parameterType="dataMap">
+	/* admin.menu.deleteAuthMenu */
+	DELETE
+	FROM TB_AUTHOR_MENU
+	WHERE MENU_PK LIKE CONCAT(#{menu_pk, jdbcType=VARCHAR}, '%')
+	</delete>
+
+	<delete id="deleteMenu" parameterType="dataMap">
+	/* admin.menu.deleteMenu */
+	DELETE
+	FROM TB_MENU
+	WHERE MENU_ID LIKE CONCAT(#{menu_id, jdbcType=VARCHAR}, '%')
+	</delete>
+
+	<select id="selectExistSortSubMenu" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectExistSortSubMenu */
+	<![CDATA[
+	SELECT CASE WHEN COUNT(1) = 0 THEN 'N' ELSE 'Y' END AS EXIST_SORT_YN
+	FROM TB_MENU A
+	WHERE
+	A.MENU_ID LIKE CONCAT(#{up_menu_id, jdbcType=VARCHAR},'%')
+	AND A.MENU_LEVEL 	= #{menuLevel, jdbcType=INTEGER}
+	AND A.SORT_ORDR = #{srt_ord, jdbcType=INTEGER}
+	AND A.MENU_ID != #{menu_id, jdbcType=VARCHAR}
+	]]>
+	</select>
+
+	<select id="selectBbsInfo" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectBbsInfo */
+	SELECT
+			A.BBS_CODE
+			,A.BBS_NM
+			,A.SYS_CODE
+			,B.CODE_NM AS ORGAN_NM
+	FROM TB_BBS_MANAGE A
+		LEFT OUTER JOIN	TB_CODE B ON A.SYS_CODE = B.CODE
+	WHERE A.BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+		AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+		AND A.USE_YN = 'Y'
+	</select>
+
+	<select id="selectCntntsInfo" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectCntntsInfo */
+	SELECT
+			A.CNTNTS_ID
+			,A.SJ
+			,B.CODE_NM AS SYS_NM
+	FROM TB_CNTNTS A
+		LEFT OUTER JOIN TB_CODE B ON A.SYS_CODE = B.CODE
+	WHERE A.CNTNTS_ID = #{cntnts_id, jdbcType=VARCHAR}
+		AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectCodeAttrbs" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectCodeAttrbs */
+	SELECT ATTRB_1, ATTRB_2, ATTRB_3
+	FROM TB_CODE
+	WHERE
+		GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	 	AND CODE = #{sys_code, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectListMenuCombo" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectListMenuCombo */
+	SELECT	MENU_ID
+		, 	CASE WHEN FNCT_NM IS NULL OR FNCT_NM = '' THEN MENU_NM
+		  		ELSE CONCAT(MENU_NM, '(', FNCT_NM, ')')
+		  	END AS MENU_NM
+	FROM 	TB_MENU
+	WHERE 	MENU_LEVEL = #{level, jdbcType=VARCHAR}
+	<if test = 'menu_level_2 != null and menu_level_2 != ""'>
+			AND MENU_ID LIKE CONCAT(#{menu_level_2, jdbcType=VARCHAR}, '%')
+	</if>
+	ORDER BY SORT_ORDR
+	</select>
+
+	<update id="updateMenuMoveLevel2" parameterType="dataMap">
+	/* admin.menu.updateMenuMoveLevel2 */
+	UPDATE 	TB_MENU AS A
+		,	(SELECT	MENU_ID
+				,	SUBSTRING(MENU_ID, 13, 8) AS ID
+				,	MENU_LEVEL
+				,	SORT_ORDR
+				,	SORT_ORDR_1
+				,	SORT_ORDR_2
+				,	SORT_ORDR_3
+				,	SORT_ORDR_4
+				,	SORT_ORDR_5
+				,	SORT_ORDR_6
+			FROM	TB_MENU
+			WHERE	MENU_ID LIKE CONCAT(#{menu_id, jdbcType=VARCHAR}, '%') ) AS B
+		,	(SELECT	CASE
+						WHEN SUBSTRING(MAX(MENU_ID), 9, 4) = '' THEN '1000'
+						ELSE CAST(SUBSTRING(MAX(MENU_ID), 9, 4) + 100 AS CHAR)
+					END AS ID
+				,	SORT_ORDR_1
+				,	SORT_ORDR_2
+				,	MAX(SORT_ORDR_3) + 10 AS SORT_ORDR_3
+			FROM	TB_MENU
+			WHERE	MENU_ID LIKE CONCAT(#{menu_move_parent, jdbcType=VARCHAR}, '%') ) AS C
+	SET 	A.MENU_ID = CONCAT(#{menu_move_parent, jdbcType=VARCHAR}, C.ID, B.ID)
+		,	A.SORT_ORDR_1 = C.SORT_ORDR_1
+		,	A.SORT_ORDR_2 = C.SORT_ORDR_2
+		,	A.SORT_ORDR_3 = C.SORT_ORDR_3
+		,	A.SORT_ORDR 	= CASE
+								WHEN B.MENU_LEVEL = 3 THEN C.SORT_ORDR_3
+								WHEN B.MENU_LEVEL = 4 THEN B.SORT_ORDR_4
+								WHEN B.MENU_LEVEL = 5 THEN B.SORT_ORDR_5
+								ELSE B.SORT_ORDR_6
+							END
+	WHERE 	A.MENU_ID = B.MENU_ID
+	</update>
+
+	<update id="updateMenuMoveLevel3" parameterType="dataMap">
+	/* admin.menu.updateMenuMoveLevel3 */
+	UPDATE 	TB_MENU AS A
+		,	(SELECT	MENU_ID
+				,	SUBSTRING(MENU_ID, 17, 4) AS ID
+				,	MENU_LEVEL
+				,	SORT_ORDR
+				,	SORT_ORDR_1
+				,	SORT_ORDR_2
+				,	SORT_ORDR_3
+				,	SORT_ORDR_4
+				,	SORT_ORDR_5
+				,	SORT_ORDR_6
+			FROM	TB_MENU
+			WHERE	MENU_ID LIKE CONCAT(#{menu_id, jdbcType=VARCHAR}, '%') ) AS B
+		,	(SELECT	CASE
+						WHEN SUBSTRING(MAX(MENU_ID), 13, 4) = '' THEN '1000'
+						ELSE CAST(SUBSTRING(MAX(MENU_ID), 13, 4) + 100 AS CHAR)
+					END AS ID
+				,	SORT_ORDR_1
+				,	SORT_ORDR_2
+				,	SORT_ORDR_3
+				,	MAX(SORT_ORDR_4) + 10 AS SORT_ORDR_4
+			FROM	TB_MENU
+			WHERE	MENU_ID LIKE CONCAT(#{menu_move_parent, jdbcType=VARCHAR}, '%') ) AS C
+	SET 	A.MENU_ID = CONCAT(#{menu_move_parent, jdbcType=VARCHAR}, C.ID, B.ID)
+		,	A.SORT_ORDR_1 = C.SORT_ORDR_1
+		,	A.SORT_ORDR_2 = C.SORT_ORDR_2
+		,	A.SORT_ORDR_3 = C.SORT_ORDR_3
+		,	A.SORT_ORDR_4 = C.SORT_ORDR_4
+		,	A.SORT_ORDR 	= CASE
+								WHEN B.MENU_LEVEL = 4 THEN C.SORT_ORDR_4
+								WHEN B.MENU_LEVEL = 5 THEN B.SORT_ORDR_5
+								ELSE B.SORT_ORDR_6
+							END
+	WHERE 	A.MENU_ID = B.MENU_ID
+	</update>
+	
+	<select id="selectListBbsCode" parameterType="dataMap" resultType="dataMap">
+	/* admin.menu.selectListBbsCode */
+	SELECT	A.BBS_CODE
+			,A.SYS_CODE
+			,A.BBS_TY_CODE
+			,B.CODE_NM
+			,A.BBS_NM
+	FROM 	TB_BBS_MANAGE A LEFT OUTER JOIN TB_CODE B ON A.BBS_TY_CODE = B.CODE
+	WHERE	A.SYS_CODE = #{sys_code, jdbcType=VARCHAR}
+			AND A.USE_YN = 'Y'
+			AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	</select>
+
+</mapper>

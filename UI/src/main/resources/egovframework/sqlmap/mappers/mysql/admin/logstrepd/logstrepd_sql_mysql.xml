@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.logstrepd">
+
+	<select id="selectLogStrePd" resultType="dataMap">
+	/* admin.logstrepd.selectLogStrePd */
+	<![CDATA[
+	SELECT
+		LOG_STRE_PD
+		, REGISTER_NO
+		, REGIST_DT
+		, date_format(DATE_SUB(now(), INTERVAL(SELECT LOG_STRE_PD FROM TB_LOG_STRE_PD) DAY), '%Y.%m.%d') AS LOG_DT
+	FROM
+		TB_LOG_STRE_PD
+	]]>
+	</select>
+
+	<delete id="deleteLogStreMgt" parameterType="dataMap">
+	/* admin.logstrepd.deleteLogStreMgt */
+	<![CDATA[
+	DELETE FROM
+		TB_LOG_STRE_PD
+	]]>
+	</delete>
+
+	<insert id="insertLogStreMgt" parameterType="dataMap">
+	/* admin.user.insertLogStreMgt */
+	<![CDATA[
+	INSERT INTO
+		TB_LOG_STRE_PD (
+			LOG_STRE_PD
+			, REGISTER_NO
+			, REGIST_DT
+		) VALUES (
+			#{storage_pd, jdbcType=VARCHAR}
+			, #{ss_user_no, jdbcType=VARCHAR}
+			, SYSDATE()
+		)
+	]]>
+	</insert>
+
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.quick">
+
+	<select id="selectListQuick" parameterType="dataMap" resultType="dataMap">
+	/* admin.quick.selectQuick */
+	SELECT A1.SEQ
+		, A1.IMAGE_DOC_ID
+		, CONCAT(A2.FILE_PARTN_COURS, A2.FILE_ID, '.', A2.FILE_EXTSN_NM) AS FILE_PATH
+		, A1.SJ
+		, A1.LINK_URL
+		, A1.RM
+		, A1.SORT_ORDR
+		, A1.TAB_YN
+	FROM TB_QUICK_MENU A1
+	LEFT OUTER JOIN TB_FILE A2
+	ON A1.IMAGE_DOC_ID = A2.DOC_ID
+	ORDER BY A1.SORT_ORDR
+	</select>
+	
+	<update id="updateQuick" parameterType="dataMap">
+		/* admin.quick.updateQuick */
+		UPDATE TB_QUICK_MENU
+		SET SJ = #{sj, jdbcType=VARCHAR}
+		<if test="image_doc_id != null and image_doc_id != ''">
+			, IMAGE_DOC_ID = #{image_doc_id, jdbcType=INTEGER}
+		</if>
+			, LINK_URL = #{link_url, jdbcType=VARCHAR}
+			, RM = #{rm, jdbcType=VARCHAR}
+			, SORT_ORDR = #{sort_ordr, jdbcType=VARCHAR}
+			, TAB_YN = #{tab_yn, jdbcType=VARCHAR}
+			, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+			, UPDT_DT = NOW()
+		WHERE SEQ = #{seq, jdbcType=VARCHAR}
+		</update>
+</mapper>

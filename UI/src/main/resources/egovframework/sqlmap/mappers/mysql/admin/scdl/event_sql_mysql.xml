@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.scdl.event">
+
+	<select id="selectTotCntEvent" parameterType="dataMap" resultType="int">
+	/* admin.scdl.event.selectTotCntEvent */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_EVENT A1
+	LEFT OUTER JOIN TB_CODE A2
+	ON A1.EVENT_SE_CODE = A2.CODE
+		AND A2.GROUP_ID = 'R010320'
+	WHERE 1 = 1
+	<!-- 관리자가 아닌경우 자신이 해당하는 구분값만 조회한다. -->
+	<if test="ss_author_id != 'ADMIN'">
+		AND A2.ATTRB_1 = #{ss_author_id, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'sj'">
+		AND A1.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'cn'">
+		AND A1.CN LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_date != null and sch_date != ''">
+		AND A1.BEGIN_DE <![CDATA[ <= ]]> STR_TO_DATE(#{sch_date, jdbcType=VARCHAR}, '%Y.%m.%d') 
+		AND A1.END_DE <![CDATA[ >= ]]> STR_TO_DATE(#{sch_date, jdbcType=VARCHAR}, '%Y.%m.%d')
+	</if>
+	</select>
+
+	<select id="selectPageListEvent" parameterType="dataMap" resultType="dataMap">
+	/* admin.scdl.event.selectPageListEvent */
+	SELECT A1.EVENT_SEQ
+		, A1.EVENT_SE_CODE
+		, A2.CODE_NM AS EVENT_SE_CODE_NM
+		, A1.BEGIN_DE
+		, DATE_FORMAT(A1.BEGIN_DE, '%Y.%m.%d %H:%i') AS BEGIN_DE_STR
+		, A1.END_DE
+		, DATE_FORMAT(A1.END_DE, '%Y.%m.%d %H:%i') AS END_DE_STR
+		, A1.SJ
+		, A1.CN
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, A1.REGISTER_NO
+		, A3.USER_NM AS REGISTER_NM
+	FROM TB_EVENT A1
+	LEFT OUTER JOIN TB_CODE A2
+	ON A1.EVENT_SE_CODE = A2.CODE
+		AND A2.GROUP_ID = 'R010320'
+	LEFT OUTER JOIN TB_USER A3
+	ON A1.REGISTER_NO = A3.USER_NO
+	WHERE 1 = 1
+	<!-- 관리자가 아닌경우 자신이 해당하는 구분값만 조회한다. -->
+	<if test="ss_author_id != 'ADMIN'">
+		AND A2.ATTRB_1 = #{ss_author_id, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_text != null and sch_text != ''">
+		<choose>
+			<when test="sch_type == 'sj'">
+		AND A1.SJ LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+			<when test="sch_type == 'cn'">
+		AND A1.CN LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+			</when>
+		</choose>
+	</if>
+	<if test="sch_date != null and sch_date != ''">
+		AND A1.BEGIN_DE <![CDATA[ <= ]]> STR_TO_DATE(#{sch_date, jdbcType=VARCHAR}, '%Y.%m.%d') 
+		AND A1.END_DE <![CDATA[ >= ]]> STR_TO_DATE(#{sch_date, jdbcType=VARCHAR}, '%Y.%m.%d')
+	</if>
+	ORDER BY A1.REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+	
+	<insert id="insertEvent" parameterType="dataMap">
+	/* admin.scdl.event.insertEvent */
+	INSERT INTO TB_EVENT (
+		EVENT_SEQ
+		, EVENT_SE_CODE
+		, BEGIN_DE
+		, END_DE
+		, SJ
+		, CN
+		, REGIST_DT
+		, REGISTER_NO
+	) VALUES (
+		(SELECT FN_NEXTVAL('SQ_EVENT_SEQ'))
+		, #{event_se_code, jdbcType=VARCHAR}
+		, STR_TO_DATE(#{begin_de, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, STR_TO_DATE(#{end_de, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, #{sj, jdbcType=VARCHAR}
+		, #{cn, jdbcType=VARCHAR}
+		, NOW()
+		, #{ss_user_no, jdbcType=VARCHAR}
+	)
+	</insert>
+	
+	<select id="selectEvent" parameterType="dataMap" resultType="dataMap">
+	/* admin.scdl.event.selectEvent */
+	SELECT A1.EVENT_SEQ
+		, A1.EVENT_SE_CODE
+		, A2.CODE_NM AS EVENT_SE_CODE_NM
+		, A1.BEGIN_DE
+		, DATE_FORMAT(A1.BEGIN_DE, '%Y.%m.%d %H:%i') AS BEGIN_DE_STR
+		, A1.END_DE
+		, DATE_FORMAT(A1.END_DE, '%Y.%m.%d %H:%i') AS END_DE_STR
+		, A1.SJ
+		, A1.CN
+		, A1.REGIST_DT
+		, DATE_FORMAT(A1.REGIST_DT, '%Y.%m.%d') AS REGIST_YMD
+		, A1.REGISTER_NO
+		, A3.USER_NM AS REGISTER_NM
+	FROM TB_EVENT A1
+	LEFT OUTER JOIN TB_CODE A2
+	ON A1.EVENT_SE_CODE = A2.CODE
+		AND A2.GROUP_ID = 'R010320'
+	LEFT OUTER JOIN TB_USER A3
+	ON A1.REGISTER_NO = A3.USER_NO
+	WHERE A1.EVENT_SEQ = #{event_seq, jdbcType=INTEGER}
+	<!-- 관리자가 아닌경우 자신이 해당하는 구분값만 조회한다. -->
+	<if test="ss_author_id != 'ADMIN'">
+		AND A2.ATTRB_1 = #{ss_author_id, jdbcType=VARCHAR}
+	</if>
+	</select>
+	
+	<update id="updateEvent" parameterType="dataMap">
+	/* admin.scdl.event.updateEvent */
+	UPDATE TB_EVENT
+	SET EVENT_SE_CODE = #{event_se_code, jdbcType=VARCHAR}
+		, BEGIN_DE = STR_TO_DATE(#{begin_de, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, END_DE = STR_TO_DATE(#{end_de, jdbcType=VARCHAR}, '%Y.%m.%d %H:%i')
+		, SJ = #{sj, jdbcType=VARCHAR}
+		, CN = #{cn, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE EVENT_SEQ = #{event_seq, jdbcType=INTEGER}
+	</update>
+	
+	<delete id="deleteEvent" parameterType="dataMap">
+	/* admin.scdl.event.deleteEvent */
+		DELETE FROM TB_EVENT
+		WHERE EVENT_SEQ = #{event_seq, jdbcType=VARCHAR}
+	</delete>
+</mapper>

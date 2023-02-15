@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.stdTerm">
+
+	<select id="selectDistinctFileName" resultType="dataMap">
+	/* admin.stdTerm.selectDistinctFileName: 행정표준용어 업로드 한 파일 리스트 */
+			SELECT
+				DISTINCT FILE_NAME, FILE_ID
+			FROM TB_STD_TERM
+			ORDER BY UPLOAD_DT DESC
+	</select>
+
+	<select id="selectTopFile" resultType="String">
+	/* admin.stdTerm.selectTopfile 행정표준용어 최신 업로드 파일 */
+		SELECT
+			FILE_ID
+		FROM TB_STD_TERM
+		ORDER BY UPLOAD_DT DESC
+		LIMIT 1
+	</select>
+
+	<select id="selectTotCntStdTermMgt" parameterType="dataMap" resultType="int">
+	/* admin.stdTerm.selectTotCntStdTerm: 행정표준용어 리스트 수 */
+		SELECT COUNT(1) AS TOT_CNT
+		FROM TB_STD_TERM
+		WHERE 1=1
+		AND USE_YN = 'Y'
+		 <if test="sch_text != null and sch_text != ''">
+			AND (TERM_NAME  LIKE CONCAT('%', #{sch_text} , '%')
+			OR TERM_ENG_NAME LIKE CONCAT('%', #{sch_text} , '%')
+			OR ENG_ABBREVIATION LIKE CONCAT('%',#{sch_text} , '%') )
+		</if>
+		 AND FILE_ID = #{fileCode}
+	</select>
+
+	<select id="selectPageListStdTermMgt" parameterType="dataMap" resultType="dataMap">
+	/* admin.stdTerm.selectPageListStdTerm: 행정표준용어 리스트 (페이지) */
+		SELECT
+			STD_SEQ,
+			TERM_CODE,
+			TERM_NAME,
+			TERM_ENG_NAME,
+			ENG_ABBREVIATION,
+			REGIST_DT,
+			USE_YN,
+			FILE_NAME,
+			FILE_ID
+		FROM TB_STD_TERM
+		WHERE 1=1
+		AND USE_YN = 'Y'
+		 <if test="sch_text != null and sch_text != ''">
+			AND (TERM_NAME  LIKE CONCAT('%', #{sch_text} , '%')
+			OR TERM_ENG_NAME LIKE CONCAT('%', #{sch_text} , '%')
+			OR ENG_ABBREVIATION LIKE CONCAT('%',#{sch_text} , '%') )
+		</if>
+		AND FILE_ID = #{fileCode}
+		LIMIT #{limitStart}, #{limitEnd}
+	</select>
+
+	<insert id="insertstdTermMgt" parameterType="dataMap">
+	/* admin.stdTerm.insertStdTerm: 행정표준용어 엑셀 파일 읽은후 등록 */
+		INSERT INTO TB_STD_TERM (TERM_CODE, TERM_NAME, TERM_ENG_NAME, ENG_ABBREVIATION, REGIST_DT, USE_YN, FILE_NAME, FILE_ID, UPLOAD_DT)
+		VALUES (#{termCode}, #{termName}, #{termEngName}, #{engAbbreviation}, #{registDt}, #{useYn}, #{fileName}, #{fileId}, #{uploadDt})
+	</insert>
+
+</mapper>

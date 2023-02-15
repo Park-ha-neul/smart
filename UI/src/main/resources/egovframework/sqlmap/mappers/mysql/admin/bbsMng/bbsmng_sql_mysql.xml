@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin.bbsMng">
+
+	<select id="selectTotCntBbsMng" parameterType="dataMap" resultType="int">
+	/* admin.bbsMng.selectTotCntBbsMng */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_BBS_MANAGE A
+	WHERE 1 = 1
+	<if test="sch_sys_code != null and sch_sys_code != ''">
+	AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_bbs_ty_code != null and sch_bbs_ty_code != ''">
+	AND A.BBS_TY_CODE = #{sch_bbs_ty_code, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_use_yn != null and sch_use_yn != ''">
+	AND A.USE_YN = #{sch_use_yn, jdbcType=VARCHAR}
+	</if>
+	<if test="sch_text != null and sch_text != ''">
+	AND (UPPER(A.BBS_CODE) LIKE CONCAT('%', UPPER(#{sch_text, jdbcType=VARCHAR}), '%') OR UPPER(A.BBS_NM) LIKE CONCAT('%', UPPER(#{sch_text, jdbcType=VARCHAR}), '%'))
+	</if>
+	</select>
+
+	<select id="selectPageListBbsMng" parameterType="dataMap" resultType="dataMap">
+	/* admin.bbsMng.selectPageListBbsMng */
+	SELECT (SELECT DD.MENU_NM FROM TB_MENU DD WHERE DD.BBS_CODE = A.BBS_CODE LIMIT 1) AS MENU_NM
+		, (SELECT COUNT(*) FROM TB_MENU DD WHERE DD.BBS_CODE = A.BBS_CODE) AS MENU_CNT
+		, A.BBS_CODE
+		, A.BBS_NM
+		, B.CODE_NM AS SYS_CODE_NM
+		, A.SYS_CODE
+		,(
+			SELECT F.CODE_NM
+		  FROM TB_CODE F
+			WHERE A.BBS_TY_CODE = F.CODE
+				AND F.GROUP_ID = #{bbs_ty_group_id, jdbcType=VARCHAR}
+		) AS BBS_TY_CODE_NM
+		, A.BBS_TY_CODE
+		, A.EDITR_YN
+		, A.ATCH_FILE_YN
+		, A.LINK_URL_YN
+		, A.KWRD_YN
+		, A.MVP_URL_YN
+		, A.ANSWER_YN
+		, A.ANSWER_EDITR_YN
+		, A.ANSWER_ATCH_FILE_YN
+		, A.REGISTER_NO
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT
+		, A.UPDUSR_NO
+		, A.UPDT_DT
+		, A.RM
+		, A.USE_YN
+		, A.MNGR_ANSWER_YN
+		, IF(A.USE_YN = 'Y', '예', '아니오') AS USE_YN_NM
+		, C.USER_NM
+	FROM TB_BBS_MANAGE A
+	LEFT OUTER JOIN TB_CODE B
+	ON A.SYS_CODE = B.CODE
+		AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	LEFT OUTER JOIN TB_USER C
+	ON A.REGISTER_NO = USER_NO
+	WHERE 1 = 1
+		<if test="sch_sys_code != null and sch_sys_code != ''">
+		 AND A.SYS_CODE = #{sch_sys_code, jdbcType=VARCHAR}
+		 </if>
+		 <if test="sch_bbs_ty_code != null and sch_bbs_ty_code != ''">
+		 AND A.BBS_TY_CODE = #{sch_bbs_ty_code, jdbcType=VARCHAR}
+		 </if>
+		 <if test="sch_use_yn != null and sch_use_yn != ''">
+		 AND A.USE_YN = #{sch_use_yn, jdbcType=VARCHAR}
+		 </if>
+		 <if test="sch_text != null and sch_text != ''">
+		 AND (UPPER(A.BBS_CODE) LIKE CONCAT('%', UPPER(#{sch_text, jdbcType=VARCHAR}), '%') OR UPPER(A.BBS_NM) LIKE CONCAT('%', UPPER(#{sch_text, jdbcType=VARCHAR}), '%'))
+		 </if>
+	 ORDER BY A.REGIST_DT DESC
+	 LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<resultMap type="egovframework.framework.common.object.DataMap" id="resultMap_selectBbsMng">
+		<result property="BBS_CODE" 									column="BBS_CODE" />
+		<result property="BBS_NM" 										column="BBS_NM" />
+		<result property="SYS_CODE_NM" 							column="SYS_CODE_NM" />
+		<result property="SYS_CODE" 								column="SYS_CODE" />
+		<result property="BBS_TY_CODE_NM" 						column="BBS_TY_CODE_NM" />
+		<result property="BBS_TY_CODE" 								column="BBS_TY_CODE" />
+		<result property="EDITR_NM" 									column="EDITR_NM" />
+		<result property="EDITR_YN" 									column="EDITR_YN" />
+		<result property="ATCH_FILE_NM" 							column="ATCH_FILE_NM" />
+		<result property="ATCH_FILE_YN" 							column="ATCH_FILE_YN" />
+		<result property="IMAGE_ATCH_FILE_NM" 				column="IMAGE_ATCH_FILE_NM" />
+		<result property="IMAGE_ATCH_FILE_YN" 				column="IMAGE_ATCH_FILE_YN" />
+		<result property="LINK_URL_NM" 								column="LINK_URL_NM" />
+		<result property="LINK_URL_YN" 								column="LINK_URL_YN" />
+		<result property="KWRD_NM" 										column="KWRD_NM" />
+		<result property="KWRD_YN" 										column="KWRD_YN" />
+		<result property="MVP_URL_NM" 								column="MVP_URL_NM" />
+		<result property="MVP_URL_YN" 								column="MVP_URL_YN" />
+		<result property="ANSWER_NM" 									column="ANSWER_NM" />
+		<result property="ANSWER_YN" 									column="ANSWER_YN" />
+		<result property="REGIST_YN" 									column="REGIST_YN" />
+		<result property="REGIST_YN_NM" 							column="REGIST_YN_NM" />
+		<result property="ANSWER_EDITR_NM" 						column="ANSWER_EDITR_NM" />
+		<result property="ANSWER_EDITR_YN" 						column="ANSWER_EDITR_YN" />
+		<result property="ANSWER_ATCH_FILE_NM" 				column="ANSWER_ATCH_FILE_NM" />
+		<result property="ANSWER_ATCH_FILE_YN" 				column="ANSWER_ATCH_FILE_YN" />
+		<result property="MNGR_ANSWER_NM" 						column="MNGR_ANSWER_NM" />
+		<result property="MNGR_ANSWER_YN" 						column="MNGR_ANSWER_YN" />
+		<result property="REGISTER_NO" 								column="REGISTER_NO" />
+		<result property="REGIST_DT" 									column="REGIST_DT" />
+		<result property="RM" 												column="RM" />
+		<result property="USE_YN" 										column="USE_YN" />
+		<result property="USE_YN_NM" 									column="USE_YN_NM" />
+		<result property="MENU_LIST" 									column="MENU_LIST" />
+		<result property="TAB_SE_GROUP_ID" 						column="TAB_SE_GROUP_ID" />
+		<result property="TAB_SE_GROUP_NM" 						column="TAB_SE_GROUP_NM" />
+		<result property="PASSWORD_YN" 								column="PASSWORD_YN" />
+		<result property="CNTNTS_CN" 						column="CNTNTS_CN" javaType="java.lang.String" jdbcType="CLOB" />
+		<result property="CNTNTS_POSITION_CODE" 						column="CNTNTS_POSITION_CODE" />
+		<result property="CNTNTS_YN" 						column="CNTNTS_YN" />
+		<result property="IMAGE_DOC_ID" 						column="IMAGE_DOC_ID" />
+
+		<collection property="AUTHOR_LIST" javaType="java.util.ArrayList" column="{bbs_code = BBS_CODE}" ofType="dataMap" select="selectListBbsMngAuthor" />
+
+	</resultMap>
+
+	<select id="selectBbsMng" parameterType="dataMap" resultMap="resultMap_selectBbsMng">
+	/* admin.bbsMng.selectBbsMng */
+	SELECT A.BBS_CODE
+		, A.BBS_NM
+		, B.CODE_NM AS SYS_CODE_NM
+		, B.ATTRB_1 AS SUBPATH
+		, A.SYS_CODE
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.BBS_TY_CODE = F.CODE
+				AND F.GROUP_ID = #{bbs_ty_group_id, jdbcType=VARCHAR}
+		) AS BBS_TY_CODE_NM
+		, A.BBS_TY_CODE
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.EDITR_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS EDITR_NM
+		, A.EDITR_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.ATCH_FILE_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS ATCH_FILE_NM
+		, A.ATCH_FILE_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.LINK_URL_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS LINK_URL_NM
+		, A.LINK_URL_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.KWRD_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS KWRD_NM
+		, A.KWRD_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.MVP_URL_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS MVP_URL_NM
+		, A.MVP_URL_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.ANSWER_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS ANSWER_NM
+		, A.ANSWER_YN
+		, A.CNTNTS_CN
+		, A.CNTNTS_POSITION_CODE
+		,IFNULL((SELECT F.CODE_NM
+	     FROM TB_CODE F
+	     WHERE A.CNTNTS_POSITION_CODE = F.CODE
+	     	AND F.GROUP_ID = #{bbs_cntnts_position_group_id, jdbcType=VARCHAR}
+    	),'-') AS CNTNTS_POSITION_NM
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.CNTNTS_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS CNTNTS_NM
+		, A.CNTNTS_YN
+		, A.IMAGE_DOC_ID
+		, A.REGIST_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.REGIST_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS REGIST_YN_NM
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.ANSWER_EDITR_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS ANSWER_EDITR_NM
+		, A.ANSWER_EDITR_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.ANSWER_ATCH_FILE_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS ANSWER_ATCH_FILE_NM
+		, A.ANSWER_ATCH_FILE_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.MNGR_ANSWER_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS MNGR_ANSWER_NM
+		, A.MNGR_ANSWER_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.PASSWORD_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS ANSWER_EDITR_NM
+		, A.PASSWORD_YN
+		, A.REGISTER_NO
+		, DATE_FORMAT(A.REGIST_DT, '%Y.%m.%d') AS REGIST_DT
+		, A.RM
+		, A.USE_YN
+		, IF(A.USE_YN = 'Y', '예', '아니오') AS USE_YN_NM
+		, C.USER_NM
+		<!-- 메뉴(컨텐츠 타입)가 걸려있는경우만 메뉴명이 노출이 된다. -->
+		, (SELECT MENU_NM FROM TB_MENU WHERE BBS_CODE = A.BBS_CODE ORDER BY REGIST_DT DESC LIMIT 1) AS MENU_LIST
+<!-- 				,(SELECT SUBSTR(XMLAGG( XMLELEMENT(COL ,',  ', '[' || (SELECT FF.MENU_NM FROM TB_MENU FF WHERE FF.MENU_ID = SUBSTR(F.MENU_ID , 1, 8)) || ']' || F.MENU_NM)  -->
+<!--      													ORDER BY F.REGIST_DT).EXTRACT('//text()').GETSTRINGVAL() -->
+<!--      							 , 2)  -->
+<!--          		FROM TB_MENU F  -->
+<!--           WHERE F.BBS_CODE = A.BBS_CODE  -->
+<!--          ) AS MENU_LIST  -->
+		, PASSWORD_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.PASSWORD_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS PASSWORD_NM
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.CAPTCHA_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS CAPTCHA_NM
+		,CAPTCHA_YN
+		, (
+			SELECT F.CODE_NM
+			FROM TB_CODE F
+			WHERE A.NONLOGIN_YN = F.CODE
+				AND F.GROUP_ID = #{yn_group_id, jdbcType=VARCHAR}
+		) AS NONLOGIN_NM
+		,NONLOGIN_YN
+	FROM TB_BBS_MANAGE A
+	LEFT OUTER JOIN TB_CODE B
+	ON A.SYS_CODE = B.CODE
+		AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	LEFT OUTER JOIN TB_USER C
+	ON A.REGISTER_NO = USER_NO
+	WHERE A.BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectListBbsMngAuthor" parameterType="dataMap" resultType="dataMap">
+	/* admin.bbsMng.selectListBbsMngAuthor */
+	SELECT A1.BBS_CODE
+		, A1.AUTHOR_ID
+		, A2.AUTHOR_NM
+	FROM TB_BBS_AUTHOR A1
+	LEFT OUTER JOIN TB_AUTHOR A2
+	ON A1.AUTHOR_ID = A2.AUTHOR_ID
+	WHERE A1.BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+	ORDER BY A1.AUTHOR_ID
+	</select>
+
+	<insert id="insertBbsMng" parameterType="dataMap">
+	/* admin.bbsMng.insertBbsMng */
+	INSERT INTO TB_BBS_MANAGE (
+		BBS_CODE
+		, SYS_CODE
+		, BBS_TY_CODE
+		, BBS_NM
+		, EDITR_YN
+		, ATCH_FILE_YN
+		, LINK_URL_YN
+		, KWRD_YN
+		, MVP_URL_YN
+		, REGIST_YN
+		, ANSWER_YN
+		, ANSWER_EDITR_YN
+		, ANSWER_ATCH_FILE_YN
+		, USE_YN
+		, CNTNTS_CN
+		, CNTNTS_YN
+		, CNTNTS_POSITION_CODE
+		, IMAGE_DOC_ID
+		, REGISTER_NO
+		, REGIST_DT
+		, RM
+		, MNGR_ANSWER_YN
+		, PASSWORD_YN
+		, NONLOGIN_YN
+		, CAPTCHA_YN
+	) VALUES (
+		UPPER(#{bbs_code, jdbcType=VARCHAR})
+		, #{sys_code, jdbcType=VARCHAR}
+		, #{bbs_ty_code, jdbcType=VARCHAR}
+		, #{bbs_nm, jdbcType=VARCHAR}
+		, #{editr_yn, jdbcType=VARCHAR}
+		, #{atch_file_yn, jdbcType=VARCHAR}
+		, #{link_url_yn, jdbcType=VARCHAR}
+		, #{kwrd_yn, jdbcType=VARCHAR}
+		, #{mvp_url_yn, jdbcType=VARCHAR}
+		, #{regist_yn, jdbcType=VARCHAR}
+		, #{answer_yn, jdbcType=VARCHAR}
+		, #{answer_editr_yn, jdbcType=VARCHAR}
+		, #{answer_atch_file_yn, jdbcType=VARCHAR}
+		, 'Y'
+		, #{cntnts_cn, jdbcType=VARCHAR}
+		, #{cntnts_yn, jdbcType=VARCHAR}
+		, #{cntnts_position, jdbcType=VARCHAR}
+		, #{image_doc_id, jdbcType=VARCHAR}
+		, #{ss_user_no, jdbcType=VARCHAR}
+		, NOW()
+		, #{rm, jdbcType=VARCHAR}
+		, #{mngr_answer_yn, jdbcType=VARCHAR}
+		, #{password_yn, jdbcType=VARCHAR}
+		, #{nonlogin_yn, jdbcType=VARCHAR}
+		, #{captcha_yn, jdbcType=VARCHAR}
+	)
+	</insert>
+
+	<insert id="insertBbsMngAuthor" parameterType="dataMap">
+	/* admin.bbsMng.insertBbsMngAuthor */
+	INSERT INTO TB_BBS_AUTHOR (
+		BBS_CODE
+		, AUTHOR_ID
+	) VALUES (
+		UPPER(#{bbs_code, jdbcType=VARCHAR})
+		, #{author_id, jdbcType=VARCHAR}
+	)
+	</insert>
+
+	<delete id="deleteBbsMngAuthor" parameterType="dataMap">
+	/* admin.bbsMng.deleteBbsMngAuthor */
+	DELETE FROM TB_BBS_AUTHOR
+	WHERE BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+	</delete>
+
+	<update id="updateBbsMng" parameterType="dataMap">
+	/* admin.bbsMng.updateBbsMng */
+	UPDATE TB_BBS_MANAGE
+	SET BBS_TY_CODE = #{bbs_ty_code, jdbcType=VARCHAR}
+		, BBS_NM = #{bbs_nm, jdbcType=VARCHAR}
+		, EDITR_YN = #{editr_yn, jdbcType=VARCHAR}
+		, ATCH_FILE_YN = #{atch_file_yn, jdbcType=VARCHAR}
+		, LINK_URL_YN = #{link_url_yn, jdbcType=VARCHAR}
+		, KWRD_YN = #{kwrd_yn, jdbcType=VARCHAR}
+		, MVP_URL_YN = #{mvp_url_yn, jdbcType=VARCHAR}
+		, REGIST_YN = #{regist_yn, jdbcType=VARCHAR}
+		, ANSWER_YN = #{answer_yn, jdbcType=VARCHAR}
+		, ANSWER_EDITR_YN = #{answer_editr_yn, jdbcType=VARCHAR}
+		, ANSWER_ATCH_FILE_YN = #{answer_atch_file_yn, jdbcType=VARCHAR}
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+		, RM = #{rm, jdbcType=VARCHAR}
+		, USE_YN = #{use_yn, jdbcType=VARCHAR}
+		, MNGR_ANSWER_YN = #{mngr_answer_yn, jdbcType=VARCHAR}
+		, CNTNTS_YN = #{cntnts_yn, jdbcType=VARCHAR}
+		, CNTNTS_POSITION_CODE = #{cntnts_position, jdbcType=VARCHAR}
+		, CNTNTS_CN = #{cntnts_cn,jdbcType=CLOB}
+		, IMAGE_DOC_ID = #{image_doc_id,jdbcType=CLOB}
+		, PASSWORD_YN = #{password_yn, jdbcType=VARCHAR}
+		, NONLOGIN_YN = #{nonlogin_yn, jdbcType=VARCHAR}
+		, CAPTCHA_YN = #{captcha_yn, jdbcType=VARCHAR}
+	WHERE BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+	</update>
+
+	<delete id="deleteBbsMng" parameterType="dataMap">
+	/* admin.bbsMng.deleteBbsMng */
+	DELETE FROM TB_BBS_MANAGE WHERE BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+	</delete>
+
+	<select id="selectExistYnBbsCode" parameterType="dataMap" resultType="dataMap">
+	/* admin.bbsMng.selectExistYnBbsCode */
+	SELECT CASE WHEN COUNT(1) = 0 THEN 'N' ELSE 'Y' END AS EXIST_YN
+	FROM TB_BBS_MANAGE A
+	WHERE UPPER(A.BBS_CODE) = UPPER(#{bbs_code, jdbcType=VARCHAR})
+	</select>
+
+	<delete id="deleteBbsMgt" parameterType="dataMap">
+	/* admin.bbs.deleteBbsMgt */
+	DELETE FROM TB_BBS
+	WHERE BBS_SEQ = #{bbs_seq, jdbcType=VARCHAR}
+	AND BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+	</delete>
+
+	<select id="selectTotCntBbsCode" parameterType="dataMap" resultType="int">
+	/* admin.bbsMng.selectTotCntBbsCode */
+	SELECT COUNT(1) TOT_CNT
+	FROM TB_BBS A
+	WHERE 1 = 1
+	AND A.BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectBbsCodeSeq" parameterType="dataMap" resultType="dataMap">
+	/* admin.bbsMng.selectBbsCodeSeq */
+	SELECT IFNULL(SUBSTR(MAX(BBS_CODE),4,2),0) + 1 AS BBS_CODE_SEQ
+	FROM TB_BBS_MANAGE A
+	WHERE A.BBS_CODE LIKE CONCAT(#{bbs_code, jdbcType=VARCHAR}, '%')
+	</select>
+
+	<select id="selectPageListMenuPop" parameterType="dataMap" resultType="dataMap">
+	/* admin.bbsMng.selectPageListMenuPop */
+	SELECT
+		MENU_ID,
+		, MENU_TY_CODE
+		, MENU_LEVEL
+		, MENU_NM
+		, URL
+		, SORT_ORDR
+		, USE_YN
+		, DISP_YN
+		, SORT_ORDR_1
+		, SORT_ORDR_2
+		, SORT_ORDR_3
+		, SORT_ORDR_4
+		, SORT_ORDR_5
+		, SORT_ORDR_6
+		, REGISTER_NO
+		, REGIST_DT
+		, UPDUSR_NO
+		, UPDT_DT
+		, URL_TY_CODE
+		, IF(URL_TY_CODE = '10', BBS_CODE, IF(URL_TY_CODE = '20', CNTNTS_ID, NULL)) AS CODE
+		FROM TB_MENU
+		WHERE USE_YN = 'Y'
+			AND (MENU_TY_CODE = '10' OR MENU_TY_CODE = '20')
+			AND MENU_ID NOT LIKE CONCAT('10001000', '%')
+		ORDER BY SORT_ORDR_1 ASC ,SORT_ORDR_2 ASC ,SORT_ORDR_3 ASC ,SORT_ORDR_4 ASC ,SORT_ORDR_5 ASC,SORT_ORDR_6 ASC
+	</select>
+
+	<update id="updateMenuBbsCode" parameterType="dataMap">
+	/* admin.bbsMng.updateMenuBbsCode */
+	UPDATE TB_MENU
+	SET BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+		,URL_TY_CODE = #{url_ty_code, jdbcType=VARCHAR}
+		,CNTNTS_ID = ''
+		,UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		,UPDT_DT = NOW()
+	WHERE MENU_ID = #{menu_id, jdbcType=VARCHAR}
+	</update>
+
+	<select id="selectBbsMngInfo" parameterType="dataMap" resultType="dataMap">
+	/* admin.bbsMng.selectBbsMngInfo */
+	SELECT A.BBS_CODE
+		, ASYS_CODE
+		, B.CODE_NM
+		, A.BBS_TY_CODE
+		, A.BBS_NM
+		, A.USE_YN
+	FROM TB_BBS_MANAGE A
+	LEFT OUTER JOIN TB_CODE B
+	ON A.SYS_CODE = B.CODE
+		AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	WHERE A.BBS_CODE = #{code, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectCntntsInfo" parameterType="dataMap" resultType="dataMap">
+	/* admin.bbsMng.selectCntntsInfo */
+	SELECT A.CNTNTS_SEQ
+		, A.CNTNTS_ID
+		, A.SYS_CODE
+		, B.CODE_NM
+		, A.SJ
+	FROM TB_CNTNTS A
+	LEFT OUTER JOIN TB_CODE B
+	ON A.SYS_CODE = B.CODE
+		AND B.GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	WHERE A.CNTNTS_ID = #{code, jdbcType=VARCHAR}
+	</select>
+
+	<update id="deleteMenuBbsCode" parameterType="dataMap">
+	/* admin.bbsMng.deleteMenuBbsCode */
+	UPDATE TB_MENU
+	SET BBS_CODE = ''
+		, URL_TY_CODE = ''
+		, CNTNTS_ID = ''
+		, UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE MENU_ID = #{before_menu_id, jdbcType=VARCHAR}
+	</update>
+
+	<select id="selectListAuthor" parameterType="dataMap" resultType="dataMap">
+	/* admin.bbsMng.selectListAuthor */
+	SELECT 	TEMP.AUTHOR_ID
+		,	C.AUTHOR_NM
+	FROM (	SELECT DISTINCT(A.AUTHOR_ID) as AUTHOR_ID
+			FROM TB_AUTHOR_MENU A
+			LEFT OUTER JOIN TB_MENU B ON A.MENU_PK = B.MENU_PK
+			<if test="sys_mapping_code != null and sys_mapping_code != ''">
+			WHERE 	URL LIKE CONCAT('/admin/bbsmng/', #{sys_mapping_code, jdbcType=VARCHAR}, '%')
+			</if>
+			) AS TEMP
+	LEFT OUTER JOIN TB_AUTHOR C ON TEMP.AUTHOR_ID = C.AUTHOR_ID
+	</select>
+
+</mapper>

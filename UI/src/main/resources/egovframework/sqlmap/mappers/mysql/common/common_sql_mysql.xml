@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common">
+	<select id="selectCodeList" parameterType="dataMap" resultType="dataMap">
+	/* common.selectCodeList */
+	SELECT
+		CODE
+		,CODE_NM
+		,CODE_NM_ENG
+		,ATTRB_1
+		,ATTRB_2
+		,ATTRB_3
+	FROM TB_CODE
+	WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR}
+	AND   USE_YN = 'Y'
+	<if test="attrb_1 != null and attrb_1 != ''">
+	AND   ATTRB_1 = #{attrb_1, jdbcType=VARCHAR}
+	</if>
+	<if test="attrb_2 != null and attrb_2 != ''">
+	AND   ATTRB_2 = #{attrb_2, jdbcType=VARCHAR}
+	</if>
+	<if test="attrb_3 != null and attrb_3 != ''">
+	AND   ATTRB_3 = #{attrb_3, jdbcType=VARCHAR}
+	</if>
+	<choose>
+		<when test="orderby != null and orderby != ''">
+	ORDER BY ${orderby, jdbcType=VARCHAR}
+		</when>
+		<otherwise>
+	ORDER BY SORT_ORDR, CODE_NM
+		</otherwise>
+	</choose>
+	</select>
+
+	<select id="selectGroupCodeList" parameterType="dataMap" resultType="dataMap">
+	/* common.selectGroupCodeList */
+	SELECT A1.GROUP_ID
+		, A2.GROUP_NM
+	FROM TB_CODE A1
+	LEFT OUTER JOIN TB_CODE_GROUP A2
+	ON A1.GROUP_ID = A2.GROUP_ID
+	WHERE 1 = 1
+	<if test="attrb_1 != null and attrb_1 != ''">
+		AND ATTRB_1 = #{attrb_1, jdbcType=VARCHAR}
+	</if>
+	<if test="attrb_2 != null and attrb_2 != ''">
+		AND ATTRB_2 = #{attrb_2, jdbcType=VARCHAR}
+	</if>
+	<if test="attrb_3 != null and attrb_3 != ''">
+		AND ATTRB_3 = #{attrb_3, jdbcType=VARCHAR}
+	</if>
+	GROUP BY A1.GROUP_ID, A2.GROUP_NM
+	ORDER BY A1.GROUP_ID DESC
+	</select>
+
+	<select id="selectCode" parameterType="dataMap" resultType="dataMap">
+	/* common.selectCode */
+	SELECT
+		CODE
+		,CODE_NM
+		,CODE_NM_ENG
+		,ATTRB_1
+		,ATTRB_2
+		,ATTRB_3
+	FROM TB_CODE
+	WHERE GROUP_ID = #{group_id, jdbcType=VARCHAR}
+		AND USE_YN = 'Y'
+		AND CODE = #{code, jdbcType=VARCHAR}
+	<if test="attrb_1 != null and attrb_1 != ''">
+		AND ATTRB_1 = #{attrb_1, jdbcType=VARCHAR}
+	</if>
+	<if test="attrb_2 != null and attrb_2 != ''">
+		AND ATTRB_2 = #{attrb_2, jdbcType=VARCHAR}
+	</if>
+	<if test="attrb_3 != null and attrb_3 != ''">
+		AND ATTRB_3 = #{attrb_3, jdbcType=VARCHAR}
+	</if>
+	</select>
+
+	<!-- 메뉴 리스트 -->
+	<select id="selectTopMenuList" parameterType="dataMap" resultType="dataMap">
+	/* common.selectTopMenuList */
+    SELECT A.MENU_ID
+		, A.MENU_LEVEL
+		, A.MENU_NM
+		, A.URL
+	FROM TB_MENU A
+	LEFT OUTER JOIN (
+		SELECT DISTINCT(MENU_PK) FROM TB_AUTHOR_MENU
+		WHERE AUTHOR_ID IN (
+			SELECT AUTHOR_ID FROM TB_USER_AUTHOR
+			WHERE USER_NO = #{ss_user_no, jdbcType=VARCHAR}
+		)
+	) B
+	ON A.MENU_PK = B.MENU_PK
+	WHERE A.MENU_LEVEL = 3
+		AND A.DISP_YN = 'Y'
+        AND A.MENU_ID LIKE CONCAT(#{up_menu_id, jdbcType=VARCHAR}, '%')
+		AND B.MENU_PK IS NOT NULL
+	ORDER BY A.SORT_ORDR, A.MENU_NM
+	</select>
+
+	<select id="selectLeftMenuList" parameterType="dataMap" resultType="dataMap">
+	/* common.selectLeftMenuList */
+	SELECT A.MENU_ID
+		, A.MENU_LEVEL
+		, A.MENU_NM
+		, A.MENU_TY_CODE
+		, A.ICON_NM
+		, A.URL
+		, CASE WHEN A.MENU_ID = #{menu_id, jdbcType=VARCHAR} THEN 'Y' ELSE 'N' END SELECT_MENU_YN
+	FROM TB_MENU A
+	LEFT OUTER JOIN (
+		SELECT DISTINCT(MENU_PK) FROM TB_AUTHOR_MENU
+		WHERE AUTHOR_ID IN (
+			SELECT AUTHOR_ID FROM TB_USER_AUTHOR
+			WHERE USER_NO = #{ss_user_no, jdbcType=VARCHAR}
+		)
+	) B
+	ON A.MENU_PK = B.MENU_PK
+	WHERE A.MENU_LEVEL <![CDATA[ > ]]> 3
+		AND A.DISP_YN = 'Y'
+		AND A.MENU_ID LIKE CONCAT(#{up_menu_id, jdbcType=VARCHAR}, '%')
+		AND B.MENU_PK IS NOT NULL
+	ORDER BY A.SORT_ORDR_1 , A.SORT_ORDR_2 , A.SORT_ORDR_3 , A.SORT_ORDR_4 , A.SORT_ORDR_5 , A.SORT_ORDR_6, A.MENU_NM
+	</select>
+
+	<select id="selectMenuByUrl" parameterType="dataMap" resultType="dataMap">
+	/* common.selectMenuByUrl */
+	SELECT
+		A.MENU_ID
+		,A.MENU_NM
+	FROM TB_MENU A
+	WHERE A.URL LIKE CONCAT(#{url, jdbcType=VARCHAR}, '%')
+	AND MENU_TY_CODE != '10'
+	</select>
+
+	<select id="menuSelect" parameterType="dataMap" resultType="dataMap">
+	/* common.menuSelect */
+	SELECT MENU_ID
+		, UP_MENU_ID
+		, MENU_LV
+		, MENU_NM
+		, URL
+	FROM TB_MENU
+	WHERE MENU_ID = #{menu_id, jdbcType=VARCHAR}
+	</select>
+
+	<select id="menuUrlSelect" parameterType="dataMap" resultType="dataMap">
+	/* common.menuUrlSelect */
+	SELECT MENU_ID
+		, UP_MENU_ID
+		, MENU_LV
+		, MENU_NM
+		, URL
+	FROM TB_MENU
+	WHERE URL = #{url, jdbcType=VARCHAR}
+	<![CDATA[
+		AND MENU_LV > 2
+	]]>
+	</select>
+
+	<select id="selectUserAcessMenu" parameterType="dataMap" resultType="String">
+	/* common.selectUserAcessMenu */
+	SELECT
+		CASE WHEN COUNT(1) = 0
+			THEN 'N'
+			ELSE 'Y'
+		END ACC_YN
+	FROM TB_USER A, TB_USER_AUTHOR B, TB_AUTHOR_MENU C, TB_MENU D
+	WHERE A.USER_NO = B.USER_NO
+		AND B.AUTHOR_ID = C.AUTHOR_ID
+		AND C.MENU_PK = D.MENU_PK
+		AND A.USER_NO = #{ss_user_no, jdbcType=VARCHAR}
+		AND D.URL LIKE CONCAT(#{request_url, jdbcType=VARCHAR}, '%')
+		AND D.USE_YN = 'Y'
+	</select>
+
+
+	<select id="userAuthSelectList" parameterType="dataMap" resultType="String">
+	/* common.userAuthSelectList */
+	SELECT AUTH_ID
+	FROM TB_USER_AUTH
+	WHERE USER_ID = #{ss_user_id, jdbcType=VARCHAR}
+	AND	COMP_CD = #{ss_user_comp_cd, jdbcType=VARCHAR}
+	</select>
+
+
+	<insert id="insertAdminEventLog" parameterType="dataMap">
+	/* common.insertAdminEventLog */
+	<![CDATA[
+	INSERT INTO TB_ADMIN_EVENT_LOG (
+			EVENT_DE,
+			MENU_PK,
+			IP,
+			PARAM_VALUE,
+			REGISTER_NO,
+			REGIST_DT
+	) VALUES (
+			DATE_FORMAT(SYSDATE(), '%Y%m%d'),
+			(SELECT MENU_PK FROM TB_MENU WHERE MENU_TY_CODE != '10' AND MENU_ID LIKE '10001000%' AND URL = #{pageUrl, jdbcType=VARCHAR} limit 1),
+			#{userIp, jdbcType=VARCHAR},
+			#{param, jdbcType=VARCHAR},
+			#{ssUserNo, jdbcType=VARCHAR},
+			SYSDATE()
+	)
+	]]>
+	</insert>
+
+	<insert id="insertErrorLog" parameterType="dataMap">
+	/* common.insertErrorLog */
+	<![CDATA[
+	INSERT INTO TB_ERROR_EVENT_LOG (
+			EVENT_DE,
+			REQUST_URL,
+			MENU_PK,
+			IP,
+			PARAM_VALUE,
+            ERROR_VALUE,
+            REGISTER_NO,
+            REGIST_DT
+    ) VALUES (
+    		DATE_FORMAT(SYSDATE(), '%Y%m%d'),
+           	#{request_url, jdbcType=VARCHAR},
+     		(SELECT MENU_PK FROM TB_MENU WHERE MENU_TY_CODE != '10' AND MENU_ID LIKE '10001000%' AND URL = #{request_url, jdbcType=VARCHAR} limit 1),
+           	#{ip, jdbcType=VARCHAR},
+			#{param, jdbcType=VARCHAR},
+           	#{error, jdbcType=VARCHAR},
+           	#{ss_user_no, jdbcType=VARCHAR},
+           	SYSDATE()
+	)
+	]]>
+	</insert>
+
+	<select id="selectAccessYn" parameterType="dataMap" resultType="String">
+	/* common.selectAccessYn */
+	SELECT
+		CASE WHEN COUNT(1) = 0
+			THEN 'N'
+			ELSE 'Y'
+		END ACC_YN
+	FROM TB_ACCES_IP
+	WHERE IP = #{ip, jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateThemaOption" parameterType="dataMap">
+	/* common.updateThemaOption */
+	UPDATE TB_USER
+	SET THEMA_OPTION = #{theme_set}
+	WHERE USER_NO = #{ss_user_no}
+	</update>
+
+	<select id="selectListCodeGroupId" resultType="dataMap">
+	/* common.selectListCodeGroupId */
+	SELECT	GROUP_ID
+	FROM 	TB_CODE_GROUP
+	</select>
+
+	<select id="selectListCode" resultType="dataMap">
+	/* common.selectListCode */
+	SELECT	GROUP_ID
+		,	CODE
+		,	CODE_NM
+		,	CODE_NM_ENG
+		,	ATTRB_1
+		,	ATTRB_2
+		,	ATTRB_3
+	FROM 	TB_CODE
+	WHERE  	USE_YN = 'Y'
+	ORDER BY SORT_ORDR ASC
+	</select>
+
+	<select id="selectUserBbsAuth" parameterType="dataMap" resultType="String">
+	/* common.selectUserBbsAuth */
+	SELECT
+		CASE WHEN COUNT(1) = 0
+			THEN 'N'
+			ELSE 'Y'
+		END BBS_ACC_YN
+	FROM TB_USER_AUTHOR A
+	RIGHT JOIN TB_BBS_AUTHOR B
+	ON A.AUTHOR_ID = B.AUTHOR_ID
+	WHERE A.USER_NO = #{ss_user_no, jdbcType=VARCHAR}
+	<if test='bbs_code != null and bbs_code != ""'>
+	AND B.BBS_CODE = #{bbs_code, jdbcType=VARCHAR}
+	</if>
+	<if test='sch_bbs_code != null and sch_bbs_code != ""'>
+	AND B.BBS_CODE = #{sch_bbs_code, jdbcType=VARCHAR}
+	</if>
+	</select>
+
+	<select id="selectAuthorMenuByUrl" parameterType="dataMap" resultType="String">
+	/* common.selectAuthorMenuByUrl */
+	SELECT M.URL
+	FROM TB_AUTHOR_MENU A
+	LEFT JOIN TB_MENU M ON A.MENU_PK = M.MENU_PK
+	WHERE 1=1
+		AND A.AUTHOR_ID = #{author_id, jdbcType=VARCHAR}
+		AND M.MENU_LEVEL IN (#{menu_level4}, #{menu_level5})
+		AND M.USE_YN = 'Y'
+		AND M.DISP_YN = 'Y'
+	ORDER BY M.MENU_LEVEL, M.SORT_ORDR
+	LIMIT 1
+	</select>
+
+</mapper>

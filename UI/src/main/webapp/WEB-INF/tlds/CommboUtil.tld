@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee  http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+
+	<description>CommboUtil functions library</description>
+	<display-name>CommboUtil functions</display-name>
+	<tlib-version>1.1</tlib-version>
+	<short-name>CommboUtil</short-name>
+
+	<function>
+		<description>리스트로 셀렉트 박스 생성</description>
+		<name>getComboStr</name>
+		<function-class>egovframework.framework.common.util.CommboUtil</function-class>
+		<function-signature>java.lang.String getComboStr(java.util.List, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<example>
+		 ${ CommboUtil:getComboStr(list, str, str, str, str) }
+		</example>
+	</function>
+
+	<function>
+		<description>리스트로 셀렉트 박스 생성</description>
+		<name>getComboStr2</name>
+		<function-class>egovframework.framework.common.util.CommboUtil</function-class>
+		<function-signature>java.lang.String getComboStr2(java.util.List, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<example>
+		 ${ CommboUtil:getComboStr2(list, str, str, str, str, str) }
+		</example>
+	</function>
+
+	<function>
+		<description>리스트로 셀렉트 박스 생성</description>
+		<name>getOrganComboStr</name>
+		<function-class>egovframework.framework.common.util.CommboUtil</function-class>
+		<function-signature>java.lang.String getOrganComboStr(java.util.List, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<example>
+		 ${ CommboUtil:getOrganComboStr(list, str, str, str, str, str, str) }
+		</example>
+	</function>
+
+	<function>
+		<description>속성값 사용 select list</description>
+		<name>getOrganComboStrAttr</name>
+		<function-class>egovframework.framework.common.util.CommboUtil</function-class>
+		<function-signature>java.lang.String getOrganComboStrAttr(java.util.List, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<example>
+		 ${ CommboUtil:getOrganComboStrAttr(list, str, str, str, str, str, str, str) }
+		</example>
+	</function>
+
+</taglib>

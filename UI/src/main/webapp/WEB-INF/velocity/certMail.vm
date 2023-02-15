@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>서울시 모바일플랫폼</title>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<div style="width:785px;margin:0 auto;">
+	<table width="785" style="font-size:13px; font-family: dotum, Helvetica, sans-serif;" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="40"></td>
+		</tr>
+		<!--header-->
+		<tr>
+			<td width="785" height="100">
+				<img src="${domain}/common/images/mail/header_01.gif" alt="seoul mobile platform" border="0" valign="top"  />
+			</td>
+		</tr>
+		<tr>
+			<td width="785" height="46">
+				<img src="${domain}/common/images/mail/header_02.gif" alt="" border="0" valign="top"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<table width="785" cellpadding="0" cellspacing="0">
+					<tr>
+						<td rowspan="3"  width="245" height="104"><img src="${domain}/common/images/mail/header_03.gif" alt="" border="0" valign="top"/></td>
+						<td width="295" bgcolor="#4e6abd" ></td>
+						<td rowspan="3"  width="245" height="104"><img src="${domain}/common/images/mail/header_04.gif" alt="" border="0" valign="top"/></td>
+					</tr>
+					<tr>
+						<td width="295" bgcolor="#4e6abd" align="center" style="font-size:26px;line-height:23px;color:#fff;"><strong>회원가입 인증메일</strong></td>
+					</tr>
+					<tr>
+						<td width="295" height="45" bgcolor="#4e6abd"></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<!--//header-->
+		<tr>
+			<td>
+				<table width="783" cellpadding="0" cellspacing="0" style="border-left:1px solid #e0e0e0;border-right:1px solid #e0e0e0;">
+					<tr>
+						<td height="55"></td>
+					</tr>
+					<tr>
+						<td align="center" style="font-size:18px;line-height:30px;color:#000;">
+							<strong>
+								안녕하세요.</br>
+								서울시 모바일플랫폼입니다.</br>
+								서울시 모바일플랫폼 홈페이지의 콘텐츠를 이용하기 위해</br>
+								이메일 주소 인증이 필요합니다.</br></br>
+								우측 링크를 클릭해 주세요 
+								>> <a href="${domain}/w/common/checkUserCert.do?cert_no=${cert_no}" target="_blank"><u>link</u></a>
+							</strong>
+						</td>
+					</tr>
+					<tr>
+						<td height="40"></td>
+					</tr>					
+					<tr>
+						<td height="70"></td>
+					</tr>
+					
+					<!--footer-->
+					<tr> 
+						<td  bgcolor="#51545f" style="border-top:1px solid #e0e0e0;">
+							<table width="783" cellpadding="0" cellspacing="0" bgcolor="#51545f">
+								<tr>
+									<td colspan="4" height="40"></td>
+								</tr>
+								<tr>
+									<td rowspan="3" width="50"></td>
+									<td style="font-size:12px;line-height:12px;color:#fff;">※ 본 메일은 발신 전용으로 회신이 되지 않습니다. </td>
+									<td rowspan="3"  width="95" height="35"><img src="${domain}/common/images/mail/footer.gif" alt="" border="0" /></td>
+									<td rowspan="3" width="60"></td>
+								</tr>
+								<tr>
+									<td height="10"></td>
+								</tr>
+								<tr>
+									<td style="font-size:12px;line-height:14px;color:#888b97;">© 2015. Seoul Metropolitan Governament. all rights reserved.</td>
+								</tr>
+								<tr>
+									<td colspan="4" height="38"></td>
+								</tr>
+								
+							</table>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		
+		<!--//footer-->
+	</table>
+</div>
+</body>
+</html>

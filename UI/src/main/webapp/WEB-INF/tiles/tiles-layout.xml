@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+	<definition name="default-layout" template="/WEB-INF/tiles/mordern/layouts/default-layout.jsp">
+		<put-attribute name="head" value="/WEB-INF/tiles/mordern/components/head.jsp" />
+		<put-attribute name="navi" value="/WEB-INF/tiles/mordern/components/navi.jsp" />
+		<put-attribute name="left" value="/WEB-INF/tiles/mordern/components/left.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/mordern/components/footer.jsp" />
+		<put-attribute name="setting" value="/WEB-INF/tiles/mordern/components/setting.jsp" />
+		<put-attribute name="msg" value="/WEB-INF/tiles/mordern/components/msg.jsp" />
+	</definition>
+
+	<definition name="login-layout" template="/WEB-INF/tiles/mordern/layouts/login-layout.jsp">
+		<put-attribute name="head" value="/WEB-INF/tiles/mordern/components/head.jsp" />
+		<put-attribute name="msg" value="/WEB-INF/tiles/mordern/components/msg.jsp" />
+	</definition>
+
+	<definition name="noMenu-layout" template="/WEB-INF/tiles/mordern/layouts/noMenu-layout.jsp">
+		<put-attribute name="head" value="/WEB-INF/tiles/mordern/components/head.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/tiles/mordern/components/footer2.jsp" />
+		<put-attribute name="msg" value="/WEB-INF/tiles/mordern/components/msg.jsp" />
+	</definition>
+
+	<definition name="redirect-layout" template="/WEB-INF/tiles/mordern/layouts/redirect-layout.jsp">
+		<put-attribute name="head" value="/WEB-INF/tiles/mordern/components/head.jsp" />
+		<put-attribute name="msg" value="/WEB-INF/tiles/mordern/components/msg.jsp" />
+	</definition>
+
+	<definition name="popUp-layout" template="/WEB-INF/tiles/mordern/layouts/popUp-layout.jsp">
+		<put-attribute name="head" value="/WEB-INF/tiles/mordern/components/head.jsp" />
+		<put-attribute name="msg" value="/WEB-INF/tiles/mordern/components/msg.jsp" />
+	</definition>
+
+	<definition name="preview-layout" template="/WEB-INF/tiles/mordern/layouts/preview-layout.jsp">
+ 		<put-attribute name="head" value="/WEB-INF/tiles/mordern/components/head.jsp" />
+		<put-attribute name="msg" value="/WEB-INF/tiles/mordern/components/msg.jsp" />
+		<put-attribute name="setting" value="/WEB-INF/tiles/mordern/components/setting.jsp" />
+	</definition>
+
+	<!-- 로그인 화면 -->
+	<definition name="*/*.login" extends="login-layout">
+		<put-attribute name="content" value="/WEB-INF/jsp/egovframework/mordern/{1}/{2}.jsp" />
+	</definition>
+
+	<!-- 메뉴 없는 구성 화면 -->
+	<definition name="*/*.noMenu" extends="noMenu-layout">
+		<put-attribute name="content" value="/WEB-INF/jsp/egovframework/mordern/{1}/{2}.jsp" />
+	</definition>
+	<definition name="*/*/*.noMenu" extends="noMenu-layout">
+		<put-attribute name="content" value="/WEB-INF/jsp/egovframework/mordern/{1}/{2}/{3}.jsp" />
+	</definition>
+
+	<!-- redierct page 구성 -->
+	<definition name="common/redirect" extends="redirect-layout">
+		<put-attribute name="content" value="/WEB-INF/jsp/egovframework/mordern/common/redirect.jsp" />
+	</definition>
+
+	<!-- PopUp page 구성 -->
+	<definition name="*/*/*.popUp" extends="popUp-layout">
+		<put-attribute name="content" value="/WEB-INF/jsp/egovframework/mordern/{1}/{2}/{3}.jsp" />
+	</definition>
+
+	<!-- PopUp page 구성 -->
+	<definition name="*/*/*.preview" extends="preview-layout">
+		<put-attribute name="content" value="/WEB-INF/jsp/egovframework/mordern/{1}/{2}/{3}.jsp" />
+	</definition>
+
+	<!-- 기본 메뉴 구성 화면 -->
+	<definition name="*/*" extends="default-layout">
+		<put-attribute name="content" value="/WEB-INF/jsp/egovframework/mordern/{1}/{2}.jsp" />
+	</definition>
+	<definition name="*/*/*" extends="default-layout">
+		<put-attribute name="content" value="/WEB-INF/jsp/egovframework/mordern/{1}/{2}/{3}.jsp" />
+	</definition>
+
+
+
+
+</tiles-definitions>

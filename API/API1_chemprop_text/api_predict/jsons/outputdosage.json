@@ -1,0 +1,35 @@
+{
+  "Molecular Weight": [
+    "Oral",
+    "Parenteral",
+    "Local"
+  ],
+  "LogP": [
+    "Parenteral"
+  ],
+  "Log D (pH7)": [
+    "Parenteral"
+  ],
+  "Water Solubility": [
+    "Parenteral"
+  ],
+  "pH3 Solubility": [
+    "Parenteral"
+  ],
+  "pH7 Solubility": [
+    "Parenteral"
+  ],
+  "Melting Point (\u00b0C)": [
+    "Oral",
+    "Parenteral",
+    "Local"
+  ],
+  "Permeability (Caco-2)": [
+    "Oral",
+    "Parenteral",
+    "Local"
+  ],
+  "Bioavailability": [
+    "Oral"
+  ]
+}

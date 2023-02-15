@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common.file">
+
+	<select id="selectAttchFile" parameterType="ntsysFileVO" resultType="ntsysFileVO">
+	/* common.file.selectAttchFile */
+		SELECT
+			FILE_ID
+			, DOC_ID
+			, FILE_NM
+			, FILE_SIZE
+			, FILE_EXTSN_NM AS FILE_EXT_NM
+			, FILE_PARTN_COURS AS FILE_RLTV_PATH
+			, FILE_ABSLT_COURS AS FILE_ASLT_PATH
+			, CNTNTS_TY AS CONTENT_TYPE
+			, SORT_ORDR AS SRT_ORD
+			, REGISTER_NO AS RGSTP_ID
+			, REGIST_DT AS RGST_DTTM
+		FROM TB_FILE
+		WHERE FILE_ID = #{fileId, jdbcType=VARCHAR}
+		ORDER BY SORT_ORDR
+	</select>
+
+	<select id="selectAttchFiles" parameterType="ntsysFileVO" resultType="ntsysFileVO">
+	/* common.file.selectAttchFiles */
+		SELECT
+			FILE_ID
+			, DOC_ID
+			, FILE_NM
+			, FILE_SIZE
+			, FILE_EXTSN_NM AS FILE_EXT_NM
+			, FILE_PARTN_COURS AS FILE_RLTV_PATH
+			, FILE_ABSLT_COURS AS FILE_ASLT_PATH
+			, CNTNTS_TY AS CONTENT_TYPE
+			, SORT_ORDR AS SRT_ORD
+			, REGISTER_NO AS RGSTP_ID
+			, REGIST_DT AS RGST_DTTM
+		FROM TB_FILE
+		WHERE DOC_ID = #{docId, jdbcType=VARCHAR}
+		ORDER BY SORT_ORDR
+	</select>
+
+	<insert id="insertAttchFile" parameterType="ntsysFileVO">
+	/* common.file.insertAttchFile */
+		INSERT INTO TB_FILE(
+			FILE_ID
+			, DOC_ID
+			, FILE_NM
+			, FILE_EXTSN_NM
+			, FILE_SIZE
+			, FILE_PARTN_COURS
+			, FILE_ABSLT_COURS
+			, CNTNTS_TY
+			, SORT_ORDR
+			, REGISTER_NO
+			, REGIST_DT
+		) VALUES (
+			#{fileId, jdbcType=VARCHAR}
+			, #{docId, jdbcType=VARCHAR}
+			, #{fileNm, jdbcType=VARCHAR}
+			, #{fileExtNm, jdbcType=VARCHAR}
+			, #{fileSize, jdbcType=VARCHAR}
+			, #{fileRltvPath, jdbcType=VARCHAR}
+			, #{fileAsltPath, jdbcType=VARCHAR}
+			, #{contentType, jdbcType=VARCHAR}
+			, (SELECT IFNULL(MAX(A1.SORT_ORDR),0)+1 FROM TB_FILE A1 WHERE A1.DOC_ID = #{docId, jdbcType=VARCHAR})
+			, #{ssUserId, jdbcType=VARCHAR}
+			, NOW()
+		)
+	</insert>
+
+	<delete id="deleteAttchFile" parameterType="dataMap">
+		DELETE FROM TB_FILE
+		WHERE
+			FILE_ID = #{file_id, jdbcType=VARCHAR}
+	</delete>
+
+	<delete id="deleteAttchFiles" parameterType="dataMap">
+		DELETE FROM TB_FILE
+		WHERE
+			DOC_ID = #{doc_id, jdbcType=VARCHAR}
+	</delete>
+
+	<update id="updateAttchFile" parameterType="dataMap">
+	/* common.file.updateAttchFile */
+		UPDATE TB_FILE
+		SET SORT_ORDR = #{sort_ordr, jdbcType=VARCHAR}
+		WHERE FILE_ID = #{file_id, jdbcType=VARCHAR}
+	</update>
+
+</mapper>

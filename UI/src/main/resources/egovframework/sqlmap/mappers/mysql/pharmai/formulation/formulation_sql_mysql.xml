@@ -1,0 +1,1372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pharmai.formulation">
+	<select id="selectPageListProject" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectPageListProject  */
+	SELECT
+		PRJCT_ID
+		, PRJCT_NM
+		, PRJCT_TYPE
+		, STEP_CD
+		, USE_YN
+		, UPDUSR_NO
+		, UPDT_DT
+	FROM TB_PRJ_MST
+	WHERE 1=1
+	AND USE_YN = 'Y'
+	AND PRJCT_TYPE = 'F'
+	<if test="sch_text != null and sch_text != ''">
+		AND PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_disp_begin_de != null and sch_disp_begin_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') >= #{sch_disp_begin_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_disp_end_de != null and sch_disp_end_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') <= #{sch_disp_end_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	ORDER BY REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+	
+<!-- 	바이오의약품 제형  불러오기 시 바이오쪽만 보여주기 -->
+	<select id="bioSelectPageListProject" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.bioSelectPageListProject  */
+	SELECT
+		PRJCT_ID
+		, PRJCT_NM
+		, PRJCT_TYPE
+		, STEP_CD
+		, USE_YN
+		, UPDUSR_NO
+		, UPDT_DT
+	FROM TB_PRJ_MST
+	WHERE 1=1
+	AND USE_YN = 'Y'
+	AND PRJCT_TYPE = 'BF'
+	<if test="sch_text != null and sch_text != ''">
+		AND PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_disp_begin_de != null and sch_disp_begin_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') >= #{sch_disp_begin_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_disp_end_de != null and sch_disp_end_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') <= #{sch_disp_end_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	ORDER BY REGIST_DT DESC
+	LIMIT #{limitStart, jdbcType=VARCHAR}, #{limitCount, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectTotCntProject" parameterType="dataMap" resultType="int">
+	/* pharmai.formulation.selectTotCntProject */
+	SELECT
+		COUNT(1) AS TOT_CNT
+	FROM TB_PRJ_MST
+	WHERE 1=1
+	AND USE_YN = 'Y'
+	AND PRJCT_TYPE = 'F'
+	<if test="sch_text != null and sch_text != ''">
+		AND PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_disp_begin_de != null and sch_disp_begin_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') >= #{sch_disp_begin_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_disp_end_de != null and sch_disp_end_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') <= #{sch_disp_end_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	</select>
+	
+<!-- 	바이오의약품 제형만 불러오기 -->
+	<select id="bioSelectTotCntProject" parameterType="dataMap" resultType="int">
+	/* pharmai.formulation.bioSelectTotCntProject */
+	SELECT
+		COUNT(1) AS TOT_CNT
+	FROM TB_PRJ_MST
+	WHERE 1=1
+	AND USE_YN = 'Y'
+	AND PRJCT_TYPE = 'BF'
+	<if test="sch_text != null and sch_text != ''">
+		AND PRJCT_NM LIKE CONCAT('%', #{sch_text, jdbcType=VARCHAR}, '%')
+	</if>
+	<if test="sch_disp_begin_de != null and sch_disp_begin_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') >= #{sch_disp_begin_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	<if test="sch_disp_end_de != null and sch_disp_end_de != ''">
+	<![CDATA[
+		AND DATE_FORMAT(REGIST_DT,'%Y%m%d') <= #{sch_disp_end_de_tmp, jdbcType=VARCHAR}
+	]]>
+	</if>
+	</select>
+
+<!-- chemical to smiles (DB) -->
+	<select id="chemicalDBcheck" resultType="String">
+	/* pharmai.formulation.chemicalDBcheck  */
+		SELECT 
+			SMILES
+		FROM
+			TB_CHEMICAL_TO_SMILES
+		WHERE
+			NAME = #{chemical}
+	</select>
+
+	<select id="projectCreate" resultType="String">
+	/* pharmai.formulation.projectCreate  */
+		SELECT FN_CREAT_PJT_ID()
+	</select>
+
+	<insert id="insertPrjMst" parameterType="dataMap">
+	/* pharmai.formulation.insertPrjMst  */
+		INSERT INTO TB_PRJ_MST (PRJCT_ID, PRJCT_NM, PRJCT_TYPE, STEP_CD, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{projectName}, 'F', '01', 'Y', #{ss_user_no}, NOW())
+	</insert>
+	
+<!-- 	바이오의약품 제형 프로젝트 생성 시 insert문 -->
+	<insert id="bioInsertPrjMst" parameterType="dataMap">
+	/* pharmai.formulation.bioInsertPrjMst  */
+		INSERT INTO TB_PRJ_MST (PRJCT_ID, PRJCT_NM, PRJCT_TYPE, STEP_CD, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{projectName}, 'BF', '01', 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertFormulaStp_01" parameterType="dataMap">
+	/* pharmai.formulation.insertFormulaStp_01  */
+		INSERT INTO TB_FORMULA_STP_01 (PRJCT_ID, INPUT_TYPE, SMILE_STRING, SDF_NM, CHEM_NM, RETURN_SMILE_STRING, DOC_ID, SVG_URL, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{prjct_id}, #{inputType}, #{smiles}, #{sdf_nm}, #{chem_nm}, #{return_smiles}, #{ntsysFileDocId}, #{svg_url}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<select id="selectLastSeqStp" parameterType="dataMap" resultType="String">
+	/* pharmai.formulation.selectLastSeqStp  */
+		SELECT MAX(STP_01_SEQ) AS STP_01_SEQ FROM TB_FORMULA_STP_01
+	</select>
+
+ 	<insert id="insertFormulaProp" parameterType="dataMap">
+ 	/* pharmai.formulation.insertFormulaProp  */
+		INSERT INTO TB_FORMULA_PROP (STP_01_SEQ, PRJCT_ID, PROP_TYPE, PH1, PH2, PH3, PH4, PH5, PH6, PH7, PH8, PH9, PH10, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{stpSeq}, #{prjct_id}, #{prop_type}, #{ph1}, #{ph2}, #{ph3}, #{ph4}, #{ph5}, #{ph6}, #{ph7}, #{ph8}, #{ph9}, #{ph10}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertFormulaPropDtl" parameterType="dataMap">
+	/* pharmai.formulation.insertFormulaPropDtl  */
+<!-- 		INSERT INTO TB_FORMULA_PROP_DTL (STP_01_SEQ, PRJCT_ID, PKA, PKB, CA_PERM, BOL_POINT, LOGP, BIO, DOSAGE_FORM, MOL_WEI, LIP_RULE, USE_YN, REGIST_NO, REGIST_DT) -->
+<!-- 		VALUES (#{stpSeq}, #{prjct_id}, #{pka}, #{pkb}, #{caPerm}, #{bolPoint}, #{logP}, #{bio}, #{dosageForm}, #{moleWeight}, #{lipskiRule}, 'Y', #{ss_user_no}, NOW()) -->
+		INSERT INTO TB_FORMULA_PROP_DTL (STP_01_SEQ, PRJCT_ID, PKA, PKB, CA_PERM, BOL_POINT, LOGP, BIO, MOL_WEI, LIP_RULE, MELTING, WATER, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{stpSeq}, #{prjct_id}, #{pka}, #{pkb}, #{caPerm}, #{bolPoint}, #{logP}, #{bio}, #{moleWeight}, #{lipskiRule}, #{melting}, #{water},'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertDosage" parameterType="dataMap">
+	/* pharmai.formulation.insertDosage  */
+		INSERT INTO TB_FORMULA_DOSAGE (STP_01_SEQ, PRJCT_ID, PROPERTIES_NM, ORAL_YN, PARENTERAL_YN, LOCAL_YN, USE_YN, REGIST_NO, REGIST_DT)
+		VALUES (#{stpSeq}, #{prjct_id}, #{propertiesNm}, #{oral}, #{parenteral}, #{local}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+
+
+	<select id="selectDataStep2" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectDataStep2  */
+	SELECT
+		PRJCT_ID
+		, ROUTES_TYPE
+		, DOSAGE_FORM_TYPE
+		, VOLUME
+		, UNIT
+		, USE_YN
+		, REGIST_NO
+		, REGIST_DT
+	FROM
+	TB_FORMULA_STP_02
+	WHERE 1=1
+	AND PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectPjtMst" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectPjtMst */
+		SELECT
+			PRJCT_ID,
+			PRJCT_NM,
+			PRJCT_TYPE,
+			STEP_CD,
+			USE_YN
+		FROM TB_PRJ_MST
+		WHERE PRJCT_ID = #{prjct_id}
+			AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectformulaStep1" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectformulaStep1 */
+	 SELECT
+		STP_01_SEQ,
+		PRJCT_ID,
+		INPUT_TYPE,
+		SMILE_STRING,
+		SDF_NM,
+		CHEM_NM,
+		RETURN_SMILE_STRING,
+		DOC_ID,
+		SVG_URL
+	 FROM TB_FORMULA_STP_01
+	 WHERE PRJCT_ID = #{prjct_id}
+	 	AND USE_YN = 'Y'
+
+	</select>
+
+	<select id="selectFormulaProp" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectFormulaProp */
+		SELECT
+			PROP_SEQ,
+			STP_01_SEQ,
+			PRJCT_ID,
+			PROP_TYPE,
+			PH1,
+			PH2,
+			PH3,
+			PH4,
+			PH5,
+			PH6,
+			PH7,
+			PH8,
+			PH9,
+			PH10
+		FROM TB_FORMULA_PROP
+		WHERE PRJCT_ID = #{prjct_id}
+			AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectFormulaPropDtl" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectFormulaPropDtl */
+	SELECT
+		PROP_DTL_SEQ,
+		STP_01_SEQ,
+		PRJCT_ID,
+		PKA,
+		PKB,
+		CA_PERM,
+		BOL_POINT,
+		LOGP,
+		BIO,
+<!-- 		DOSAGE_FORM, -->
+		MOL_WEI,
+		LIP_RULE,
+		MELTING,
+		WATER
+	FROM TB_FORMULA_PROP_DTL
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+
+	</select>
+
+	<select id="selectFormulaDosage" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectFormulaDosage */
+	SELECT
+		PROP_DOSAGE_SEQ,
+		STP_01_SEQ,
+		PRJCT_ID,
+		PROPERTIES_NM,
+		ORAL_YN,
+		PARENTERAL_YN,
+		LOCAL_YN
+	FROM TB_FORMULA_DOSAGE
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+
+	</select>
+
+
+	<select id="selectNextDataExt" parameterType="dataMap" resultType="String">
+	/* pharmai.formulation.selectNextDataExt */
+	SELECT
+	<![CDATA[
+		CASE WHEN STEP_CD > LPAD(#{status, jdbcType=VARCHAR}, 2, '0') THEN 'Y'
+		ELSE 'N' END AS NEXT_DATA
+	]]>
+	FROM TB_PRJ_MST
+	WHERE 1=1
+	AND PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	</select>
+
+
+	<update id="updateChoicePrjctSeq" parameterType="dataMap">
+	/* pharmai.formulation.updateChoicePrjctSeq */
+	UPDATE TB_USER
+	SET
+	CUR_PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	WHERE USER_NO = #{userNo, jdbcType=VARCHAR}
+	</update>
+
+	<select id="selectDosageFormCnt" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectDosageFormCnt */
+	SELECT
+		IFNULL(SUM(T1.ORAL_CNT),0) AS ORAL_TOT,
+		IFNULL(SUM(T1.PARENTERAL_CNT),0) AS PARENTERAL_TOT,
+		IFNULL(SUM(T1.LOCAL_CNT),0) AS LOCAL_TOT
+	FROM (
+	SELECT
+		CASE WHEN ORAL_YN = 'Y' THEN 1 ELSE 0 END ORAL_CNT,
+		CASE WHEN PARENTERAL_YN = 'Y' THEN 1 ELSE 0 END PARENTERAL_CNT,
+		CASE WHEN LOCAL_YN = 'Y' THEN 1 ELSE 0 END LOCAL_CNT
+	FROM
+	TB_FORMULA_DOSAGE
+	WHERE 1=1
+	AND PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	and USE_YN = 'Y'
+	) T1
+	</select>
+
+	<select id="selectListExcipient" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectListExcipient */
+	SELECT
+		PRJCT_ID
+		, CHECK_YN
+		, EXCIPIENT_NM
+		, USE_YN
+		, REGIST_NO
+		, REGIST_DT
+	FROM
+	TB_FORMULA_EXCIPIENT
+	WHERE 1=1
+	AND USE_YN = 'Y'
+	AND PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	</select>
+
+	<insert id="insertStep2" parameterType="dataMap">
+	/* pharmai.formulation.insertStep2 */
+	INSERT INTO TB_FORMULA_STP_02 (PRJCT_ID, ROUTES_TYPE, DOSAGE_FORM_TYPE, VOLUME, UNIT, USE_YN, REGIST_NO, REGIST_DT)
+	VALUES (#{prjct_id}, #{routes}, #{shape_list}, #{volume}, #{unit}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertExcipient" parameterType="dataMap">
+	/* pharmai.formulation.insertExcipient */
+	INSERT INTO TB_FORMULA_EXCIPIENT (STP_02_SEQ, PRJCT_ID, CHECK_YN, EXCIPIENT_NM, USE_YN, REGIST_NO, REGIST_DT)
+	VALUES (#{stp_02_seq}, #{prjct_id}, #{check_yn}, #{excipiecnt_nm}, 'Y', #{ss_user_no}, NOW())
+
+	</insert>
+
+	<select id="selectStp02Seq" resultType="String">
+	/* pharmai.formulation.selectStp02Seq */
+	SELECT
+		MAX(STP_02_SEQ) AS STP_02_SEQ
+	FROM TB_FORMULA_STP_02
+	</select>
+
+
+	<insert id="insertFormulaStp03" parameterType="dataMap">
+	/* pharmai.formulation.insertFormulaStp03 */
+	INSERT INTO TB_FORMULA_STP_03 (
+		PRJCT_ID,
+		CHECK_YN,
+		EXCIPIENT,
+		KIND,
+		MAXIMUM,
+		UNIT,
+		USE_RANGE_S,
+		USE_RANGE_E,
+		IPT_USE_RANGE_S,
+		IPT_USE_RANGE_E,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) VALUES (
+		#{prjct_id},
+		#{checkYn},
+		#{excipient},
+		#{kind},
+		#{maximum},
+		#{unit},
+		#{use_range_s},
+		#{use_range_e},
+		#{ipt_use_range_s},
+		#{ipt_use_range_e},
+		'Y',
+		#{ss_user_no},
+		NOW())
+	</insert>
+
+	<!-- 프로젝트 복사 시작  -->
+	<update id="copyPrjctMst" parameterType="dataMap">
+	/* pharmai.formulation.copyPrjctMst */
+	INSERT INTO TB_PRJ_MST(
+	PRJCT_ID
+	, PRJCT_NM
+	, PRJCT_TYPE
+	, STEP_CD
+	, USE_YN
+	, REGIST_NO
+	, REGIST_DT
+	)
+	SELECT
+	 #{new_prjct_id} AS PRJCT_ID
+	, CONCAT(PRJCT_NM , '_Copy') AS PRJCT_NM
+	, PRJCT_TYPE
+	, '02'
+	, 'Y'
+	, #{ss_user_no}
+	, NOW()
+	FROM TB_PRJ_MST
+	WHERE PRJCT_ID = #{c_prjct_id}
+	AND USE_YN = 'Y'
+	</update>
+
+	<update id="copyPrjctStp01" parameterType="dataMap">
+	/* pharmai.formulation.copyPrjctStp01 */
+	INSERT INTO TB_FORMULA_STP_01(
+	PRJCT_ID
+	, INPUT_TYPE
+	, SMILE_STRING
+	, SDF_NM
+	, CHEM_NM
+	, RETURN_SMILE_STRING
+	, DOC_ID
+	, SVG_URL
+	, USE_YN
+	, REGIST_NO
+	, REGIST_DT
+	)
+	SELECT
+	 #{new_prjct_id} AS PRJCT_ID
+	, INPUT_TYPE
+	, SMILE_STRING
+	, SDF_NM
+	, CHEM_NM
+	, RETURN_SMILE_STRING
+	, DOC_ID
+	, SVG_URL
+	, 'Y'
+	, #{ss_user_no}
+	, NOW()
+	FROM TB_FORMULA_STP_01
+	WHERE PRJCT_ID = #{c_prjct_id}
+	AND USE_YN = 'Y'
+	</update>
+
+	<update id="copyPrjctProp" parameterType="dataMap">
+	/* pharmai.formulation.copyPrjctProp */
+	INSERT INTO TB_FORMULA_PROP(
+	STP_01_SEQ
+	, PRJCT_ID
+	, PROP_TYPE
+	, PH1
+	, PH2
+	, PH3
+	, PH4
+	, PH5
+	, PH6
+	, PH7
+	, PH8
+	, PH9
+	, PH10
+	, USE_YN
+	, REGIST_NO
+	, REGIST_DT
+	)
+	SELECT
+	STP_01_SEQ
+	, #{new_prjct_id} AS PRJCT_ID
+	, PROP_TYPE
+	, PH1
+	, PH2
+	, PH3
+	, PH4
+	, PH5
+	, PH6
+	, PH7
+	, PH8
+	, PH9
+	, PH10
+	, 'Y'
+	, #{ss_user_no}
+	, NOW()
+	FROM TB_FORMULA_PROP
+	WHERE PRJCT_ID = #{c_prjct_id}
+	AND USE_YN = 'Y'
+	</update>
+
+	<update id="copyPrjctDosage" parameterType="dataMap">
+	/* pharmai.formulation.copyPrjctDosage */
+	INSERT INTO tb_formula_dosage(
+	STP_01_SEQ
+	, PRJCT_ID
+	, PROPERTIES_NM
+	, ORAL_YN
+	, PARENTERAL_YN
+	, LOCAL_YN
+	, USE_YN
+	, REGIST_NO
+	, REGIST_DT
+	)
+	SELECT
+	STP_01_SEQ
+	, #{new_prjct_id} AS PRJCT_ID
+	, PROPERTIES_NM
+	, ORAL_YN
+	, PARENTERAL_YN
+	, LOCAL_YN
+	, 'Y'
+	, #{ss_user_no}
+	, NOW()
+	FROM tb_formula_dosage
+	WHERE PRJCT_ID = #{c_prjct_id}
+	AND USE_YN = 'Y'
+	</update>
+
+	<update id="copyPrjctPropDtl" parameterType="dataMap">
+	/* pharmai.formulation.copyPrjctPropDtl */
+	INSERT INTO TB_FORMULA_PROP_DTL	(
+	STP_01_SEQ
+	, PRJCT_ID
+	, PKA
+	, PKB
+	, CA_PERM
+	, BOL_POINT
+	, LOGP
+	, BIO
+<!-- 	, DOSAGE_FORM -->
+	, MOL_WEI
+	, LIP_RULE
+	, MELTING
+	, WATER
+	, USE_YN
+	, REGIST_NO
+	, REGIST_DT
+	)
+	SELECT
+	STP_01_SEQ
+	, #{new_prjct_id} AS PRJCT_ID
+	, PKA
+	, PKB
+	, CA_PERM
+	, BOL_POINT
+	, LOGP
+	, BIO
+<!-- 	, DOSAGE_FORM -->
+	, MOL_WEI
+	, LIP_RULE
+	, MELTING
+	, WATER
+	, 'Y'
+	, #{ss_user_no}
+	, NOW()
+	FROM TB_FORMULA_PROP_DTL
+	WHERE PRJCT_ID = #{c_prjct_id}
+	AND USE_YN = 'Y'
+	</update>
+
+	<update id="copyPrjctStp02" parameterType="dataMap">
+	/* pharmai.formulation.copyPrjctStp02 */
+	INSERT INTO TB_FORMULA_STP_02
+	(PRJCT_ID
+	, ROUTES_TYPE
+	, DOSAGE_FORM_TYPE
+	, VOLUME
+	, USE_YN
+	, REGIST_NO
+	, REGIST_DT
+	)
+	SELECT
+	#{new_prjct_id} AS PRJCT_ID
+	, ROUTES_TYPE
+	, DOSAGE_FORM_TYPE
+	, VOLUME
+	, 'Y'
+	, #{ss_user_no}
+	, NOW()
+	FROM TB_FORMULA_STP_02
+	WHERE PRJCT_ID = #{c_prjct_id}
+	AND USE_YN = 'Y'
+	</update>
+
+	<update id="copyPrjctExcipient" parameterType="dataMap">
+	/* pharmai.formulation.copyPrjctExcipient */
+	INSERT INTO TB_FORMULA_EXCIPIENT
+	(STP_02_SEQ
+	, PRJCT_ID
+	, CHECK_YN
+	, EXCIPIENT_NM
+	, USE_YN
+	, REGIST_NO
+	, REGIST_DT
+	)
+	SELECT
+	STP_02_SEQ
+	, #{new_prjct_id} AS PRJCT_ID
+	, CHECK_YN
+	, EXCIPIENT_NM
+	, 'Y'
+	, #{ss_user_no}
+	, NOW()
+	FROM TB_FORMULA_EXCIPIENT
+	WHERE PRJCT_ID = #{c_prjct_id}
+	AND USE_YN = 'Y'
+	</update>
+	<!-- 프로젝트 복사 종료  -->
+
+
+	<insert id="insertFormulaStp_04" parameterType="dataMap">
+	/* pharmai.formulation.insertFormulaStp_04 */
+	INSERT INTO TB_FORMULA_STP_04 (PRJCT_ID, CHECK_YN, CQA_NM, USE_YN, REGIST_NO, REGIST_DT)
+	VALUES (#{prjct_id}, #{check_yn}, #{cqa_nm}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<select id="selectDosage_Form_type" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectDosage_Form_type */
+	SELECT
+		DOSAGE_FORM_TYPE
+	FROM  TB_FORMULA_STP_02
+	WHERE PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectListFormulaStp_04" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectListFormulaStp_04 */
+	SELECT
+		PRJCT_ID
+		, CHECK_YN
+		, CQA_NM
+		, USE_YN
+		, REGIST_NO
+		, REGIST_DT
+	FROM
+	TB_FORMULA_STP_04
+	WHERE 1=1
+	AND USE_YN = 'Y'
+	AND PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	</select>
+
+
+	<select id="selectStp02" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectStp02 */
+	SELECT
+		A.RETURN_SMILE_STRING,
+		B.DOSAGE_FORM_TYPE,
+		B.VOLUME,
+		B.UNIT,
+		B.STP_02_SEQ
+	FROM TB_FORMULA_STP_01 A
+	INNER JOIN TB_FORMULA_STP_02 B ON A.PRJCT_ID = B.PRJCT_ID
+	WHERE A.PRJCT_ID = #{prjct_id}
+		AND A.USE_YN = 'Y'
+		AND B.USE_YN = 'Y'
+	</select>
+
+	<select id="selectStp03" parameterType="dataMap" resultType="dataMap" >
+	/* pharmai.formulation.selectStp03 */
+	SELECT
+		STP_03_SEQ,
+		PRJCT_ID,
+		SORT_ORDR,
+		CHECK_YN,
+		EXCIPIENT,
+		KIND,
+		MAXIMUM,
+		UNIT,
+		USE_RANGE_S,
+		USE_RANGE_E,
+		IPT_USE_RANGE_S,
+		IPT_USE_RANGE_E,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	FROM TB_FORMULA_STP_03
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<update id="projectNmUpdate" parameterType="dataMap">
+	/* pharmai.formulation.projectNmUpdate */
+		UPDATE TB_PRJ_MST
+	 	SET PRJCT_NM = #{projectName, jdbcType=VARCHAR},
+	 	UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR},
+	 	UPDT_DT = NOW()
+	 	WHERE PRJCT_ID = #{prjct_id, jdbcType=VARCHAR}
+	</update>
+
+
+	<insert id="insertFormulaStp_05" parameterType="dataMap">
+	/* pharmai.formulation.insertFormulaStp_05 */
+	INSERT INTO TB_FORMULA_STP_05
+	(
+		PRJCT_ID
+		, SORT_ORDR
+		, C1
+		, C2
+		, C3
+		, C4
+		, C5
+		, C6
+		, C7
+		, C8
+		, C9
+		, C10
+		, C11
+		, C12
+		, C13
+		, USE_YN
+		, REGIST_NO
+		, REGIST_DT
+	)
+
+	VALUES
+	(
+		#{prjct_id}
+		, #{sort_ordr}
+		, #{c1}
+		, #{c2}
+		, #{c3}
+		, #{c4}
+		, #{c5}
+		, #{c6}
+		, #{c7}
+		, #{c8}
+		, #{c9}
+		, #{c10}
+		, #{c11}
+		, #{c12}
+		, #{c13}
+		, 'Y'
+		, #{ss_user_no}
+		, NOW()
+	)
+	</insert>
+
+
+	<select id="selectListFormulaStp_03" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectListFormulaStp_03 */
+	SELECT
+		PRJCT_ID
+		, SORT_ORDR
+		, CHECK_YN
+		, EXCIPIENT
+		, KIND
+		, MAXIMUM
+		, UNIT
+		, USE_RANGE_S
+		, USE_RANGE_E
+		, IPT_USE_RANGE_S
+		, IPT_USE_RANGE_E
+		, USE_YN
+		, REGIST_NO
+		, REGIST_DT
+	FROM
+	TB_FORMULA_STP_03
+	WHERE 1=1
+	AND USE_YN = 'Y'
+	AND CHECK_YN = 'Y'
+	AND PRJCT_ID = #{prjct_id}
+	</select>
+
+	<select id="selectListFormulaStp_05" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectListFormulaStp_05 */
+	SELECT
+		STP_05_SEQ
+		, PRJCT_ID
+		, SORT_ORDR
+		, IFNULL(C1, 'NULL') AS C1
+		, IFNULL(C2, 'NULL') AS C2
+		, IFNULL(C3, 'NULL') AS C3
+		, IFNULL(C4, 'NULL') AS C4
+		, IFNULL(C5, 'NULL') AS C5
+		, IFNULL(C6, 'NULL') AS C6
+		, IFNULL(C7, 'NULL') AS C7
+		, IFNULL(C8, 'NULL') AS C8
+		, IFNULL(C9, 'NULL') AS C9
+		, IFNULL(C10, 'NULL') AS C10
+		, IFNULL(C11, 'NULL') AS C11
+		, IFNULL(C12, 'NULL') AS C12
+		, IFNULL(C13, 'NULL') AS C13
+		, USE_YN
+		, REGIST_NO
+		, REGIST_DT
+	FROM TB_FORMULA_STP_05
+	WHERE PRJCT_ID = #{prjct_id}
+	 	AND USE_YN = 'Y'
+	ORDER BY STP_05_SEQ
+	</select>
+
+	<select id="selectStp5ColumnCount" parameterType="dataMap" resultType="int">
+	/* pharmai.formulation.selectStp5ColumnCount */
+	SELECT COUNT(*)
+	FROM information_schema.columns
+	WHERE table_name='TB_FORMULA_STP_05'
+	</select>
+
+	<select id="selectStp3TotYn" parameterType="dataMap" resultType="int">
+	/* pharmai.formulation.selectStp3TotYn */
+	SELECT COUNT(CHECK_YN) FROM TB_FORMULA_STP_03
+	WHERE PRJCT_ID = #{prjct_id}
+	AND CHECK_YN = "Y"
+	AND USE_YN = "Y"
+	</select>
+
+	<update id="prjStepChange" parameterType="dataMap">
+	/* pharmai.formulation.prjStepChange */
+	UPDATE TB_PJR_MST SET
+		STEP_CD = #{step_cd]
+	WHERE PRJCT_ID = #{prjct_id}
+
+	</update>
+
+
+	<update id="updateMstStep" parameterType="dataMap">
+	/* pharmai.formulation.updateMstStep */
+	UPDATE TB_PRJ_MST SET
+		STEP_CD = #{step_cd}
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<update id="updateUseYnStep01" parameterType="dataMap">
+	/* pharmai.formulation.updateUseYnStep01 */
+		UPDATE TB_FORMULA_STP_01 SET
+			USE_YN = 'N',
+			UPDUSR_NO = #{ss_user_no},
+			UPDT_DT = NOW()
+		WHERE PRJCT_ID = #{prjct_id}
+
+	</update>
+
+	<update id="updateUseYnStep01Prop" parameterType="dataMap">
+	/* pharmai.formulation.updateUseYnStep01Prop */
+		UPDATE TB_FORMULA_PROP SET
+			USE_YN = 'N',
+			UPDUSR_NO = #{ss_user_no},
+			UPDT_DT = NOW()
+		WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<update id="updateUseYnStep01PropDtl" parameterType="dataMap">
+	/* pharmai.formulation.updateUseYnStep01PropDtl */
+		UPDATE TB_FORMULA_PROP_DTL SET
+			USE_YN = 'N',
+			UPDUSR_NO = #{ss_user_no},
+			UPDT_DT = NOW()
+		WHERE PRJCT_ID = #{prjct_id}
+
+	</update>
+
+	<update id="updateUseYnStep01Dosage" parameterType="dataMap">
+	/* pharmai.formulation.updateUseYnStep01Dosage */
+		UPDATE TB_FORMULA_DOSAGE SET
+			USE_YN = 'N',
+			UPDUSR_NO = #{ss_user_no},
+			UPDT_DT = NOW()
+		WHERE PRJCT_ID = #{prjct_id}
+
+	</update>
+
+	<update id="updateUseYnFormulaStp02" parameterType="dataMap">
+	/* pharmai.formulation.updateUseYnFormulaStp02 */
+		UPDATE TB_FORMULA_STP_02 SET
+			USE_YN = 'N',
+			UPDUSR_NO = #{ss_user_no},
+			UPDT_DT = NOW()
+		WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+
+	<update id="updateUseYnExcipient" parameterType="dataMap">
+	/* pharmai.formulation.updateUseYnExcipient */
+		UPDATE TB_FORMULA_EXCIPIENT SET
+			USE_YN = 'N',
+			UPDUSR_NO = #{ss_user_no},
+			UPDT_DT = NOW()
+		WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+
+	<update id="updateUseYnStep3" parameterType="dataMap">
+	/* pharmai.formulation.updateUseYnStep3 */
+		UPDATE TB_FORMULA_STP_03 SET
+			USE_YN = 'N',
+			UPDUSR_NO =#{ss_user_no},
+			UPDT_DT = NOW()
+		WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<update id="updateUseYnFormulaStp_04" parameterType="dataMap">
+	/* pharmai.formulation.updateUseYnFormulaStp_04 */
+	UPDATE TB_FORMULA_STP_04 SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<update id="updateUseYnFormulaStp_05" parameterType="dataMap">
+	/* pharmai.formulation.updateUseYnFormulaStp_05 */
+	UPDATE TB_FORMULA_STP_05 SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<select id="selectFileData" parameterType="dataMap" resultType="dataMap">
+	/*pharmai.formulation.selectFileData */
+	SELECT
+		FILE_ID
+		, DOC_ID
+		, FILE_NM
+		, FILE_SIZE
+		, FILE_EXTSN_NM AS FILE_EXT_NM
+		, FILE_PARTN_COURS AS FILE_RLTV_PATH
+		, FILE_ABSLT_COURS AS FILE_ASLT_PATH
+		, CNTNTS_TY AS CONTENT_TYPE
+		, SORT_ORDR AS SRT_ORD
+		, REGISTER_NO AS RGSTP_ID
+		, REGIST_DT AS RGST_DTTM
+	FROM TB_FILE
+	WHERE DOC_ID = #{doc_id, jdbcType=VARCHAR}
+
+	</select>
+
+
+	<select id="stepChangeFunc" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.stepChangeFunc */
+		SELECT FN_RESET_STEP(#{prjct_id}, #{status}, #{ss_user_no}) AS RSLT
+	</select>
+
+	<update id="updatePrjMst" parameterType="dataMap">
+	/* pharmai.formulation.updatePrjMst */
+		UPDATE tb_prj_mst SET
+			USE_YN = 'N',
+			UPDUSR_NO = #{ss_user_no},
+			UPDT_DT = NOW()
+		WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<insert id="insertStep6Graph" parameterType="dataMap">
+	/* pharmai.formulation.insertStep6Graph */
+	INSERT INTO tb_formula_stp_06_graph (
+		PRJCT_ID,
+		PRETO_PATH_1,
+		PRETO_PATH_2,
+		PRETO_PATH_3,
+		PRETO_PATH_4,
+		PRETO_PATH_5,
+		CONTOUR_PATH_1,
+		CONTOUR_PATH_2,
+		CONTOUR_PATH_3,
+		CONTOUR_PATH_4,
+		CONTOUR_PATH_5,
+		CONTOUR_PATH_6,
+		CONTOUR_PATH_7,
+		CONTOUR_PATH_8,
+		CONTOUR_PATH_9,
+		CONTOUR_PATH_10,
+		CONTOUR_PATH_11,
+		CONTOUR_PATH_12,
+		CONTOUR_PATH_13,
+		CONTOUR_PATH_14,
+		CONTOUR_PATH_15,
+		RESPONSE_PATH_1,
+		RESPONSE_PATH_2,
+		RESPONSE_PATH_3,
+		RESPONSE_PATH_4,
+		RESPONSE_PATH_5,
+		RESPONSE_PATH_6,
+		RESPONSE_PATH_7,
+		RESPONSE_PATH_8,
+		RESPONSE_PATH_9,
+		RESPONSE_PATH_10,
+		RESPONSE_PATH_11,
+		RESPONSE_PATH_12,
+		RESPONSE_PATH_13,
+		RESPONSE_PATH_14,
+		RESPONSE_PATH_15,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) VALUES (
+		#{prjct_id},
+		#{preto_path_1},
+		#{preto_path_2},
+		#{preto_path_3},
+		#{preto_path_4},
+		#{preto_path_5},
+		#{contour_path_1},
+		#{contour_path_2},
+		#{contour_path_3},
+		#{contour_path_4},
+		#{contour_path_5},
+		#{contour_path_6},
+		#{contour_path_7},
+		#{contour_path_8},
+		#{contour_path_9},
+		#{contour_path_10},
+		#{contour_path_11},
+		#{contour_path_12},
+		#{contour_path_13},
+		#{contour_path_14},
+		#{contour_path_15},
+		#{response_path_1},
+		#{response_path_2},
+		#{response_path_3},
+		#{response_path_4},
+		#{response_path_5},
+		#{response_path_6},
+		#{response_path_7},
+		#{response_path_8},
+		#{response_path_9},
+		#{response_path_10},
+		#{response_path_11},
+		#{response_path_12},
+		#{response_path_13},
+		#{response_path_14},
+		#{response_path_15},
+		'Y',
+		#{ss_user_no},
+		NOW())
+
+	</insert>
+
+	<select id="selectStep6Graph_preto" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectStep6Graph_preto */
+	SELECT
+		RSLT_GRAPH_SEQ,
+		PRJCT_ID,
+		PRETO_PATH_1,
+		PRETO_PATH_2,
+		PRETO_PATH_3,
+		PRETO_PATH_4,
+		PRETO_PATH_5,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	FROM TB_FORMULA_STP_06_GRAPH
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectStep6Graph_contour" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectStep6Graph_contour */
+	SELECT
+		RSLT_GRAPH_SEQ,
+		PRJCT_ID,
+		CONTOUR_PATH_1,
+		CONTOUR_PATH_2,
+		CONTOUR_PATH_3,
+		CONTOUR_PATH_4,
+		CONTOUR_PATH_5,
+		CONTOUR_PATH_6,
+		CONTOUR_PATH_7,
+		CONTOUR_PATH_8,
+		CONTOUR_PATH_9,
+		CONTOUR_PATH_10,
+		CONTOUR_PATH_11,
+		CONTOUR_PATH_12,
+		CONTOUR_PATH_13,
+		CONTOUR_PATH_14,
+		CONTOUR_PATH_15,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	FROM TB_FORMULA_STP_06_GRAPH
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectStep6Graph_response" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectStep6Graph_response */
+	SELECT
+		RSLT_GRAPH_SEQ,
+		PRJCT_ID,
+		RESPONSE_PATH_1,
+		RESPONSE_PATH_2,
+		RESPONSE_PATH_3,
+		RESPONSE_PATH_4,
+		RESPONSE_PATH_5,
+		RESPONSE_PATH_6,
+		RESPONSE_PATH_7,
+		RESPONSE_PATH_8,
+		RESPONSE_PATH_9,
+		RESPONSE_PATH_10,
+		RESPONSE_PATH_11,
+		RESPONSE_PATH_12,
+		RESPONSE_PATH_13,
+		RESPONSE_PATH_14,
+		RESPONSE_PATH_15,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	FROM TB_FORMULA_STP_06_GRAPH
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<update id="updatePjt_mst" parameterType="dataMap">
+	/* pharmai.formulation.updatePjt_mst */
+	UPDATE TB_PRJ_MST
+	SET	UPDUSR_NO = #{ss_user_no, jdbcType=VARCHAR}
+		, UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<insert id="insertStp07Design" parameterType="dataMap">
+	/* pharmai.formulation.insertStp07Design */
+	INSERT INTO TB_FORMULA_STP_07_DESIGN (PRJCT_ID, Y_VARIABLE, EFFECT, IPT_START_Y, IPT_END_Y, USE_YN, REGIST_NO, REGIST_DT)
+	VALUES (#{prjct_id}, #{y_variable}, #{effect}, #{ipt_start_y}, #{ipt_end_y}, 'Y', #{ss_user_no}, NOW())
+	</insert>
+
+	<insert id="insertStp07DesignImg" parameterType="dataMap">
+	/* pharmai.formulation.insertStp07DesignImg */
+	INSERT INTO TB_FORMULA_STP_07_DESIGN_IMG (
+		PRJCT_ID,
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3,
+		USE_YN, REGIST_NO,
+		REGIST_DT
+	) VALUES (
+		#{prjct_id},
+		#{design_img_path_1},
+		#{design_img_path_2},
+		#{design_img_path_3},
+		'Y',
+		#{ss_user_no},
+		NOW()
+	)
+	</insert>
+
+
+	<update id="updateStp07Design" parameterType="dataMap">
+	/* pharmai.formulation.updateStp07Design */
+	UPDATE TB_FORMULA_STP_07_DESIGN SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+
+	</update>
+
+	<update id="updateStp07DesignImg" parameterType="dataMap">
+	/* pharmai.formulation.updateStp07DesignImg */
+	UPDATE TB_FORMULA_STP_07_DESIGN_IMG SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<select id="selectStep6Design" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectStep6Design */
+	SELECT
+		PRJCT_ID,
+		Y_VARIABLE,
+		EFFECT,
+		IPT_START_Y,
+		IPT_END_Y,
+		USE_YN
+	FROM TB_FORMULA_STP_07_DESIGN
+	WHERE PRJCT_ID = #{prjct_id}
+	 	AND USE_YN = 'Y'
+	ORDER BY DESIGN_SEQ
+	</select>
+
+	<select id="selectStep6Design_img" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectStep6Design_img */
+	SELECT
+		PRJCT_ID,
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	FROM TB_FORMULA_STP_07_DESIGN_IMG
+	WHERE PRJCT_ID = #{prjct_id}
+		AND USE_YN = 'Y'
+	</select>
+
+	<insert id="insertStp07result" parameterType="dataMap">
+	/* pharmai.formulation.insertStp07result */
+	INSERT INTO tb_formula_stp_07_result (
+		PRJCT_ID,
+		EXCIPENT_NM,
+		EXCIPENT_MIN,
+		EXCIPENT_MAX,
+		CONTROL_SPACE_MIN,
+		CONTROL_SPACE_MAX,
+		DESIGN_SPACE_MIN,
+		DESIGN_SPACE_MAX,
+		KNOWLEDGE_SPACE_MIN,
+		KNOWLEDGE_SPACE_MAX,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) VALUES (
+		#{prjct_id},
+		#{excipent_nm},
+		#{excipent_min},
+		#{excipent_max},
+		#{control_space_min},
+		#{control_space_max},
+		#{design_space_min},
+		#{design_space_max},
+		#{knowledge_space_min},
+		#{knowledge_space_max},
+		'Y',
+		#{ss_user_no},
+		NOW()
+	)
+
+	</insert>
+
+
+	<insert id="insertStp07resultImg" parameterType="dataMap">
+	/* pharmai.formulation.insertStp07resultImg */
+	INSERT INTO TB_FORMULA_STP_07_RESULT_IMG (
+		PRJCT_ID,
+		DESIGN_IMG_PATH_1,
+		DESIGN_IMG_PATH_2,
+		DESIGN_IMG_PATH_3,
+		CONTOUR_IMG_PATH_1,
+		CONTOUR_IMG_PATH_2,
+		CONTOUR_IMG_PATH_3,
+		CONTOUR_IMG_PATH_4,
+		CONTOUR_IMG_PATH_5,
+		CONTOUR_IMG_PATH_6,
+		CONTOUR_IMG_PATH_7,
+		CONTOUR_IMG_PATH_8,
+		CONTOUR_IMG_PATH_9,
+		CONTOUR_IMG_PATH_10,
+		CONTOUR_IMG_PATH_11,
+		CONTOUR_IMG_PATH_12,
+		CONTOUR_IMG_PATH_13,
+		CONTOUR_IMG_PATH_14,
+		CONTOUR_IMG_PATH_15,
+		CONTOUR_IMG_PATH_16,
+		CONTOUR_IMG_PATH_17,
+		CONTOUR_IMG_PATH_18,
+		USE_YN,
+		REGIST_NO,
+		REGIST_DT
+	) VALUES (
+		#{prjct_id},
+		#{design_img_path_1},
+		#{design_img_path_2},
+		#{design_img_path_3},
+		#{contour_img_path_1},
+		#{contour_img_path_2},
+		#{contour_img_path_3},
+		#{contour_img_path_4},
+		#{contour_img_path_5},
+		#{contour_img_path_6},
+		#{contour_img_path_7},
+		#{contour_img_path_8},
+		#{contour_img_path_9},
+		#{contour_img_path_10},
+		#{contour_img_path_11},
+		#{contour_img_path_12},
+		#{contour_img_path_13},
+		#{contour_img_path_14},
+		#{contour_img_path_15},
+		#{contour_img_path_16},
+		#{contour_img_path_17},
+		#{contour_img_path_18},
+		'Y',
+		#{ss_user_no},
+		NOW()
+	)
+
+	</insert>
+
+	<update id="updateStp07result" parameterType="dataMap">
+	/* pharmai.formulation.updateStp07result */
+	UPDATE TB_FORMULA_STP_07_RESULT SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<update id="updateStp07resultImg" parameterType="dataMap">
+	/* pharmai.formulation.updateStp07resultImg */
+	UPDATE TB_FORMULA_STP_07_RESULT_IMG SET
+		USE_YN = 'N',
+		UPDUSR_NO = #{ss_user_no},
+		UPDT_DT = NOW()
+	WHERE PRJCT_ID = #{prjct_id}
+	</update>
+
+	<select id="selectListFormulaStp_06" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectListFormulaStp_06 */
+	SELECT
+		DESIGN_SEQ,
+		PRJCT_ID,
+		EFFECT,
+		IPT_START_Y,
+		IPT_END_Y,
+		USE_YN
+	FROM TB_FORMULA_STP_07_DESIGN
+	WHERE USE_YN='Y' AND PRJCT_ID = #{prjct_id}
+	ORDER BY DESIGN_SEQ
+	</select>
+
+
+	<select id="selectStp07result" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectStp07result */
+	SELECT
+		RESULT_SEQ,
+		PRJCT_ID,
+		EXCIPENT_NM,
+		EXCIPENT_MIN,
+		EXCIPENT_MAX,
+		CONTROL_SPACE_MIN,
+		CONTROL_SPACE_MAX,
+		DESIGN_SPACE_MIN,
+		DESIGN_SPACE_MAX,
+		KNOWLEDGE_SPACE_MIN,
+		KNOWLEDGE_SPACE_MAX
+	FROM TB_FORMULA_STP_07_RESULT
+	WHERE PRJCT_ID = #{prjct_id} AND USE_YN = 'Y'
+	</select>
+
+	<select id="selectStp07resultImg" parameterType="dataMap" resultType="dataMap">
+	/* pharmai.formulation.selectStp07resultImg */
+	SELECT
+		 RESULT_IMG_SEQ,
+		 PRJCT_ID,
+		 DESIGN_IMG_PATH_1,
+		 DESIGN_IMG_PATH_2,
+		 DESIGN_IMG_PATH_3,
+		 CONTOUR_IMG_PATH_1,
+		 CONTOUR_IMG_PATH_2,
+		 CONTOUR_IMG_PATH_3,
+		 CONTOUR_IMG_PATH_4,
+		 CONTOUR_IMG_PATH_5,
+		 CONTOUR_IMG_PATH_6,
+		 CONTOUR_IMG_PATH_7,
+		 CONTOUR_IMG_PATH_8,
+		 CONTOUR_IMG_PATH_9,
+		 CONTOUR_IMG_PATH_10,
+		 CONTOUR_IMG_PATH_11,
+		 CONTOUR_IMG_PATH_12,
+		 CONTOUR_IMG_PATH_13,
+		 CONTOUR_IMG_PATH_14,
+		 CONTOUR_IMG_PATH_15,
+		 CONTOUR_IMG_PATH_16,
+		 CONTOUR_IMG_PATH_17,
+		 CONTOUR_IMG_PATH_18
+	FROM TB_FORMULA_STP_07_RESULT_IMG
+	WHERE PRJCT_ID = #{prjct_id} AND USE_YN = 'Y'
+	</select>
+
+
+
+
+
+</mapper>
+
+
+
